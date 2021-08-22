@@ -28,24 +28,6 @@ TEST_BOT                = False
 #
 class EverquestLogFile():
 
-    # list of targets which this log file watches for
-    target_list = [
-        'Verina Tomb',
-        'Vessel Drozlin',
-        'Dain Frostreaver IV'
-        ]
-
-    # list of regular expressions matching log files indicating the 'target' is spawned and active
-    trigger_list = [
-        '^(?P<target>[\w ]+)\'s body pulses with mystic fortitude',
-        '^(?P<target>[\w ]+) is cloaked in a shimmer of glowing symbols',
-        '^(?P<target>[\w ]+) begins to cast a spell',
-        '^(?P<target>[\w ]+) engages (?P<playername>[\w ]+)!',
-        '^(?P<target>[\w ]+) has been slain',
-        '^(?P<target>[\w ]+) says'
-        ]
-
-
     #
     # ctor
     #
@@ -118,22 +100,6 @@ class EverquestLogFile():
         else:
             return None
 
-    # regex match?
-    def regex_match(self, line):
-        # cut off the leading date-time stamp info
-        trunc_line = line[27:]
-
-        # walk thru the target list and trigger list and see if we have any match
-        for target in self.target_list:
-            for trigger in self.trigger_list:
-                # return value m is either None of an object with information about the RE search
-                m = re.match(trigger, trunc_line)
-                if (m) and (m.group('target') == target):
-                    return m.group('target')
-
-        # only executes if loops did not return already
-        return None
-
 
 # create the global instance of the log file class
 elf     = EverquestLogFile()
@@ -159,13 +125,8 @@ async def parse():
             elf.prevtime = now
             print(line, end = '')
 
-            # does it match a trigger?
-            target = elf.regex_match(line)
-            if target:
+            # process this line
 
-                # sound the alarm
-                await client.alarm(elf.ctx, '@everyone {} Spawn!!'.format(target))
-                await client.alarm(elf.ctx, '{} [{}]'.format(line, elf.current_tzname))
 
         else:
             # check the heartbeat.  Has our tracker gone silent?
@@ -188,21 +149,32 @@ class myClient(commands.Bot):
     def __init__(self):
         commands.Bot.__init__(self, command_prefix = myconfig.BOT_COMMAND_PREFIX)
 
-    # sound the alarm
-    async def alarm(self, ctx, msg):
+    # sound the alert
+    async def alert(self, ctx, msg):
 
-        # try to find the #pop channels
+        # try to find the #alert channels
         if ctx.guild.name == myconfig.PERSONAL_SERVER_NAME:
-            pop_channel = client.get_channel(myconfig.PERSONAL_SERVER_POPID)
-            await pop_channel.send(msg)
+            special_channel = client.get_channel(myconfig.PERSONAL_SERVER_ALERTID)
+            await special_channel.send(msg)
 
-        elif ctx.guild.name == myconfig.SNEK_SERVER_NAME:
-            pop_channel = client.get_channel(myconfig.SNEK_SERVER_POPID)
-            await pop_channel.send(msg)
-
-        # if we didn't find the #pop channel for whatever reason, just bang it to current channel
+        # if we didn't find the desired channel for whatever reason, just bang it to current channel
         else:
             await ctx.send(msg)
+
+
+    # notify of pop
+    async def pop(self, ctx, msg):
+
+        # try to find the #alert channels
+        if ctx.guild.name == myconfig.PERSONAL_SERVER_NAME:
+            special_channel = client.get_channel(myconfig.PERSONAL_SERVER_POPID)
+            await special_channel.send(msg)
+
+
+        # if we didn't find the desired channel for whatever reason, just bang it to current channel
+        else:
+            await ctx.send(msg)
+
 
 
 # create the global instance of the client that manages communication to the discord bot
@@ -218,7 +190,7 @@ client  = myClient()
 # on_ready
 @client.event
 async def on_ready():
-    print('Spawn Tracker 2000 is alive!')
+    print('EQ Valet is alive!')
     print('Discord.py version: {}'.format(discord.__version__))
 
     print('Logged on as {}!'.format(client.user))
@@ -248,27 +220,11 @@ async def ping(ctx):
 
 # firedrill command
 # test the ability to send a message to the #pop channel
-@client.command(aliases = ['fd', '911'])
+@client.command(aliases = ['fd'])
 async def firedrill(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
-    await client.alarm(ctx, 'This is a test.  This is only a test.')
-
-
-
-# show all the triggers being monitored
-@client.command()
-async def triggers(ctx):
-    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
-
-    # list all the target mobs
-    await ctx.send('*Target Mobs:*')
-    for target in elf.target_list:
-        await ctx.send('|        {}'.format(target))
-
-    # list all the triggers
-    await ctx.send('*Triggers:*')
-    for trigger in elf.trigger_list:
-        await ctx.send('|        {}'.format(trigger))
+    await client.alert(ctx, 'This is a test.  This is only a test.')
+    await client.pop(ctx, 'This is a test.  This is only a test.')
 
 
 
