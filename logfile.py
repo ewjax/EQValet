@@ -18,7 +18,7 @@ import myconfig
 #
 # class to encapsulate log file operations
 #
-class EverquestLogFile():
+class EverquestLogFile:
 
     #
     # ctor
@@ -36,7 +36,6 @@ class EverquestLogFile():
         self.parsing        = threading.Event()
         self.parsing.clear()
 
-        self.ctx            = None
         self.author         = ''
 
         self.prevtime       = time.time()
