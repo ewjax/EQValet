@@ -10,8 +10,9 @@ from discord.ext import commands
 
 # import the customized settings and file locations etc, found in myconfig.py
 import myconfig
-import logfile
 import randoms
+import gvar
+
 
 
 
@@ -23,8 +24,6 @@ TEST_BOT                = False
 
 
 
-# create a global instance of the log file reader class
-elf = logfile.EverquestLogFile()
 
 
 
@@ -43,13 +42,13 @@ class SmartBuffer:
     # ctor
     def __init__(self):
 
-        self.bufflist           = list()
+        self._bufflist           = list()
         self._working_buffer    = ''
 
     def add(self, string):
         # would the new string make the buffer too long?
         if ( len(self._working_buffer) + len(string) ) > 1950:
-             self.bufflist.append(self._working_buffer)
+             self._bufflist.append(self._working_buffer)
              self._working_buffer = ''
 
         self._working_buffer += string
@@ -57,10 +56,10 @@ class SmartBuffer:
     def get_bufflist(self):
         # add any content currently in the working buffer to the list
         if self._working_buffer != '':
-            self.bufflist.append(self._working_buffer)
+            self._bufflist.append(self._working_buffer)
 
         # return the list of buffers
-        return self.bufflist
+        return self._bufflist
 
 
 
@@ -81,82 +80,19 @@ class EQValetClient(commands.Bot):
         # save the ctx for later
         self.ctx                = None
 
-        # list of all random rolls, and all RandomEvents
-        self.all_rolls          = list()
-        self.all_random_events  = list()
+        # use a RandomTracker class to deal with all things random numbers and rolls
+        self.random_tracker     = randoms.RandomTracker()
 
 
     # process each line
-    async def process_line(self, line):
+    async def process_line(self, ctx, line):
         print(line, end = '')
 
         # check if a random has started
-        await self.check4_random(line)
+        await self.random_tracker.process_line(ctx, line)
 
         # do other parsing things here
         pass
-
-
-
-
-    # check if a random is occurring
-    async def check4_random(self, line):
-
-        # begin by checking if any of the RandomEvents is due to expire
-        for (ndx, rev) in enumerate(self.all_random_events):
-            if (rev.expired == False):
-                toggled = rev.check_expiration(line)
-                if toggled:
-                    await self.ctx.send('{}'.format(rev.report_summary(ndx, elf.char_name)))
-
-
-        # cut off the leading date-time stamp info
-        trunc_line = line[27:]
-        target1 = '\*\*A Magic Die is rolled by (?P<playername>[\w ]+)\.'
-        target2 = '\*\*It could have been any number from (?P<low>[0-9]+) to (?P<high>[0-9]+), but this time it turned up a (?P<value>[0-9]+)\.'
-
-        # return value m is either None of an object with information about the RE search
-        m = re.match(target1, trunc_line)
-        if (m):
-
-            # fetch the player name
-            player = m.group('playername')
-
-            # get next line
-            line = elf.readline()
-            print(line, end = '')
-            trunc_line = line[27:]
-
-            # fetch the low, high, and value numbers
-            m = re.match(target2, trunc_line)
-            if (m):
-                low     = m.group('low')
-                high    = m.group('high')
-                value   = m.group('value')
-
-                # create the roll object
-                roll = randoms.PlayerRandomRoll(player, value, low, high, line)
-#                print(roll)
-
-                # add it to the list of all rolls
-                self.all_rolls.append(roll)
-
-                added = False
-                # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
-                for rev in self.all_random_events:
-                    if (rev.expired == False):
-                        if (rev.add_roll(roll)):
-                            added = True
-                            break
-
-                # if the roll wasn't added, create a new RandomEvent to hold this one
-                if (added == False):
-                    rev = randoms.RandomEvent(low, high)
-                    rev.add_roll(roll)
-                    self.all_random_events.append(rev)
-
-
-
 
 
     # sound the alert
@@ -187,10 +123,11 @@ class EQValetClient(commands.Bot):
 
 
 
-# create the global instance of the client that manages communication to the discord bot
-client = EQValetClient()
 
 #################################################################################################
+
+# create the global instance of the client that manages communication to the discord bot
+client = EQValetClient()
 
 
 #
@@ -238,12 +175,12 @@ async def rolls(ctx):
     sb = SmartBuffer()
 
     # add total rolls, and total random events
-    sb.add('Total Rolls = {}\n'.format(len(client.all_rolls)))
-    sb.add('Total Random Events = {}\n'.format(len(client.all_random_events)))
+    sb.add('Total Rolls = {}\n'.format(len(client.random_tracker.all_rolls)))
+    sb.add('Total Random Events = {}\n'.format(len(client.random_tracker.all_random_events)))
 
     # add the list of random events
-    for (ndx, rev) in enumerate(client.all_random_events):
-        sb.add('{}'.format(rev.report_summary(ndx, elf.char_name)))
+    for (ndx, rev) in enumerate(client.random_tracker.all_random_events):
+        sb.add('{}'.format(rev.report_summary(ndx, gvar.elf.char_name)))
 
     # get the list of buffers and send each to discord
     bufflist = sb.get_bufflist()
@@ -260,11 +197,11 @@ async def show(ctx, ndx = -1):
 
     # if the ndx value isn't specified, default to showing the last randomevent
     if ndx == -1:
-        ndx = len(client.all_random_events) - 1
+        ndx = len(client.random_tracker.all_random_events) - 1
 
     # is ndx in range
-    if ((ndx >= 0) and (ndx < len(client.all_random_events))):
-        rev = client.all_random_events[ndx]
+    if ((ndx >= 0) and (ndx < len(client.random_tracker.all_random_events))):
+        rev = client.random_tracker.all_random_events[ndx]
 
         # create a smart buffer to keep buffers under max size for discord messages (2000)
         sb = SmartBuffer()
@@ -285,7 +222,7 @@ async def show(ctx, ndx = -1):
             await ctx.send('{}'.format(b))
 
     else:
-        await ctx.send('Requested random event ndx value is out of range.  Must be between 0 and {}'.format(len(client.all_random_events)-1))
+        await ctx.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.random_tracker.all_random_events)-1))
         await ctx.send('Unspecified ndx value = shows most recent random event')
 
 
@@ -297,73 +234,17 @@ async def regroup(ctx, ndx = -1, new_window = 0):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # is ndx in range
-    if (len(client.all_random_events) == 0):
+    if (len(client.random_tracker.all_random_events) == 0):
         await ctx.send('Error:  No RandomEvents to regroup!')
 
-    elif ( (ndx < 0) or (ndx >= len(client.all_random_events)) ):
-        await ctx.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.all_random_events)-1))
+    elif ( (ndx < 0) or (ndx >= len(client.random_tracker.all_random_events)) ):
+        await ctx.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.random_tracker.all_random_events)-1))
 
     elif (new_window <= 0):
         await ctx.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
 
     else:
-        # grab the requested random event, and restore it to time-ascending order
-        old_rev = client.all_random_events.pop(ndx)
-
-        low     = old_rev.low
-        high    = old_rev.high
-        rolls   = old_rev.rolls
-
-        # is the new, larger window overlapping into the next random event(s)?
-        if (new_window > old_rev.delta_seconds):
-            processing = True
-            while processing:
-                processing = False
-                if (ndx < len(client.all_random_events)):
-                    next_rev = client.all_random_events[ndx]
-                    # get delta t
-                    delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
-                    delta = delta_seconds.total_seconds()
-                    # does next random event and is within new time window?
-                    if ( (low == next_rev.low) and (high == next_rev.high) and (delta <= new_window) ):
-                        # add the next randomm event rolls to the list of rolls to be sorted / readded
-                        rolls += next_rev.rolls
-                        client.all_random_events.pop(ndx)
-                        # we're not done yet
-                        processing = True
-
-        # sort the list of all rolls in time-ascenting order
-        rolls.sort(key = lambda x: x.time_stamp)
-
-        # get all the rolls from the old random event
-        for r in rolls:
-
-            added = False
-            # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
-            for rev in client.all_random_events:
-                if (rev.expired == False):
-                    if (rev.add_roll(r)):
-                        added = True
-                        break
-
-            # if the roll wasn't added, create a new RandomEvent to hold this one
-            if (added == False):
-                rev = randoms.RandomEvent(low, high, new_window)
-                rev.add_roll(r)
-                client.all_random_events.append(rev)
-
-        # sort the event list to restore it to time-ascending order
-        client.all_random_events.sort(key = lambda x: x.start_time_stamp)
-
-        # if not expired yet, these are the random events just added, so close them, sort them, report them
-        for (n, ev) in enumerate(client.all_random_events):
-            if (ev.expired == False):
-                ev.expired = True
-                ev.sort_descending_randoms()
-                await client.ctx.send('{}'.format(ev.report_summary(n, elf.char_name)))
-
-
-
+        await client.random_tracker.regroup(ctx, ndx, new_window)
 
 
 # firedrill command
@@ -382,47 +263,47 @@ async def start(ctx, charname = None):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # already parsing?
-    if elf.is_parsing():
-        await ctx.send('Already parsing character log for: [{}]'.format(elf.char_name))
-        await ctx.send('Log filename: [{}]'.format(elf.filename))
-        await ctx.send('Parsing initiated by: [{}]'.format(elf.author))
+    if gvar.elf.is_parsing():
+        await ctx.send('Already parsing character log for: [{}]'.format(gvar.elf.char_name))
+        await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
+        await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
         
     else:
         # new log file name get passed?
         if charname:
-            elf.char_name = charname
+            gvar.elf.char_name = charname
         else:
-            elf.char_name = myconfig.DEFAULT_CHAR_NAME
-        elf.build_filename()
+            gvar.elf.char_name = myconfig.DEFAULT_CHAR_NAME
+        gvar.elf.build_filename()
 
         # open the log file to be parsed
         # allow for testing, by forcing the bot to read an old log file for the VT and VD fights
         if TEST_BOT == False:
             # start parsing.  The default behavior is to open the log file, and begin reading it from tne end, i.e. only new entries
-            rv = elf.open(ctx.message.author)
+            rv = gvar.elf.open(ctx.message.author)
 
         else:
             # use a back door to force the system to read files from the beginning that contain VD / VT fights to test with
-            elf.filename = 'randoms.txt'
+            gvar.elf.filename = 'randoms.txt'
 
             # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
-            rv = elf.open(ctx.message.author, seek_end = False)
+            rv = gvar.elf.open(ctx.message.author, seek_end = False)
 
 
         # if the log file was successfully opened, then initiate parsing
         if rv:
             # status message
-            await ctx.send('Now parsing character log for: [{}]'.format(elf.char_name))
-            await ctx.send('Log filename: [{}]'.format(elf.filename))
-            await ctx.send('Parsing initiated by: [{}]'.format(elf.author))
-            await ctx.send('Heartbeat timeout (minutes): [{}]'.format(elf.heartbeat))
+            await ctx.send('Now parsing character log for: [{}]'.format(gvar.elf.char_name))
+            await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
+            await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
+            await ctx.send('Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
 
             # create the background processs and kick it off
             client.ctx = ctx
             client.loop.create_task(parse())
         else:
-            await ctx.send('ERROR: Could not open character log file for: [{}]'.format(elf.char_name))
-            await ctx.send('Log filename: [{}]'.format(elf.filename))
+            await ctx.send('ERROR: Could not open character log file for: [{}]'.format(gvar.elf.char_name))
+            await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
 
 
 
@@ -431,15 +312,15 @@ async def start(ctx, charname = None):
 async def stop(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    if elf.is_parsing():
+    if gvar.elf.is_parsing():
 
         # only the person who started the log can close it
-        if elf.author == ctx.message.author:
+        if gvar.elf.author == ctx.message.author:
             # stop parsing
-            elf.close()
-            await ctx.send('Stopped parsing character log for: [{}]'.format(elf.char_name))
+            gvar.elf.close()
+            await ctx.send('Stopped parsing character log for: [{}]'.format(gvar.elf.char_name))
         else:
-            await ctx.send('Error: Parsing can only be stopped by the same person who started it.  Starter: [{}], !stop requestor [{}]'.format(elf.author, ctx.message.author))
+            await ctx.send('Error: Parsing can only be stopped by the same person who started it.  Starter: [{}], !stop requestor [{}]'.format(gvar.elf.author, ctx.message.author))
 
     else:
         await ctx.send('Not currently parsing')
@@ -451,11 +332,11 @@ async def stop(ctx):
 async def status(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    if elf.is_parsing():
-        await ctx.send('Parsing character log for: [{}]'.format(elf.char_name))
-        await ctx.send('Log filename: [{}]'.format(elf.filename))
-        await ctx.send('Parsing initiated by: [{}]'.format(elf.author))
-        await ctx.send('Heartbeat timeout (minutes): [{}]'.format(elf.heartbeat))
+    if gvar.elf.is_parsing():
+        await ctx.send('Parsing character log for: [{}]'.format(gvar.elf.char_name))
+        await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
+        await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
+        await ctx.send('Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
     else:
         await ctx.send('Not currently parsing')
 
@@ -470,24 +351,24 @@ async def parse():
     print('Parsing Started')
 
     # process the log file lines here
-    while elf.is_parsing() == True:
+    while gvar.elf.is_parsing() == True:
 
         # read a line
-        line = elf.readline()
+        line = gvar.elf.readline()
         now = time.time()
         if line:
-            elf.prevtime = now
+            gvar.elf.prevtime = now
 
             # process this line
-            await client.process_line(line)
+            await client.process_line(client.ctx, line)
 
 
         else:
             # check the heartbeat.  Has our tracker gone silent?
-            elapsed_minutes = (now - elf.prevtime)/60.0
-            if elapsed_minutes > elf.heartbeat:
-                elf.prevtime = now
-                await client.ctx.send('Heartbeat Warning:  Tracker [{}] logfile has had no new entries in last {} minutes.  Is {} still online?'.format(elf.char_name, elf.heartbeat, elf.char_name))
+            elapsed_minutes = (now - gvar.elf.prevtime)/60.0
+            if elapsed_minutes > gvar.elf.heartbeat:
+                gvar.elf.prevtime = now
+                await client.ctx.send('Heartbeat Warning:  Tracker [{}] logfile has had no new entries in last {} minutes.  Is {} still online?'.format(gvar.elf.char_name, gvar.elf.heartbeat, gvar.elf.char_name))
 
             await asyncio.sleep(0.1)
 

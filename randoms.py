@@ -1,6 +1,11 @@
 
+
 # import the datetime class from the datetime module
 from datetime import datetime
+import re
+
+import gvar
+
 
 
 #
@@ -185,7 +190,144 @@ class RandomEvent:
 
 
 
+#
+# class to do all the tracking work
+class RandomTracker:
 
+    # ctor
+    def __init__(self):
+
+        # list of all random rolls, and all RandomEvents
+        self.all_rolls          = list()
+        self.all_random_events  = list()
+
+
+    # check if a random is occurring
+    async def process_line(self, ctx, line):
+
+        # begin by checking if any of the RandomEvents is due to expire
+        for (ndx, rev) in enumerate(self.all_random_events):
+            if (rev.expired == False):
+                toggled = rev.check_expiration(line)
+                if toggled:
+                    await ctx.send('{}'.format(rev.report_summary(ndx, gvar.elf.char_name)))
+
+
+        # cut off the leading date-time stamp info
+        trunc_line = line[27:]
+        target1 = '\*\*A Magic Die is rolled by (?P<playername>[\w ]+)\.'
+        target2 = '\*\*It could have been any number from (?P<low>[0-9]+) to (?P<high>[0-9]+), but this time it turned up a (?P<value>[0-9]+)\.'
+
+        # return value m is either None of an object with information about the RE search
+        m = re.match(target1, trunc_line)
+        if (m):
+
+            # fetch the player name
+            player = m.group('playername')
+
+            # get next line
+            line = gvar.elf.readline()
+            print(line, end = '')
+            trunc_line = line[27:]
+
+            # fetch the low, high, and value numbers
+            m = re.match(target2, trunc_line)
+            if (m):
+                low     = m.group('low')
+                high    = m.group('high')
+                value   = m.group('value')
+
+                # create the roll object
+                roll = PlayerRandomRoll(player, value, low, high, line)
+#                print(roll)
+
+                # add it to the list of all rolls
+                self.all_rolls.append(roll)
+
+                added = False
+                # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
+                for rev in self.all_random_events:
+                    if (rev.expired == False):
+                        if (rev.add_roll(roll)):
+                            added = True
+                            break
+
+                # if the roll wasn't added, create a new RandomEvent to hold this one
+                if (added == False):
+                    rev = RandomEvent(low, high)
+                    rev.add_roll(roll)
+                    self.all_random_events.append(rev)
+
+
+    # regroup random events with a new, different window than what the random events currently have
+    async def regroup(self, ctx, ndx = -1, new_window = 0):
+        print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+        # is ndx in range
+        if (len(self.all_random_events) == 0):
+            await ctx.send('Error:  No RandomEvents to regroup!')
+
+        elif ( (ndx < 0) or (ndx >= len(self.all_random_events)) ):
+            await ctx.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events)-1))
+
+        elif (new_window <= 0):
+            await ctx.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+
+        else:
+            # grab the requested random event, and restore it to time-ascending order
+            old_rev = self.all_random_events.pop(ndx)
+
+            low     = old_rev.low
+            high    = old_rev.high
+            rolls   = old_rev.rolls
+
+            # is the new, larger window overlapping into the next random event(s)?
+            if (new_window > old_rev.delta_seconds):
+                processing = True
+                while processing:
+                    processing = False
+                    if (ndx < len(self.all_random_events)):
+                        next_rev = self.all_random_events[ndx]
+                        # get delta t
+                        delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
+                        delta = delta_seconds.total_seconds()
+                        # does next random event and is within new time window?
+                        if ( (low == next_rev.low) and (high == next_rev.high) and (delta <= new_window) ):
+                            # add the next randomm event rolls to the list of rolls to be sorted / readded
+                            rolls += next_rev.rolls
+                            self.all_random_events.pop(ndx)
+                            # we're not done yet
+                            processing = True
+
+            # sort the list of all rolls in time-ascenting order
+            rolls.sort(key = lambda x: x.time_stamp)
+
+            # get all the rolls from the old random event(s)
+            for r in rolls:
+
+                added = False
+                # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
+                for rev in self.all_random_events:
+                    if (rev.expired == False):
+                        if (rev.add_roll(r)):
+                            added = True
+                            break
+
+                # if the roll wasn't added, create a new RandomEvent to hold this one
+                if (added == False):
+                    rev = RandomEvent(low, high, new_window)
+                    rev.add_roll(r)
+                    self.all_random_events.append(rev)
+
+            # sort the event list to restore it to time-ascending order
+            self.all_random_events.sort(key = lambda x: x.start_time_stamp)
+
+            # if not expired yet, these are the random events just added, so close them, sort them, report them
+            for (n, ev) in enumerate(self.all_random_events):
+                if (ev.expired == False):
+                    ev.expired = True
+                    ev.sort_descending_randoms()
+                    await ctx.send('{}'.format(ev.report_summary(n, gvar.elf.char_name)))
 
 
 
