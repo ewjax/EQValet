@@ -20,9 +20,9 @@ class PlayerRandomRoll:
     def __init__(self, player_name, random_value, low, high, eq_timestamp):
 
         self.player_name    = player_name
-        self.random_value   = random_value
-        self.low            = low
-        self.high           = high
+        self.random_value   = int(random_value)
+        self.low            = int(low)
+        self.high           = int(high)
 
         # create a datetime object, using the very capable strptime() parsing function built into the datetime module
         self.time_stamp     = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
@@ -35,12 +35,12 @@ class PlayerRandomRoll:
     def report(self, boldname = ''):
 
         rv = ''
-        if self.player_name == boldname:
+        if self.player_name.casefold() == boldname.casefold():
             rv += '**'
 
-        rv += '--Player: {} | Roll: {} | Time: {}\n'.format(self.player_name, self.random_value, self.time_stamp)
+        rv += '--Player: {} | Random: {} | Time: {}\n'.format(self.player_name, self.random_value, self.time_stamp)
 
-        if self.player_name == boldname:
+        if self.player_name.casefold() == boldname.casefold():
             rv += '**'
 
         return rv
@@ -64,9 +64,9 @@ class RandomEvent:
     # ctor
     def __init__(self, low, high, delta_seconds = 30):
 
-        self.low                = low
-        self.high               = high
-        self.delta_seconds      = delta_seconds
+        self.low                = int(low)
+        self.high               = int(high)
+        self.delta_seconds      = int(delta_seconds)
 
         self.rolls              = list()
         self.start_time_stamp   = None

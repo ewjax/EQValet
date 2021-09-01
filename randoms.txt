@@ -478,3 +478,212 @@
 [Sat Aug 28 15:08:25 2021] **It could have been any number from 0 to 1000, but this time it turned up a 981.
 [Sat Aug 28 15:09:24 2021] Arkis says, 'Hail, Venpunch'
 
+
+[Tue Aug 31 17:21:17 2021] Nonphixion tells the guild, '/ran 23456 - Top 2 win a Diamond'
+[Tue Aug 31 17:21:18 2021] Basen winces.
+[Tue Aug 31 17:21:19 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:21 2021] Basen begins to cast a spell.
+[Tue Aug 31 17:21:22 2021] Basen winces.
+[Tue Aug 31 17:21:23 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:25 2021] Basen begins to cast a spell.
+[Tue Aug 31 17:21:26 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:26 2021] Basen winces.
+[Tue Aug 31 17:21:27 2021] Winny says, 'Hail, Ainea's corpse'
+[Tue Aug 31 17:21:27 2021] The brambles fall away.
+[Tue Aug 31 17:21:28 2021] Yober tells the guild, 'I wants a blue diamond'
+[Tue Aug 31 17:21:30 2021] Fria says, 'SH on Paipai'
+[Tue Aug 31 17:21:30 2021] You feel replenished.
+[Tue Aug 31 17:21:31 2021] **A Magic Die is rolled by Ellement.
+[Tue Aug 31 17:21:31 2021] **It could have been any number from 0 to 23456, but this time it turned up a 7802.
+[Tue Aug 31 17:21:31 2021] **A Magic Die is rolled by Jino.
+[Tue Aug 31 17:21:31 2021] **It could have been any number from 0 to 23456, but this time it turned up a 8135.
+[Tue Aug 31 17:21:32 2021] **A Magic Die is rolled by Dhuma.
+[Tue Aug 31 17:21:32 2021] **It could have been any number from 0 to 23456, but this time it turned up a 395.
+[Tue Aug 31 17:21:32 2021] Basen begins to cast a spell.
+[Tue Aug 31 17:21:32 2021] **A Magic Die is rolled by Deadd.
+[Tue Aug 31 17:21:32 2021] **It could have been any number from 0 to 23456, but this time it turned up a 23014.
+[Tue Aug 31 17:21:32 2021] **A Magic Die is rolled by Bhiig.
+[Tue Aug 31 17:21:32 2021] **It could have been any number from 0 to 23456, but this time it turned up a 15370.
+[Tue Aug 31 17:21:33 2021] Basen winces.
+[Tue Aug 31 17:21:33 2021] **A Magic Die is rolled by Mycrow.
+[Tue Aug 31 17:21:33 2021] **It could have been any number from 0 to 23456, but this time it turned up a 15099.
+[Tue Aug 31 17:21:33 2021] **A Magic Die is rolled by Rooge.
+[Tue Aug 31 17:21:33 2021] **It could have been any number from 0 to 23456, but this time it turned up a 15565.
+[Tue Aug 31 17:21:34 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:35 2021] Rustyclipper tells the guild, 'Blue Diamond'
+[Tue Aug 31 17:21:35 2021] **A Magic Die is rolled by Teche.
+[Tue Aug 31 17:21:35 2021] **It could have been any number from 0 to 23456, but this time it turned up a 1545.
+[Tue Aug 31 17:21:36 2021] Basen begins to cast a spell.
+[Tue Aug 31 17:21:36 2021] **A Magic Die is rolled by Bronwyne.
+[Tue Aug 31 17:21:36 2021] **It could have been any number from 0 to 23456, but this time it turned up a 18809.
+[Tue Aug 31 17:21:36 2021] **A Magic Die is rolled by Chalkdust.
+[Tue Aug 31 17:21:36 2021] **It could have been any number from 0 to 23456, but this time it turned up a 5210.
+[Tue Aug 31 17:21:37 2021] **A Magic Die is rolled by Zanicor.
+[Tue Aug 31 17:21:37 2021] **It could have been any number from 0 to 23456, but this time it turned up a 10226.
+[Tue Aug 31 17:21:37 2021] Basen winces.
+[Tue Aug 31 17:21:37 2021] **A Magic Die is rolled by Zulukingg.
+[Tue Aug 31 17:21:37 2021] **It could have been any number from 0 to 23456, but this time it turned up a 4977.
+[Tue Aug 31 17:21:38 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:38 2021] **A Magic Die is rolled by Tontoo.
+[Tue Aug 31 17:21:38 2021] **It could have been any number from 0 to 23456, but this time it turned up a 6351.
+[Tue Aug 31 17:21:38 2021] **A Magic Die is rolled by Bashum.
+[Tue Aug 31 17:21:38 2021] **It could have been any number from 0 to 23456, but this time it turned up a 4646.
+[Tue Aug 31 17:21:38 2021] **A Magic Die is rolled by Tiale.
+[Tue Aug 31 17:21:38 2021] **It could have been any number from 0 to 23456, but this time it turned up a 17917.
+[Tue Aug 31 17:21:39 2021] Trooper Sardek tries to bash Myzem, but Myzem blocks!
+[Tue Aug 31 17:21:39 2021] Trooper Sardek tries to hit Myzem, but Myzem blocks!
+[Tue Aug 31 17:21:39 2021] Trooper Sardek hits Myzem for 59 points of damage.
+[Tue Aug 31 17:21:40 2021] **A Magic Die is rolled by Waskuh.
+[Tue Aug 31 17:21:40 2021] **It could have been any number from 0 to 23456, but this time it turned up a 3406.
+[Tue Aug 31 17:21:40 2021] **A Magic Die is rolled by Xytl.
+[Tue Aug 31 17:21:40 2021] **It could have been any number from 0 to 23456, but this time it turned up a 8196.
+[Tue Aug 31 17:21:41 2021] Basen begins to cast a spell.
+[Tue Aug 31 17:21:41 2021] Trooper Sardek tries to hit Myzem, but Myzem blocks!
+[Tue Aug 31 17:21:42 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:42 2021] **A Magic Die is rolled by Nirah.
+[Tue Aug 31 17:21:42 2021] **It could have been any number from 0 to 23456, but this time it turned up a 2266.
+[Tue Aug 31 17:21:43 2021] **A Magic Die is rolled by Paipai.
+[Tue Aug 31 17:21:43 2021] **It could have been any number from 0 to 23456, but this time it turned up a 4228.
+[Tue Aug 31 17:21:43 2021] **A Magic Die is rolled by Jollybottoms.
+[Tue Aug 31 17:21:43 2021] **It could have been any number from 0 to 23456, but this time it turned up a 10866.
+[Tue Aug 31 17:21:43 2021] Ellement says, 'lfg'
+[Tue Aug 31 17:21:43 2021] **A Magic Die is rolled by Pyriox.
+[Tue Aug 31 17:21:43 2021] **It could have been any number from 0 to 23456, but this time it turned up a 7723.
+[Tue Aug 31 17:21:44 2021] Gdoorf regains concentration and continues casting.
+[Tue Aug 31 17:21:45 2021] **A Magic Die is rolled by Fria.
+[Tue Aug 31 17:21:45 2021] **It could have been any number from 0 to 23456, but this time it turned up a 8593.
+[Tue Aug 31 17:21:45 2021] Trooper Sardek goes on a RAMPAGE!
+[Tue Aug 31 17:21:45 2021] Trooper Sardek hits Bronwyne for 106 points of damage.
+[Tue Aug 31 17:21:45 2021] Trooper Sardek hits Bronwyne for 59 points of damage.
+[Tue Aug 31 17:21:46 2021] **A Magic Die is rolled by Grendol.
+[Tue Aug 31 17:21:46 2021] **It could have been any number from 0 to 23456, but this time it turned up a 76.
+[Tue Aug 31 17:21:46 2021] You feel replenished.
+[Tue Aug 31 17:21:47 2021] A missed note brings Buskin's song to a close!
+[Tue Aug 31 17:21:47 2021] Basen begins to regenerate.
+[Tue Aug 31 17:21:48 2021] Trooper Sardek tries to hit Deadd, but misses!
+[Tue Aug 31 17:21:48 2021] Trooper Sardek tries to hit Deadd, but Deadd blocks!
+[Tue Aug 31 17:21:48 2021] Trooper Sardek tries to hit Deadd, but Deadd blocks!
+[Tue Aug 31 17:21:48 2021] Trooper Sardek goes on a RAMPAGE!
+[Tue Aug 31 17:21:48 2021] Trooper Sardek bashes Deadd for 40 points of damage.
+[Tue Aug 31 17:21:50 2021] Lebeker beams a smile at Trooper Sardek
+[Tue Aug 31 17:21:50 2021] Lebeker says 'Ahhh, I feel much better now...'
+[Tue Aug 31 17:21:50 2021] **A Magic Die is rolled by Treun.
+[Tue Aug 31 17:21:50 2021] **It could have been any number from 0 to 1000, but this time it turned up a 257.
+[Tue Aug 31 17:21:50 2021] Trooper Sardek tries to hit Deadd, but misses!
+[Tue Aug 31 17:21:51 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:51 2021] Nirah Scores a critical hit!(137)
+[Tue Aug 31 17:21:51 2021] Players on EverQuest:
+[Tue Aug 31 17:21:51 2021] ---------------------------
+[Tue Aug 31 17:21:51 2021] [52 Elementalist] Ellement (Gnome) <Force of Will> LFG
+[Tue Aug 31 17:21:51 2021] [60 Grandmaster] Yula (Dark Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 High Priest] Fembot (Halfling) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [52 Channeler] Redlite (Dark Elf) <Force of Will> LFG
+[Tue Aug 31 17:21:51 2021] [55 Myrmidon] Treun (Half Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [57 Revenant] Myuharin (Ogre) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Assassin] Winny (Gnome) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Oracle] Jino (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Blackguard] Venek (Dwarf) <Force of Will> LFG
+[Tue Aug 31 17:21:51 2021] [51 Reaver] Bashum (Ogre) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Grandmaster] Myzem (Iksar) <Force of Will> LFG
+[Tue Aug 31 17:21:51 2021] [52 Vicar] Delala (High Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 High Priest] Nonphixion (Erudite) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Grandmaster] Stormshadow (Iksar) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Oracle] Dhuma (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Warder] Tontoo (Wood Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Master] Paipai (Dark Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Luminary] Fria (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 High Priest] Tiale (High Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Virtuoso] Avitar (Wood Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [ANONYMOUS] Believeitornot  <Force of Will>
+[Tue Aug 31 17:21:51 2021] [57 Evoker] Lavalamp (Dark Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Blackguard] Gyes (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Oracle] Gdoorf (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [57 Luminary] Reptilus (Iksar) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [56 Preserver] Zanicor (Halfling) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [54 Cavalier] Mathaiux (Dark Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Blackguard] Rooge (Dark Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Phantasmist] Chalkdust (High Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Arch Mage] Yober (Gnome) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Virtuoso] Buskin (Half Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [52 Mystic] Basen (Troll) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Grave Lord] Lizzay (Iksar) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Warlord] Rustyclipper (Ogre) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [52 Mystic] Sliceberg (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Grave Lord] Zulukingg (Troll) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [57 Myrmidon] Grendol (Ogre) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [ANONYMOUS] Basics  <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Luminary] Jollybottoms (Dark Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Assassin] Bhiig (Barbarian) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Hierophant] Gdare (Wood Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Grandmaster] Deadd (Human) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 High Priest] Bronwyne (Halfling) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Hierophant] Lilsticky (Halfling) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [55 Evoker] Pyriox (Dark Elf) <Force of Will> LFG
+[Tue Aug 31 17:21:51 2021] [56 Templar] Mycrow (Halfling) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [56 Defiler] Deadleaf (Skeleton) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Troubadour] Teche (Half Elf) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [59 Myrmidon] Nirah (Iksar) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [60 Oracle] Waskuh (Bear) <Force of Will>
+[Tue Aug 31 17:21:51 2021] [52 Heretic] Xytl (Skeleton) <Force of Will>
+[Tue Aug 31 17:21:51 2021] There are 51 players in Kael Drakkal.
+[Tue Aug 31 17:21:51 2021] Trooper Sardek tries to hit Lebeker, but misses!
+[Tue Aug 31 17:21:52 2021] Zanicor begins to cast a spell.
+[Tue Aug 31 17:21:52 2021] Trooper Sardek hits Deadd for 36 points of damage.
+[Tue Aug 31 17:21:52 2021] Trooper Sardek tries to hit Deadd, but misses!
+[Tue Aug 31 17:21:54 2021] Trooper Sardek tries to hit Deadd, but misses!
+[Tue Aug 31 17:21:54 2021] Trooper Sardek tries to hit Deadd, but Deadd blocks!
+[Tue Aug 31 17:21:54 2021] Trooper Sardek hits Jaraner for 148 points of damage.
+[Tue Aug 31 17:21:54 2021] Lebeker beams a smile at Trooper Sardek
+[Tue Aug 31 17:21:54 2021] Lebeker says 'Ahhh, I feel much better now...'
+[Tue Aug 31 17:21:55 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:55 2021] **A Magic Die is rolled by Lizzay.
+[Tue Aug 31 17:21:55 2021] **It could have been any number from 0 to 23456, but this time it turned up a 4253.
+[Tue Aug 31 17:21:55 2021] **A Magic Die is rolled by Yober.
+[Tue Aug 31 17:21:55 2021] **It could have been any number from 0 to 23456, but this time it turned up a 4585.
+[Tue Aug 31 17:21:56 2021] Trooper Sardek hits Ztik for 148 points of damage.
+[Tue Aug 31 17:21:56 2021] Trooper Sardek tries to kick Deadd, but misses!
+[Tue Aug 31 17:21:56 2021] **A Magic Die is rolled by Mathaiux.
+[Tue Aug 31 17:21:56 2021] **It could have been any number from 0 to 23456, but this time it turned up a 7918.
+[Tue Aug 31 17:21:57 2021] Bashum beams a smile at Trooper Sardek
+[Tue Aug 31 17:21:57 2021] Bashum says 'Ahhh, I feel much better now...'
+[Tue Aug 31 17:21:58 2021] **A Magic Die is rolled by Venek.
+[Tue Aug 31 17:21:58 2021] **It could have been any number from 0 to 23456, but this time it turned up a 12235.
+[Tue Aug 31 17:21:58 2021] Zulukingg beams a smile at Trooper Sardek
+[Tue Aug 31 17:21:58 2021] Zulukingg says 'Ahhh, I feel much better now...'
+[Tue Aug 31 17:21:58 2021] Your mind begins to clear.
+[Tue Aug 31 17:21:59 2021] **A Magic Die is rolled by Deadleaf.
+[Tue Aug 31 17:21:59 2021] **It could have been any number from 0 to 23456, but this time it turned up a 2351.
+[Tue Aug 31 17:21:59 2021] Bashum beams a smile at Trooper Sardek
+[Tue Aug 31 17:21:59 2021] Bashum says 'Ahhh, I feel much better now...'
+[Tue Aug 31 17:22:01 2021] Buskin begins to regenerate.
+[Tue Aug 31 17:22:01 2021] You begin to regenerate.
+[Tue Aug 31 17:22:01 2021] Zanicor begins to regenerate.
+[Tue Aug 31 17:22:01 2021] Trooper Sardek tries to hit Deadd, but misses!
+[Tue Aug 31 17:22:02 2021] You feel replenished.
+[Tue Aug 31 17:22:04 2021] Zarab says 'At your service Master.'
+[Tue Aug 31 17:22:04 2021] xxx is not online at this time.
+[Tue Aug 31 17:22:04 2021] Zanicor begins to cast a spell.
+[Tue Aug 31 17:22:05 2021] **A Magic Die is rolled by Stormshadow.
+[Tue Aug 31 17:22:05 2021] **It could have been any number from 0 to 23456, but this time it turned up a 14711.
+[Tue Aug 31 17:22:05 2021] Ztik tries to maul Trooper Sardek, but misses!
+[Tue Aug 31 17:22:05 2021] Jaraner hits Trooper Sardek for 23 points of damage.
+[Tue Aug 31 17:22:05 2021] Jaraner tries to hit Trooper Sardek, but misses!
+[Tue Aug 31 17:22:05 2021] Nirah pierces Trooper Sardek for 190 points of damage.
+[Tue Aug 31 17:22:05 2021] Bhiig pierces Trooper Sardek for 51 points of damage.
+[Tue Aug 31 17:22:06 2021] Rooge pierces Trooper Sardek for 19 points of damage.
+[Tue Aug 31 17:22:06 2021] Rooge tries to pierce Trooper Sardek, but misses!
+[Tue Aug 31 17:22:06 2021] Rooge slashes Trooper Sardek for 35 points of damage.
+[Tue Aug 31 17:22:06 2021] Deadd crushes Trooper Sardek for 37 points of damage.
+[Tue Aug 31 17:22:06 2021] Deadd crushes Trooper Sardek for 48 points of damage.
+[Tue Aug 31 17:22:06 2021] Your mind begins to clear.
+[Tue Aug 31 17:22:07 2021] Rooge is surrounded by a thorny barrier.
+[Tue Aug 31 17:22:07 2021] Buskin is surrounded by a thorny barrier.
+[Tue Aug 31 17:22:07 2021] Basen is surrounded by a thorny barrier.
+[Tue Aug 31 17:22:07 2021] You are surrounded by a thorny barrier.
+[Tue Aug 31 17:22:07 2021] Zanicor is surrounded by a thorny barrier.
+[Tue Aug 31 17:22:10 2021] Your mind begins to clear.
+[Tue Aug 31 17:22:11 2021] **A Magic Die is rolled by Redlite.
+[Tue Aug 31 17:22:11 2021] **It could have been any number from 0 to 23456, but this time it turned up a 388.
+[Tue Aug 31 17:22:14 2021] Your mind begins to clear.
+[Tue Aug 31 17:22:18 2021] You feel replenished.
+

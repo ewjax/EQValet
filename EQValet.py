@@ -211,10 +211,10 @@ async def show(ctx, ndx = -1):
 
         # add all the rolls
         for r in rev.rolls:
-            sb.add(r.report(elf.char_name))
+            sb.add(r.report(gvar.elf.char_name))
 
         # add the winner
-        sb.add(rev.report_winner(elf.char_name))
+        sb.add(rev.report_winner(gvar.elf.char_name))
 
         # get the list of buffers and send each to discord
         bufflist = sb.get_bufflist()
