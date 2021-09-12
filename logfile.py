@@ -6,7 +6,7 @@ import discord
 import random
 import os
 import re
-
+import glob
 
 
 import myconfig
@@ -30,7 +30,7 @@ class EverquestLogFile:
         self.logs_directory = myconfig.LOGS_DIRECTORY
         self.char_name      = char_name
         self.server_name    = myconfig.SERVER_NAME
-        self.filename       = ''
+        self.filename       = self.build_filename(self.char_name)
         self.file           = None
 
         self.parsing        = threading.Event()
@@ -45,13 +45,11 @@ class EverquestLogFile:
         self.current_tzname = time.tzname[time.daylight]
 
 
-        # build the filename
-        self.build_filename()
-
     # build the file name
     # call this anytime that the filename attributes change
-    def build_filename(self):
-        self.filename = self.base_directory + self.logs_directory + 'eqlog_' + self.char_name + '_' + self.server_name + '.txt'
+    def build_filename(self, charname):
+        rv = self.base_directory + self.logs_directory + 'eqlog_' + charname + '_' + self.server_name + '.txt'
+        return rv
 
     # is the file being actively parsed
     def set_parsing(self):
@@ -63,16 +61,38 @@ class EverquestLogFile:
     def is_parsing(self):
         return self.parsing.is_set()
 
+    # open the file with most recent mod time (i.e. latest)
+    def open_latest(self, author, seek_end = True):
+        # get a list of all log files, and sort on mod time, latest at top
+        mask = self.base_directory + self.logs_directory + 'eqlog_*_' + self.server_name + '.txt'
+        files = glob.glob(mask)
+        files.sort(key=os.path.getmtime, reverse = True)
+
+        # foo - what if there are no files in the list?
+        latest_file = files[0]
+        if ( (self.is_parsing() == False) or (self.filename != latest_file) ):
+
+            # extract the character name from the filename
+            charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\w ]+)_')
+            m = re.match(charname_regexp, self.filename)
+            char_name = m.group('charname')
+
+            # open the file
+            rv = self.open(author, char_name, latest_file, seek_end)
+            return rv
+
 
     # open the file
     # seek file position to end of file if passed parameter 'seek_end' is true
-    def open(self, author, seek_end = True):
+    def open(self, author, charname, filename, seek_end = True):
         try:
-            self.file = open(self.filename)
+            self.file = open(filename, 'r')
             if seek_end:
                 self.file.seek(0, os.SEEK_END)
 
             self.author = author
+            self.char_name = charname
+            self.filename = filename
             self.set_parsing()
             return True
         except:

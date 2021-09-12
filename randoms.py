@@ -283,21 +283,18 @@ class RandomTracker:
 
             # is the new, larger window overlapping into the next random event(s)?
             if (new_window > old_rev.delta_seconds):
-                processing = True
-                while processing:
-                    processing = False
-                    if (ndx < len(self.all_random_events)):
-                        next_rev = self.all_random_events[ndx]
-                        # get delta t
-                        delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
-                        delta = delta_seconds.total_seconds()
-                        # does next random event and is within new time window?
-                        if ( (low == next_rev.low) and (high == next_rev.high) and (delta <= new_window) ):
-                            # add the next randomm event rolls to the list of rolls to be sorted / readded
-                            rolls += next_rev.rolls
-                            self.all_random_events.pop(ndx)
-                            # we're not done yet
-                            processing = True
+                while (ndx < len(self.all_random_events)):
+                    next_rev = self.all_random_events[ndx]
+                    # get delta t
+                    delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
+                    delta = delta_seconds.total_seconds()
+                    # does next random event and is within new time window?
+                    if ( (low == next_rev.low) and (high == next_rev.high) and (delta <= new_window) ):
+                        # add the next randomm event rolls to the list of rolls to be sorted / readded
+                        rolls += next_rev.rolls
+                        self.all_random_events.pop(ndx)
+                    else:
+                        ndx += 1
 
             # sort the list of all rolls in time-ascenting order
             rolls.sort(key = lambda x: x.time_stamp)

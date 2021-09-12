@@ -91,6 +91,8 @@ class EQValetClient(commands.Bot):
         # check if a random has started
         await self.random_tracker.process_line(ctx, line)
 
+
+
         # do other parsing things here
         pass
 
@@ -270,33 +272,48 @@ async def start(ctx, charname = None):
         
     else:
         # new log file name get passed?
-        if charname:
-            gvar.elf.char_name = charname
-        else:
-            gvar.elf.char_name = myconfig.DEFAULT_CHAR_NAME
-        gvar.elf.build_filename()
+        cn = myconfig.DEFAULT_CHAR_NAME
+        if charname != None:
+            cn = charname
+
+
+#        if charname:
+#            cn = charname
+##            gvar.elf.char_name = charname
+#        else:
+#            cn = myconfig.DEFAULT_CHAR_NAME
+##            gvar.elf.char_name = myconfig.DEFAULT_CHAR_NAME
+
+        filename = gvar.elf.build_filename(cn)
 
         # open the log file to be parsed
         # allow for testing, by forcing the bot to read an old log file for the VT and VD fights
         if TEST_BOT == False:
             # start parsing.  The default behavior is to open the log file, and begin reading it from tne end, i.e. only new entries
-            rv = gvar.elf.open(ctx.message.author)
+            rv = gvar.elf.open(ctx.message.author, cn, filename)
 
         else:
             # use a back door to force the system to read files from the beginning that contain VD / VT fights to test with
-            gvar.elf.filename = 'randoms.txt'
+#            gvar.elf.filename = 'randoms.txt'
+            filename = 'randoms.txt'
 
             # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
-            rv = gvar.elf.open(ctx.message.author, seek_end = False)
+            rv = gvar.elf.open(ctx.message.author, 'Testing', filename, seek_end = False)
 
 
         # if the log file was successfully opened, then initiate parsing
         if rv:
             # status message
-            await ctx.send('Now parsing character log for: [{}]'.format(gvar.elf.char_name))
-            await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
-            await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
-            await ctx.send('Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
+#            await ctx.send('Now parsing character log for: [{}]'.format(gvar.elf.char_name))
+#            await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
+#            await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
+#            await ctx.send('Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
+
+            await client.alert(ctx, 'Now parsing character log for: [{}]'.format(gvar.elf.char_name))
+            await client.alert(ctx, 'Log filename: [{}]'.format(gvar.elf.filename))
+            await client.alert(ctx, 'Parsing initiated by: [{}]'.format(gvar.elf.author))
+            await client.alert(ctx, 'Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
+
 
             # create the background processs and kick it off
             client.ctx = ctx
