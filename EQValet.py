@@ -17,7 +17,7 @@ import gvar
 
 
 
-# allow for testing, by forcing the bot to read an old log file for the VT and VD fights
+# allow for testing, by forcing the bot to read an old log file
 TEST_BOT                = False
 #TEST_BOT                = True
 
@@ -144,6 +144,8 @@ async def on_ready():
 
     print('Logged on as {}'.format(client.user))
     print('App ID: {}'.format(client.user.id))
+    print('Ctx: {}'.format(client.ctx))
+
 
 
 
@@ -249,6 +251,26 @@ async def regroup(ctx, ndx = -1, new_window = 0):
         await client.random_tracker.regroup(ctx, ndx, new_window)
 
 
+
+# window command
+# change the default window for future RandomEvents
+@client.command(aliases = ['win'])
+async def window(ctx, new_window = 0):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    if (new_window < 0):
+        await ctx.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+
+    elif (new_window == 0):
+        await ctx.send('RandomEvent default window = {}'.format(client.random_tracker.default_window))
+
+    else:
+        client.random_tracker.default_window = new_window
+        await ctx.send('RandomEvent default window = {}'.format(client.random_tracker.default_window))
+
+
+
+
 # firedrill command
 # test the ability to send a message to the #pop channel
 @client.command(aliases = ['fd'])
@@ -267,60 +289,38 @@ async def start(ctx, charname = None):
     # already parsing?
     if gvar.elf.is_parsing():
         await ctx.send('Already parsing character log for: [{}]'.format(gvar.elf.char_name))
-        await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
-        await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
         
     else:
-        # new log file name get passed?
-        cn = myconfig.DEFAULT_CHAR_NAME
-        if charname != None:
-            cn = charname
 
+        # use a back door to force the system to read a test file
+        if TEST_BOT == True:
 
-#        if charname:
-#            cn = charname
-##            gvar.elf.char_name = charname
-#        else:
-#            cn = myconfig.DEFAULT_CHAR_NAME
-##            gvar.elf.char_name = myconfig.DEFAULT_CHAR_NAME
-
-        filename = gvar.elf.build_filename(cn)
-
-        # open the log file to be parsed
-        # allow for testing, by forcing the bot to read an old log file for the VT and VD fights
-        if TEST_BOT == False:
-            # start parsing.  The default behavior is to open the log file, and begin reading it from tne end, i.e. only new entries
-            rv = gvar.elf.open(ctx.message.author, cn, filename)
-
-        else:
-            # use a back door to force the system to read files from the beginning that contain VD / VT fights to test with
-#            gvar.elf.filename = 'randoms.txt'
+            # read a sample file with sample random rolls in it
             filename = 'randoms.txt'
 
             # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
             rv = gvar.elf.open(ctx.message.author, 'Testing', filename, seek_end = False)
 
+        # open the latest file
+        else:
+            # open the latest file, and kick off the parsing process
+            rv = gvar.elf.open_latest(ctx.message.author)
+
 
         # if the log file was successfully opened, then initiate parsing
         if rv:
+
             # status message
-#            await ctx.send('Now parsing character log for: [{}]'.format(gvar.elf.char_name))
-#            await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
-#            await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
-#            await ctx.send('Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
-
-            await client.alert(ctx, 'Now parsing character log for: [{}]'.format(gvar.elf.char_name))
-            await client.alert(ctx, 'Log filename: [{}]'.format(gvar.elf.filename))
-            await client.alert(ctx, 'Parsing initiated by: [{}]'.format(gvar.elf.author))
-            await client.alert(ctx, 'Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
-
+            await ctx.send('Now parsing character log for: [{}]'.format(gvar.elf.char_name))
 
             # create the background processs and kick it off
             client.ctx = ctx
             client.loop.create_task(parse())
+
         else:
             await ctx.send('ERROR: Could not open character log file for: [{}]'.format(gvar.elf.char_name))
             await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
+
 
 
 
@@ -329,18 +329,7 @@ async def start(ctx, charname = None):
 async def stop(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    if gvar.elf.is_parsing():
 
-        # only the person who started the log can close it
-        if gvar.elf.author == ctx.message.author:
-            # stop parsing
-            gvar.elf.close()
-            await ctx.send('Stopped parsing character log for: [{}]'.format(gvar.elf.char_name))
-        else:
-            await ctx.send('Error: Parsing can only be stopped by the same person who started it.  Starter: [{}], !stop requestor [{}]'.format(gvar.elf.author, ctx.message.author))
-
-    else:
-        await ctx.send('Not currently parsing')
 
 
 
@@ -353,7 +342,7 @@ async def status(ctx):
         await ctx.send('Parsing character log for: [{}]'.format(gvar.elf.char_name))
         await ctx.send('Log filename: [{}]'.format(gvar.elf.filename))
         await ctx.send('Parsing initiated by: [{}]'.format(gvar.elf.author))
-        await ctx.send('Heartbeat timeout (minutes): [{}]'.format(gvar.elf.heartbeat))
+        await ctx.send('Heartbeat timeout (seconds): [{}]'.format(gvar.elf.heartbeat))
     else:
         await ctx.send('Not currently parsing')
 
@@ -363,7 +352,7 @@ async def status(ctx):
 
 # the background process to parse the log files
 #
-async def parse():
+async def parse():                                      
 
     print('Parsing Started')
 
@@ -381,12 +370,22 @@ async def parse():
 
 
         else:
-            # check the heartbeat.  Has our tracker gone silent?
-            elapsed_minutes = (now - gvar.elf.prevtime)/60.0
-            if elapsed_minutes > gvar.elf.heartbeat:
-                gvar.elf.prevtime = now
-                await client.ctx.send('Heartbeat Warning:  Tracker [{}] logfile has had no new entries in last {} minutes.  Is {} still online?'.format(gvar.elf.char_name, gvar.elf.heartbeat, gvar.elf.char_name))
 
+            # don't check the heartbeat if we are just testing
+            if TEST_BOT == False:
+
+                # check the heartbeat.  Has our tracker gone silent?
+                elapsed_seconds = (now - gvar.elf.prevtime)
+
+                if elapsed_seconds > gvar.elf.heartbeat:
+                    print('Heartbeat over limit, elapsed seconds = {}'.format(elapsed_seconds))
+                    gvar.elf.prevtime = now
+
+                    # attempt to open latest log file - returns True if a new logfile is opened
+                    if (gvar.elf.open_latest(client.ctx.message.author)):
+                        await client.ctx.send('Now parsing character log for: [{}]'.format(gvar.elf.char_name))
+
+            # if we didn't read a line, pause just for a 100 msec blink
             await asyncio.sleep(0.1)
 
     print('Parsing Stopped')

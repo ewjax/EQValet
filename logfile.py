@@ -62,6 +62,7 @@ class EverquestLogFile:
         return self.parsing.is_set()
 
     # open the file with most recent mod time (i.e. latest)
+    # returns True if a new file was opened, False otherwise
     def open_latest(self, author, seek_end = True):
         # get a list of all log files, and sort on mod time, latest at top
         mask = self.base_directory + self.logs_directory + 'eqlog_*_' + self.server_name + '.txt'
@@ -70,16 +71,37 @@ class EverquestLogFile:
 
         # foo - what if there are no files in the list?
         latest_file = files[0]
-        if ( (self.is_parsing() == False) or (self.filename != latest_file) ):
+#        print('Latest file = {}'.format(latest_file))
 
-            # extract the character name from the filename
-            charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\w ]+)_')
-            m = re.match(charname_regexp, self.filename)
-            char_name = m.group('charname')
+        # extract the character name from the filename
+        # note that windows pathnames must usess double-backslashes in the pathname
+        # note that backslashes in regular expressions are double-double-backslashes
+        # this expression replaces double \\ with quadruple \\\\, as well as the filename mask asterisk to a named regular expression
+        charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\w ]+)_')
+        m = re.match(charname_regexp, latest_file)
+        char_name = m.group('charname')
+#        print('Character = {}'.format(char_name))
 
-            # open the file
+        rv = False
+
+        # figure out what to do
+        # if we are already parsing a file, and it is the lastest file - do nothing
+        if ( (self.is_parsing() == True) and (self.filename == latest_file) ):
+            # do nothing
+            pass
+
+        # if we are already parsing a file, but it is not the latest file, close the old and open the latest
+        elif ( (self.is_parsing() == True) and (self.filename != latest_file) ):
+            # stop parsing old and open the new file
+            self.close()
             rv = self.open(author, char_name, latest_file, seek_end)
-            return rv
+
+        # if we aren't parsing any file, then open latest
+        elif (self.is_parsing() == False):
+            rv = self.open(author, char_name, latest_file, seek_end)
+
+        return rv
+
 
 
     # open the file

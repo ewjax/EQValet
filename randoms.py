@@ -4,6 +4,8 @@
 from datetime import datetime
 import re
 
+# import the customized settings and file locations etc, found in myconfig.py
+import myconfig
 import gvar
 
 
@@ -62,7 +64,7 @@ class PlayerRandomRoll:
 class RandomEvent:
 
     # ctor
-    def __init__(self, low, high, delta_seconds = 30):
+    def __init__(self, low, high, delta_seconds):
 
         self.low                = int(low)
         self.high               = int(high)
@@ -201,6 +203,9 @@ class RandomTracker:
         self.all_rolls          = list()
         self.all_random_events  = list()
 
+        # default time a RandomEvent runs, collecting PlayerRandomRolls
+        self.default_window     = myconfig.DEFAULT_WINDOW
+
 
     # check if a random is occurring
     async def process_line(self, ctx, line):
@@ -254,7 +259,7 @@ class RandomTracker:
 
                 # if the roll wasn't added, create a new RandomEvent to hold this one
                 if (added == False):
-                    rev = RandomEvent(low, high)
+                    rev = RandomEvent(low, high, self.default_window)
                     rev.add_roll(roll)
                     self.all_random_events.append(rev)
 
