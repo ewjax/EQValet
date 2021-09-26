@@ -108,7 +108,7 @@ class EverquestLogFile:
     # seek file position to end of file if passed parameter 'seek_end' is true
     def open(self, author, charname, filename, seek_end = True):
         try:
-            self.file = open(filename, 'r')
+            self.file = open(filename, 'r', errors='ignore')
             if seek_end:
                 self.file.seek(0, os.SEEK_END)
 

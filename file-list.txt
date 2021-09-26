@@ -1,4 +1,8 @@
 "myconfig - original.py"
 EQValet.py
+gvar.py
+logfile.py
+randoms.py
+pets.py
 file-list.txt
 

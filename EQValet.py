@@ -11,6 +11,7 @@ from discord.ext import commands
 # import the customized settings and file locations etc, found in myconfig.py
 import myconfig
 import randoms
+import pets
 import gvar
 
 
@@ -42,7 +43,8 @@ class SmartBuffer:
     # ctor
     def __init__(self):
 
-        self._bufflist           = list()
+#        self._bufflist           = list()
+        self._bufflist          = []
         self._working_buffer    = ''
 
     def add(self, string):
@@ -82,14 +84,16 @@ class EQValetClient(commands.Bot):
 
         # use a RandomTracker class to deal with all things random numbers and rolls
         self.random_tracker     = randoms.RandomTracker()
+        self.pet_tracker        = pets.PetTracker()
 
 
     # process each line
     async def process_line(self, ctx, line):
         print(line, end = '')
 
-        # check if a random has started
+        # check for a random or for a pet
         await self.random_tracker.process_line(ctx, line)
+        await self.pet_tracker.process_line(ctx, line)
 
 
 
@@ -144,9 +148,6 @@ async def on_ready():
 
     print('Logged on as {}'.format(client.user))
     print('App ID: {}'.format(client.user.id))
-    print('Ctx: {}'.format(client.ctx))
-
-
 
 
 # on_message - catches everything, messages and commands
@@ -296,7 +297,8 @@ async def start(ctx, charname = None):
         if TEST_BOT == True:
 
             # read a sample file with sample random rolls in it
-            filename = 'randoms.txt'
+#            filename = 'randoms.txt'
+            filename = 'pets.txt'
 
             # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
             rv = gvar.elf.open(ctx.message.author, 'Testing', filename, seek_end = False)
@@ -345,6 +347,24 @@ async def status(ctx):
         await ctx.send('Heartbeat timeout (seconds): [{}]'.format(gvar.elf.heartbeat))
     else:
         await ctx.send('Not currently parsing')
+
+
+
+#        self.pet_tracker        = pets.PetTracker()
+
+
+# pet command
+@client.command()
+async def pet(ctx):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    if client.pet_tracker.current_pet:
+        await ctx.send(client.pet_tracker.current_pet)
+
+    else:
+        await ctx.send('No pet')
+
+
 
 
 #################################################################################################

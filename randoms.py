@@ -193,7 +193,7 @@ class RandomEvent:
 
 
 #
-# class to do all the tracking work
+# class to do all the random tracking work
 class RandomTracker:
 
     # ctor
