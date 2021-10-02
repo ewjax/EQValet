@@ -197,7 +197,10 @@ class RandomEvent:
 class RandomTracker:
 
     # ctor
-    def __init__(self):
+    def __init__(self, client):
+
+        # pointer to the discord client for comms
+        self.client             = client
 
         # list of all random rolls, and all RandomEvents
         self.all_rolls          = list()
@@ -208,14 +211,16 @@ class RandomTracker:
 
 
     # check if a random is occurring
-    async def process_line(self, ctx, line):
+#    async def process_line(self, ctx, line):
+    async def process_line(self, line):
 
         # begin by checking if any of the RandomEvents is due to expire
         for (ndx, rev) in enumerate(self.all_random_events):
             if (rev.expired == False):
                 toggled = rev.check_expiration(line)
                 if toggled:
-                    await ctx.send('{}'.format(rev.report_summary(ndx, gvar.elf.char_name)))
+#                    await ctx.send('{}'.format(rev.report_summary(ndx, gvar.elf.char_name)))
+                    await self.client.send('{}'.format(rev.report_summary(ndx, gvar.elf.char_name)))
 
 
         # cut off the leading date-time stamp info
@@ -265,18 +270,21 @@ class RandomTracker:
 
 
     # regroup random events with a new, different window than what the random events currently have
-    async def regroup(self, ctx, ndx = -1, new_window = 0):
-        print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+#    async def regroup(self, ctx, ndx = -1, new_window = 0):
+    async def regroup(self, ndx = -1, new_window = 0):
 
         # is ndx in range
         if (len(self.all_random_events) == 0):
-            await ctx.send('Error:  No RandomEvents to regroup!')
+#            await ctx.send('Error:  No RandomEvents to regroup!')
+            await self.client.send('Error:  No RandomEvents to regroup!')
 
         elif ( (ndx < 0) or (ndx >= len(self.all_random_events)) ):
-            await ctx.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events)-1))
+#            await ctx.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events)-1))
+            await self.client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events)-1))
 
         elif (new_window <= 0):
-            await ctx.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+#            await ctx.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+            await self.client.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
 
         else:
             # grab the requested random event, and restore it to time-ascending order
@@ -329,7 +337,8 @@ class RandomTracker:
                 if (ev.expired == False):
                     ev.expired = True
                     ev.sort_descending_randoms()
-                    await ctx.send('{}'.format(ev.report_summary(n, gvar.elf.char_name)))
+#                    await ctx.send('{}'.format(ev.report_summary(n, gvar.elf.char_name)))
+                    await self.client.send('{}'.format(ev.report_summary(n, gvar.elf.char_name)))
 
 
 

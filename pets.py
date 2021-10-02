@@ -89,7 +89,10 @@ class Pet:
 class PetTracker:
 
     # ctor
-    def __init__(self):
+    def __init__(self, client):
+
+        # pointer to the discord client for comms
+        self.client         = client
 
         self.current_pet    = None
 
@@ -140,7 +143,8 @@ class PetTracker:
 
 
     # check for pet related items
-    async def process_line(self, ctx, line):
+#    async def process_line(self, ctx, line):
+    async def process_line(self, line):
 
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
@@ -162,7 +166,8 @@ class PetTracker:
             m3 = re.match(target, trunc_line)
 
             if (m1 or m2 or m3):
-                await ctx.send('Pet {} died'.format(self.current_pet.pet_name))
+#                await ctx.send('Pet {} died'.format(self.current_pet.pet_name))
+                await self.client.send('Pet {} died'.format(self.current_pet.pet_name))
                 self.current_pet = None
 
 
@@ -197,7 +202,8 @@ class PetTracker:
                 self.current_pet.name_pending = False
 
                 self.all_pets.append(self.current_pet)
-                await ctx.send(self.current_pet.created_report())
+#                await ctx.send(self.current_pet.created_report())
+                await self.client.send(self.current_pet.created_report())
 
 
         # if we have a pet, scan for the max melee hit value
@@ -219,7 +225,8 @@ class PetTracker:
                             self.current_pet.pet_rank = petstat.rank
 
                     # announce the pet rank
-                    await ctx.send(self.current_pet)
+#                    await ctx.send(self.current_pet)
+                    await self.client.send(self.current_pet)
 
 
         # search for the special case where the pet is attacking itself - this
@@ -253,7 +260,8 @@ class PetTracker:
                         self.current_pet.name_pending = False
 
                         self.all_pets.append(self.current_pet)
-                        await ctx.send(self.current_pet.created_report())
+#                        await ctx.send(self.current_pet.created_report())
+                        await self.client.send(self.current_pet.created_report())
 
                 # ok somehow EQValet thinks we have a pet, but the name is goofed up, so just reset the max_melee and pet_rank fields and let them get
                 # determined again
@@ -264,7 +272,8 @@ class PetTracker:
                     self.current_pet.max_melee      = 0
                     self.pet_rank       = 0
                     self.max_melee      = 0
-                    await ctx.send(self.current_pet.created_report())
+#                    await ctx.send(self.current_pet.created_report())
+                    await self.client.send(self.current_pet.created_report())
 
 
 
