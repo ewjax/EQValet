@@ -1,10 +1,6 @@
 
 import re
 
-# import the customized settings and file locations etc, found in myconfig.py
-#import myconfig
-#import gvar
-
 
 
 class PetStats:
@@ -143,7 +139,6 @@ class PetTracker:
 
 
     # check for pet related items
-#    async def process_line(self, ctx, line):
     async def process_line(self, line):
 
         # cut off the leading date-time stamp info
@@ -166,7 +161,6 @@ class PetTracker:
             m3 = re.match(target, trunc_line)
 
             if (m1 or m2 or m3):
-#                await ctx.send('Pet {} died'.format(self.current_pet.pet_name))
                 await self.client.send('Pet {} died'.format(self.current_pet.pet_name))
                 self.current_pet = None
 
@@ -202,7 +196,6 @@ class PetTracker:
                 self.current_pet.name_pending = False
 
                 self.all_pets.append(self.current_pet)
-#                await ctx.send(self.current_pet.created_report())
                 await self.client.send(self.current_pet.created_report())
 
 
@@ -225,7 +218,6 @@ class PetTracker:
                             self.current_pet.pet_rank = petstat.rank
 
                     # announce the pet rank
-#                    await ctx.send(self.current_pet)
                     await self.client.send(self.current_pet)
 
 
@@ -260,7 +252,6 @@ class PetTracker:
                         self.current_pet.name_pending = False
 
                         self.all_pets.append(self.current_pet)
-#                        await ctx.send(self.current_pet.created_report())
                         await self.client.send(self.current_pet.created_report())
 
                 # ok somehow EQValet thinks we have a pet, but the name is goofed up, so just reset the max_melee and pet_rank fields and let them get
@@ -272,7 +263,6 @@ class PetTracker:
                     self.current_pet.max_melee      = 0
                     self.pet_rank       = 0
                     self.max_melee      = 0
-#                    await ctx.send(self.current_pet.created_report())
                     await self.client.send(self.current_pet.created_report())
 
 
