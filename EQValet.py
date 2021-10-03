@@ -19,8 +19,8 @@ import logfile
 
 
 # allow for testing, by forcing the bot to read an old log file
-#TEST_BOT                = False
-TEST_BOT                = True
+TEST_BOT                = False
+#TEST_BOT                = True
 
 
 
@@ -105,23 +105,63 @@ class EQValetClient(commands.Bot):
     # sound the alert
     async def alert(self, msg):
 
-        special_channel = client.get_channel(myconfig.PERSONAL_SERVER_ALERTID)
+        special_channel = self.get_channel(myconfig.PERSONAL_SERVER_ALERTID)
         await special_channel.send(msg)
 
 
     # notify of pop
     async def pop(self, msg):
 
-        special_channel = client.get_channel(myconfig.PERSONAL_SERVER_POPID)
+        special_channel = self.get_channel(myconfig.PERSONAL_SERVER_POPID)
         await special_channel.send(msg)
 
 
     # send message to the special EQValet channel
     async def send(self, msg):
 
-        special_channel = client.get_channel(myconfig.PERSONAL_SERVER_VALETID)
+        special_channel = self.get_channel(myconfig.PERSONAL_SERVER_VALETID)
         await special_channel.send(msg)
         
+
+
+    # begin parsing
+    async def begin_parsing(self):
+        # already parsing?
+        if self.elf.is_parsing():
+            await self.send('Already parsing character log for: [{}]'.format(self.elf.char_name))
+
+        else:
+
+            # use a back door to force the system to read a test file
+            if TEST_BOT == True:
+
+                # read a sample file with sample random rolls in it
+    #            filename = 'randoms.txt'
+                filename = 'pets.txt'
+
+                # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
+                rv = self.elf.open(self.user, 'Testing', filename, seek_end = False)
+
+            # open the latest file
+            else:
+                # open the latest file, and kick off the parsing process
+                rv = self.elf.open_latest(self.user)
+
+
+            # if the log file was successfully opened, then initiate parsing
+            if rv:
+
+                # status message
+                await self.send('Now parsing character log for: [{}]'.format(self.elf.char_name))
+
+                # create the background processs and kick it off
+                self.loop.create_task(parse())
+
+            else:
+                await self.send('ERROR: Could not open character log file for: [{}]'.format(self.elf.char_name))
+                await self.send('Log filename: [{}]'.format(self.elf.filename))
+
+
 
 
 
@@ -145,6 +185,7 @@ async def on_ready():
     print('App ID: {}'.format(client.user.id))
 
     await client.send('EQ Valet is alive!')
+    await client.begin_parsing()
 
 
 
@@ -287,40 +328,8 @@ async def firedrill(ctx):
 async def start(ctx, charname = None):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    # already parsing?
-    if client.elf.is_parsing():
-        await client.send('Already parsing character log for: [{}]'.format(client.elf.char_name))
-        
-    else:
+    await client.begin_parsing()
 
-        # use a back door to force the system to read a test file
-        if TEST_BOT == True:
-
-            # read a sample file with sample random rolls in it
-#            filename = 'randoms.txt'
-            filename = 'pets.txt'
-
-            # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
-            rv = client.elf.open(client.user, 'Testing', filename, seek_end = False)
-
-        # open the latest file
-        else:
-            # open the latest file, and kick off the parsing process
-            rv = client.elf.open_latest(client.user)
-
-
-        # if the log file was successfully opened, then initiate parsing
-        if rv:
-
-            # status message
-            await client.send('Now parsing character log for: [{}]'.format(client.elf.char_name))
-
-            # create the background processs and kick it off
-            client.loop.create_task(parse())
-
-        else:
-            await client.send('ERROR: Could not open character log file for: [{}]'.format(client.elf.char_name))
-            await client.send('Log filename: [{}]'.format(client.elf.filename))
 
 
 # status command
