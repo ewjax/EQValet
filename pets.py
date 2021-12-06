@@ -111,6 +111,34 @@ class PetTracker:
         self.pet_dict['Bone Walk'] = pet_template
 
         pet_stat_list       = []
+        pet_stat_list.append(PetStats(rank = 1, pet_level =  8, max_melee = 10, max_bashkick = 10, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 2, pet_level =  9, max_melee = 12, max_bashkick = 12, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 3, pet_level = 10, max_melee = 14, max_bashkick = 14, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 4, pet_level = 11, max_melee = 16, max_bashkick = 16, max_backstab = 0, lifetap = 0))
+        pet_template = PetTemplate('Convoke Shadow', 'Necro', caster_level = 12, pet_stats_list = pet_stat_list.copy())
+        self.pet_dict['Convoke Shadow'] = pet_template
+
+        pet_stat_list       = []
+        pet_stat_list.append(PetStats(rank = 1, pet_level = 12, max_melee = 12, max_bashkick = 12, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 2, pet_level = 13, max_melee = 14, max_bashkick = 14, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 3, pet_level = 14, max_melee = 16, max_bashkick = 15, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 4, pet_level = 15, max_melee = 18, max_bashkick = 15, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 5, pet_level = 16, max_melee = 20, max_bashkick = 16, max_backstab = 0, lifetap = 0))
+        pet_template = PetTemplate('Restless Bones', 'Necro', caster_level = 16, pet_stats_list = pet_stat_list.copy())
+        self.pet_dict['Restless Bones'] = pet_template
+
+        pet_stat_list       = []
+        pet_stat_list.append(PetStats(rank = 1, pet_level = 15, max_melee = 14, max_bashkick = 14, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 2, pet_level = 16, max_melee = 16, max_bashkick = 15, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 3, pet_level = 17, max_melee = 18, max_bashkick = 15, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 4, pet_level = 18, max_melee = 20, max_bashkick = 16, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 5, pet_level = 19, max_melee = 22, max_bashkick = 16, max_backstab = 0, lifetap = 0))
+        pet_template = PetTemplate('Animate Dead', 'Necro', caster_level = 20, pet_stats_list = pet_stat_list.copy())
+        self.pet_dict['Animate Dead'] = pet_template
+
+
+
+        pet_stat_list       = []
         pet_stat_list.append(PetStats(rank = 1, pet_level = 37, max_melee = 47, max_bashkick = 22, max_backstab = 0, lifetap = 38))
         pet_stat_list.append(PetStats(rank = 2, pet_level = 38, max_melee = 49, max_bashkick = 23, max_backstab = 0, lifetap = 39))
         pet_stat_list.append(PetStats(rank = 3, pet_level = 39, max_melee = 51, max_bashkick = 23, max_backstab = 0, lifetap = 40))
@@ -163,16 +191,17 @@ class PetTracker:
 
             # pet reclaimed?
             target = '^{} disperses'.format(self.current_pet.pet_name)
-            m2 = re.match(target, trunc_line)
+            m2 = re.match(target, trunc_line, re.IGNORECASE)
 
             # pet died?
             target = '^{} says, \'Sorry to have failed you, oh Great One'.format(self.current_pet.pet_name)
-            m3 = re.match(target, trunc_line)
+            m3 = re.match(target, trunc_line, re.IGNORECASE)
 
             # somehow pet is gone
             target = r'^You don\'t have a pet to command!'
             m4 = re.match(target, trunc_line)
 
+            # check for any of the pet died messages
             if (m1 or m2 or m3 or m4):
                 await self.client.send('Pet {} died'.format(self.current_pet.pet_name))
                 self.current_pet = None
@@ -217,9 +246,9 @@ class PetTracker:
         if self.current_pet:
 
             # look for max melee
-            target = r'^{} (hits|slashes|pierces|crushes|claws|bites) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) points of damage'.format(self.current_pet.pet_name)
+            target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(self.current_pet.pet_name)
             # return value m is either None of an object with information about the RE search
-            m = re.match(target, trunc_line)
+            m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
                 # fetch the damage
                 damage = int(m.group('damage'))
@@ -234,13 +263,20 @@ class PetTracker:
                             self.current_pet.pet_rank   = petstat.rank
                             self.current_pet.pet_level  = petstat.pet_level
 
+                    # if charmed pet, determine implied level here
+                    if self.current_pet.pet_template.spell_name == 'CharmPet':
+                        if damage <= 60:
+                            self.current_pet.pet_level = damage / 2
+                        else:
+                            self.current_pet.pet_level = (damage + 60) / 4
+                            
                     # announce the pet rank
                     await self.client.send(self.current_pet)
                     await self.client.send('*Identified via max melee damage*')
 
             # look for lifetap
             target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
-            m = re.match(target, trunc_line)
+            m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
                 # read the next line for the damage message
                 next_line = self.client.elf.readline()
@@ -263,6 +299,9 @@ class PetTracker:
                             await self.client.send('*Identified via lifetap signature*')
 
 
+        # do we need to reset our pet name to the parser?
+        reset_pet = False
+
         # watch for pet leader commands, and check that our pet name matches
         # this is useful if somehow our pet name is goofed up
         target = r'^(?P<pet_name>[\w` ]+) says \'My leader is (?P<char_name>[\w` ]+)'
@@ -273,42 +312,7 @@ class PetTracker:
 
             # if a pet just declared our character as the leader...
             if (char_name == self.client.elf.char_name):
-
-                # announce the pet name
-                await self.client.send('Pet name = {}'.format(pet_name))
-
-                # no pet known to EQValet?
-                if self.current_pet is None:
-
-                    # then we probably have a charmed pet
-                    spell_name = 'CharmPet'
-
-                    # does the spell name match one of the pets we know about?
-                    if spell_name in self.pet_dict:
-                        pet_template = self.pet_dict[spell_name]
-                        self.current_pet = Pet(pet_template)
-                        self.current_pet.pet_name = pet_name
-                        self.current_pet.name_pending = False
-                        self.current_pet.pet_rank       = 0
-                        self.current_pet.max_melee      = 0
-                        self.pet_rank       = 0
-                        self.max_melee      = 0
-
-                        self.all_pets.append(self.current_pet)
-                        await self.client.send(self.current_pet.created_report())
-
-                # ok somehow EQValet thinks we have a pet, but the name is goofed up, so just reset the max_melee and pet_rank fields and let them get
-                # determined again
-                elif (self.current_pet.pet_name != pet_name):
-                    self.current_pet.pet_name       = pet_name
-                    self.current_pet.name_pending   = False
-                    self.current_pet.pet_rank       = 0
-                    self.current_pet.max_melee      = 0
-                    self.pet_rank       = 0
-                    self.max_melee      = 0
-                    await self.client.send(self.current_pet.created_report())
-
-
+                reset_pet = True
 
         # search for the special case where the pet is attacking itself - this
         # how we will communicate to EQValet from within the game regarding the
@@ -326,34 +330,37 @@ class PetTracker:
 
             # is the pet attacking itself?
             if pet_name == target_name:
+                reset_pet = True
 
-                # no pet known to EQValet?
-                if self.current_pet is None:
+        if reset_pet:
+            # announce the pet name
+            await self.client.send('Pet name = {}'.format(pet_name))
 
-                    # then we probably have a charmed pet
-                    spell_name = 'CharmPet'
+            # no pet known to EQValet?
+            if self.current_pet is None:
 
-                    # does the spell name match one of the pets we know about?
-                    if spell_name in self.pet_dict:
-                        pet_template = self.pet_dict[spell_name]
-                        self.current_pet = Pet(pet_template)
-                        self.current_pet.pet_name = pet_name
-                        self.current_pet.name_pending = False
+                # then we probably have a charmed pet
+                spell_name = 'CharmPet'
 
-                        self.all_pets.append(self.current_pet)
-                        await self.client.send(self.current_pet.created_report())
+                # does the spell name match one of the pets we know about?
+                if spell_name in self.pet_dict:
+                    pet_template = self.pet_dict[spell_name]
+                    self.current_pet = Pet(pet_template)
+                    self.current_pet.pet_name = pet_name
+                    self.current_pet.name_pending = False
 
-                # ok somehow EQValet thinks we have a pet, but the name is goofed up, so just reset the max_melee and pet_rank fields and let them get
-                # determined again
-                else:
-                    self.current_pet.pet_name       = pet_name
-                    self.current_pet.name_pending   = False
-                    self.current_pet.pet_rank       = 0
-                    self.current_pet.max_melee      = 0
-                    self.pet_rank       = 0
-                    self.max_melee      = 0
+                    self.all_pets.append(self.current_pet)
                     await self.client.send(self.current_pet.created_report())
 
+            # ok somehow EQValet thinks we have a pet, but the name is goofed up, so just reset the max_melee and pet_rank fields and let them get
+            # determined again
+            else:
+                self.current_pet.pet_name       = pet_name
+                self.current_pet.name_pending   = False
+                self.current_pet.pet_rank       = 0
+                self.current_pet.pet_level      = 0
+                self.current_pet.max_melee      = 0
+                await self.client.send(self.current_pet)
 
 
 
