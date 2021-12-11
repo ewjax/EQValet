@@ -12,6 +12,7 @@ from discord.ext import commands
 import myconfig
 import randoms
 import pets
+import damage
 import logfile
 
 
@@ -88,18 +89,22 @@ class EQValetClient(commands.Bot):
         # use a PetTracker class to deal with all things pets
         self.pet_tracker        = pets.PetTracker(self)
 
+        # use a DamageTracker class to keep track of total damage dealt by spells and by pets
+        self.damage_tracker     = damage.DamageTracker(self)
+
 
     # process each line
     async def process_line(self, line):
         print(line, end = '')
 
-        # check for a random or for a pet
+        # check for a random
         await self.random_tracker.process_line(line)
+
+        # check for pet-related content
         await self.pet_tracker.process_line(line)
 
-
-        # do other parsing things here
-        pass
+        # check for damage-related content
+        await self.damage_tracker.process_line(line)
 
 
     # sound the alert
