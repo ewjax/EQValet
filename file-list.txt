@@ -1,8 +1,9 @@
 "myconfig - original.py"
 EQValet.py
-gvar.py
+smartbuffer.py
 logfile.py
 randoms.py
 pets.py
+damage.py
 file-list.txt
 

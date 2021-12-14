@@ -113,7 +113,7 @@ class PetTracker:
         self.all_pets       = []
 
 
-        # a dictionary hash on pet spell names
+        # a dictionary of pets, keys = Pet Spell Names, values = associated PetSpell objects
         self.pet_dict       = {}
         self.load_pet_dict()
 
@@ -342,7 +342,6 @@ class PetTracker:
     # create the dictionary of pet spells, with all pet spell info for each
     #
     def load_pet_dict(self):
-#        pet_stat_list = list()
 
         #
         # Necro pets
@@ -381,6 +380,7 @@ class PetTracker:
         pet_spell = PetSpell('Animate Dead', 'Necro', caster_level = 20, pet_stats_list = pet_stat_list.copy())
         self.pet_dict['Animate Dead'] = pet_spell
 
+        # need 24, 29, 34, 39, 44 necro pets here
 
 
         pet_stat_list       = []
@@ -432,9 +432,6 @@ class PetTracker:
         pet_stat_list.append(PetStats(rank = 0, pet_level = 0, max_melee = 0, max_bashkick = 0, max_backstab = 0, lifetap = 0))
         pet_spell = PetSpell('CharmPet', 'UnknownClass', caster_level = 0, pet_stats_list = pet_stat_list.copy())
         self.pet_dict['CharmPet'] = pet_spell
-
-
-#        print(self.pet_dict)
 
 
 

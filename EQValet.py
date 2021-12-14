@@ -14,6 +14,7 @@ import randoms
 import pets
 import damage
 import logfile
+from smartbuffer import SmartBuffer 
 
 
 
@@ -27,42 +28,6 @@ TEST_BOT                = False
 
 
 
-
-
-#################################################################################################
-
-#
-# a class to help manage long streams of text being sent to Discord
-# There is apparently a limit of 2000 characters on any message, anything over that throws an 
-# exception
-# 
-# this class works by just creating a list of buffers, none of which is over the 2K limit
-# Note that when using this, it is important to access the list of buffers using the get_bufflist()
-# method, to ensure any remaining content currently stored in the working_buffer is added to the list
-#
-class SmartBuffer:
-    # ctor
-    def __init__(self):
-
-#        self._bufflist           = list()
-        self._bufflist          = []
-        self._working_buffer    = ''
-
-    def add(self, string):
-        # would the new string make the buffer too long?
-        if ( len(self._working_buffer) + len(string) ) > 1950:
-             self._bufflist.append(self._working_buffer)
-             self._working_buffer = ''
-
-        self._working_buffer += string
-
-    def get_bufflist(self):
-        # add any content currently in the working buffer to the list
-        if self._working_buffer != '':
-            self._bufflist.append(self._working_buffer)
-
-        # return the list of buffers
-        return self._bufflist
 
 
 
@@ -86,11 +51,11 @@ class EQValetClient(commands.Bot):
         # use a RandomTracker class to deal with all things random numbers and rolls
         self.random_tracker     = randoms.RandomTracker(self)
 
-        # use a PetTracker class to deal with all things pets
-        self.pet_tracker        = pets.PetTracker(self)
-
         # use a DamageTracker class to keep track of total damage dealt by spells and by pets
         self.damage_tracker     = damage.DamageTracker(self)
+
+        # use a PetTracker class to deal with all things pets
+        self.pet_tracker        = pets.PetTracker(self)
 
 
     # process each line
@@ -100,11 +65,12 @@ class EQValetClient(commands.Bot):
         # check for a random
         await self.random_tracker.process_line(line)
 
+        # check for damage-related content
+        await self.damage_tracker.process_line(line)
+
         # check for pet-related content
         await self.pet_tracker.process_line(line)
 
-        # check for damage-related content
-        await self.damage_tracker.process_line(line)
 
 
     # sound the alert
@@ -141,8 +107,8 @@ class EQValetClient(commands.Bot):
             if TEST_BOT == True:
 
                 # read a sample file with sample random rolls in it
-    #            filename = 'randoms.txt'
-                filename = 'pets.txt'
+                filename = 'randoms.txt'
+#                filename = 'pets.txt'
 
                 # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
                 rv = self.elf.open(self.user, 'Testing', filename, seek_end = False)
@@ -235,7 +201,6 @@ async def rolls(ctx):
     bufflist = sb.get_bufflist()
     for b in bufflist:
         await client.send('{}'.format(b))
-
 
 
 # show command
@@ -364,6 +329,23 @@ async def pet(ctx):
     else:
         await client.send('No pet')
 
+
+
+# cto command
+# change the combat timeout value
+@client.command()
+async def cto(ctx, new_cto = 0):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    if (new_cto < 0):
+        await client.send('Error:  Requested new_cto value = {}.  Value for new_cto must be > 0'.format(new_cto))
+
+    elif (new_cto == 0):
+        await client.send('DamageTracker combat timeout (CTO) = {}'.format(client.damage_tracker.combat_timeout))
+
+    else:
+        client.damage_tracker.combat_timeout = new_cto
+        await client.send('DamageTracker Combat timeout (CTO) = {}'.format(client.damage_tracker.combat_timeout))
 
 
 

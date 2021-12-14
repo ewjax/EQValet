@@ -1,35 +1,14 @@
 # import the datetime class from the datetime module
 from datetime import datetime
-
-
 import re
+import copy
+
+import myconfig
+from smartbuffer import SmartBuffer 
 
 
-#
-# class for Targets
-#
-class Target:
 
-    # ctor
-    def __init__(self, name):
-
-        self.name                       = name
-        self.player_damage_event_list   = []
-        self.pet_damage_event_list      = []
-
-
-    # add a damage event to the list
-    def add_damage_event(self, de):
-        pass
-
-    # clear DE list
-    def clear_damage_event_list(self):
-        pass
-
-    # build a damage report, subtotaled by damage type
-    def damage_report(self):
-        pass       
-
+#################################################################################################
 # 
 # Inheritance Diagram:
 #         
@@ -41,9 +20,16 @@ class Target:
 #                                   /     \
 #                      LinearDOT_Spell   Splurt_Spell
 #         
+# common data:
+#       attacker_name       
+#       target_name
+#       eq_time                                                     for discrete events, the time.  For DOT's, the start time
+#
 # common methods:
-#       damage_dealt()      returns amount of damage in this particular DamageEvent
-#       damage_type()       returns the type of damage for summing
+#       set_instance_data(attacker_name, target_name, eq_timestamp) set instance info
+#       damage_dealt()                                              returns amount of damage in this particular DamageEvent
+#       damage_type()                                               returns the type of damage for summing
+#       is_ticking()                                                only returns true for DOT spells that have yet to close out
 #
 
 #################################################################################################
@@ -55,16 +41,31 @@ class DamageEvent:
 
     # ctor
     def __init__(self):
-        pass
 
+        # common data, to be set when an instance of the DamageEvent is created
+        self.attacker_name  = None
+        self.target_name    = None
+        self._eq_time       = None
+
+
+    # set instance data
+    # eq_timestamp assumed to be in the format of EQ logfile timestamp
+    def set_instance_data(self, attacker_name, target_name, eq_timestamp):
+        self.attacker_name  = attacker_name
+        self.target_name    = target_name
+        self._eq_time       = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # function to be overloaded by child classes
     def damage_dealt(self):
-        return 0
+        return int(0)
 
     # function to return type of damage - spell name, or melee type, or non-melee, etc
     def damage_type(self):
         return None
+
+    # only returns true for DOT spells that are not yet closed out
+    def is_ticking(self):
+        return False
 
 #################################################################################################
 
@@ -76,11 +77,11 @@ class DiscreteDamageEvent(DamageEvent):
     # ctor
     # for the time parameter, pass at least, or all, of the actual log file line containing the timestamp
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
-    def __init__(self, dmg_type, dmg_amount, eq_timestamp):
+    def __init__(self, attacker_name, target_name, eq_timestamp, dmg_type, dmg_amount):
         DamageEvent.__init__(self)
+        self.set_instance_data(attacker_name, target_name, eq_timestamp)
         self.dmg_type       = dmg_type
-        self.dmg_amount     = dmg_amount
-        self.eq_time        = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.dmg_amount     = int(dmg_amount)
 
     # function to be overloaded by child classes
     def damage_dealt(self):
@@ -92,9 +93,11 @@ class DiscreteDamageEvent(DamageEvent):
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
-        return '({}, {}, {})'.format(self.dmg_type,
-                                     self.dmg_amount,
-                                     self.eq_time)
+        return '({}, {}, {}, {}, {})'.format(self.attacker_name, 
+                                             self.target_name,
+                                             self._eq_time,
+                                             self.dmg_type,
+                                             self.dmg_amount)
 
 
 #################################################################################################
@@ -120,26 +123,27 @@ class DOT_Spell(DamageEvent):
         if self.faded_message == None:
             self.faded_message = '^Your ' + self.spell_name + ' spell has worn off'
 
-        self.start_time         = None
-        self.end_time           = None
+        # this will get set later
+        self._end_time          = None
 
-    # set the start time
+
+    # set the start time - shouldn't need this, normally would be set in set_instance_info(), but provide it just in case
     # using the very capable strptime() parsing function built into the datetime module
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
     def set_start_time(self, eq_timestamp):
-        self.start_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self._eq_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # set the end time
     # using the very capable strptime() parsing function built into the datetime module
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
     def set_end_time(self, eq_timestamp):
-        self.end_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self._end_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # helper function to get number of ticks elapsed 
     def elapsed_ticks(self):
         ticks = 0
-        if (self.end_time and self.start_time):
-            elapsed_timedelta = self.end_time - self.start_time
+        if (self._end_time and self._eq_time):
+            elapsed_timedelta = self._end_time - self._eq_time
             elapsed_seconds = elapsed_timedelta.total_seconds()
             if elapsed_seconds > self.max_duration_sec:
                 elapsed_seconds = self.max_duration_sec
@@ -154,12 +158,23 @@ class DOT_Spell(DamageEvent):
     def damage_type(self):
         return self.spell_name
 
+    # returns true if end time has not yet been set in this spell
+    def is_ticking(self):
+        rv = False
+        if self._end_time == None:
+            rv = True
+        return rv
+
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
-        return '({}, {}, {}, {})'.format(self.spell_name,
-                                         self.max_duration_sec,
-                                         self.start_time,
-                                         self.end_time)
+        return '({}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                         self.target_name,
+                                                         self._eq_time,
+                                                         self._end_time,
+                                                         self.spell_name,
+                                                         self.max_duration_sec,
+                                                         self.landed_message,
+                                                         self.faded_message)
 
 
 #################################################################################################
@@ -173,13 +188,13 @@ class LinearDOT_Spell(DOT_Spell):
     # ctor
     def __init__(self, spell_name, max_duration_sec, dmg_initial, dmg_per_tick, landed_message, faded_message = None):
         DOT_Spell.__init__(self, spell_name, max_duration_sec, landed_message, faded_message)
-        self.dmg_initial    = dmg_initial
-        self.dmg_per_tick   = dmg_per_tick
+        self.dmg_initial    = int(dmg_initial)
+        self.dmg_per_tick   = int(dmg_per_tick)
 
     # overload the damage_dealt() function
     def damage_dealt(self):
         damage = 0
-        if (self.end_time and self.start_time):
+        if (self._end_time and self._eq_time):
             ticks = self.elapsed_ticks()
             damage = self.dmg_initial + ticks * self.dmg_per_tick
         return damage
@@ -187,14 +202,16 @@ class LinearDOT_Spell(DOT_Spell):
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
-        return '({}, {}, {}, {}, {}, {}, {}, {})'.format(self.spell_name,
-                                                         self.max_duration_sec,
-                                                         self.dmg_initial,
-                                                         self.dmg_per_tick,
-                                                         self.landed_message,
-                                                         self.faded_message,
-                                                         self.start_time,
-                                                         self.end_time)
+        return '({}, {}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                                 self.target_name,
+                                                                 self._eq_time,
+                                                                 self._end_time,
+                                                                 self.spell_name,
+                                                                 self.max_duration_sec,
+                                                                 self.dmg_initial,
+                                                                 self.dmg_per_tick,
+                                                                 self.landed_message,
+                                                                 self.faded_message)
 
 #################################################################################################
 
@@ -206,12 +223,12 @@ class Splurt_Spell(DOT_Spell):
 
     # ctor
     def __init__(self):
-        DOT_Spell.__init__(self, 'Splurt', 102, '^{s}\'s body begins to splurt', None)
+        DOT_Spell.__init__(self, 'Splurt', 102, r'^(?P<target_name>[\w` ]+)\'s body begins to splurt', None)
 
     # overload the damage_dealt() function
     def damage_dealt(self):
         damage = 0
-        if (self.end_time and self.start_time):
+        if (self._end_time and self._eq_time):
 
             ticks = self.elapsed_ticks()
             base_damage = ticks * 11
@@ -229,34 +246,174 @@ class Splurt_Spell(DOT_Spell):
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
-        return '({}, {}, {}, {})'.format(self.spell_name,
-                                         self.max_duration_sec,
-                                         self.landed_message,
-                                         self.start_time,
-                                         self.end_time)
+        return '({}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                     self.target_name,
+                                                     self._eq_time,
+                                                     self._end_time,
+                                                     self.spell_name,
+                                                     self.max_duration_sec,
+                                                     self.landed_message)
+
+
 
 
 
 #################################################################################################
 
+#
+# class for Targets
+#
+class Target:
+
+    # ctor
+    def __init__(self):
+
+        # target name
+        self.target_name                = None
+        self.in_combat                  = False
+        self._first_combat_time         = None
+        self._last_combat_time          = None
+
+        # a dictionary of lists, keys = attacker names, values = list[] of all DamageEvents done by that attacker
+        self.damage_events_dict = {}
 
 
 
+    # start combat
+    def start_combat(self, target_name, eq_timestamp):
+        self.target_name = target_name
+        self._first_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.in_combat = True
+
+    # end combat
+    def end_combat(self, eq_timestamp):
+
+        self._last_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.in_combat = False
+
+        # for each attacker..
+        for attacker in self.damage_events_dict:
+            # get the list of DE events for this attacker
+            de_list = self.damage_events_dict[attacker]
+            # for each event in the list
+            for de in de_list:
+                if de.is_ticking():
+                    de.set_end_time(eq_timestamp)
+
+    # clear DE list
+    def clear(self):
+        self.target_name                = None
+        self.in_combat                  = False
+        self._first_combat_time         = None
+        self._last_combat_time          = None
+
+        self.damage_events_dict.clear()
+
+
+    # combat timeout time in seconds - time since last DamageEvent
+    def combat_timeout_seconds(self, eq_timestamp):
+        now = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        elapsed_timedelta = now - self._last_combat_time
+        elapsed_seconds = elapsed_timedelta.total_seconds()
+        return elapsed_seconds
+
+    # combat duration in seconds - first to last
+    def combat_duration_seconds(self):
+        elapsed_timedelta = self._last_combat_time - self._first_combat_time
+        elapsed_seconds = elapsed_timedelta.total_seconds()
+        return elapsed_seconds
+
+
+    # add a damage event to the list
+    def add_damage_event(self, de):
+
+        # targets must match
+        if (self.target_name.casefold() == de.target_name.casefold()) and self.in_combat:
+            
+            # is there an entry in the dictionary for this attacker?
+            if de.attacker_name not in self.damage_events_dict:
+                self.damage_events_dict[de.attacker_name] = []
+
+            de_list = self.damage_events_dict[de.attacker_name]
+            de_list.append(de)
+            self._last_combat_time = de._eq_time
+
+    # build a damage report, subtotaled by damage type
+    async def damage_report(self, client):
+
+        sb = SmartBuffer()
+
+        sb.add('Damage Report, Target: ====[{:^30}]==============================================\n'.format(self.target_name))
+        sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
+        grand_total = 0
+
+        # for each attacker a...
+        for attacker in self.damage_events_dict:
+            sb.add('        {}\n'.format(attacker))
+
+            # get list of DamageEvents for this attacker
+            attacker_total = 0
+
+            # create a dictionary, keys = damage types, values = integer total damage done for that damage type
+            dmg_type_summary_dict = {}
+            de_list = self.damage_events_dict[attacker]
+
+            # for each DamageEvent in the list...
+            for de in de_list:
+                if de.damage_type() not in dmg_type_summary_dict:
+                    dmg_type_summary_dict[de.damage_type()] = 0
+                dmg_type_summary_dict[de.damage_type()] += de.damage_dealt()
+
+            # sort damage type report from highest to lowest damage
+            for (type, type_damage_sum) in sorted(dmg_type_summary_dict.items(), key = lambda tuple:tuple[1], reverse = True):
+                sb.add('{:>35}: {:>5}\n'.format(type, type_damage_sum))
+                attacker_total += type_damage_sum
+
+            sb.add('{:>35}: {:>5}\n'.format('Total', attacker_total))
+            grand_total += attacker_total
+
+        sb.add('\n')
+        sb.add('{:>35}: {:>5}\n'.format('Grand Total', grand_total))
+
+        sb.add('---------------------------------------------------------------------------------------------------------\n')
+
+        # get the list of buffers and send each to discord
+        bufflist = sb.get_bufflist()
+        for b in bufflist:
+            # surrounding the text with 3 back-ticks makes the resulting output code-formatted, i.e. a fixed width font for each table creation
+            await client.send('```{}```'.format(b))
+
+
+
+
+
+#################################################################################################
 
 #
 # class to do all the damage tracking work
+#
 class DamageTracker:
 
     # ctor
     def __init__(self, client):
 
         # pointer to the discord client for comms
-        self.client         = client
+        self.client                     = client
 
-        # a dictionary hash on spell name
-        self.spell_dict     = {}
+        # the target that is being attacked
+        self.the_target                 = Target()
+
+        # dictionary of all known DOT_Spells, keys = spell names, contents = DOT_Spell objects
+        self.spell_dict                 = {}
         self.load_spell_dict()
 
+        # use this flag for when we have detected the start of a spell cast and need to watch for the landed message
+        # this is a pointer to the actual spell that is pending
+        self.spell_pending              = None
+        self.spell_pending_start        = None
+
+        # combat timeout
+        self.combat_timeout             = myconfig.COMBAT_TIMEOUT_SEC
 
 
     #
@@ -267,13 +424,128 @@ class DamageTracker:
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
+        #
+        # watch for conditions indicating combat is finished
+        #
+        if self.the_target.in_combat:
+
+            end_combat = False
+
+            # exp message
+            target = r'^(You gain experience|You gain party experience)'
+            m = re.match(target, trunc_line)
+            if m:
+                end_combat = True
+
+            # target is slain by pet or anyone else
+            target = r'^(?P<target_name>[\w` ]+) has been slain'
+            m = re.match(target, trunc_line)
+            if m:
+                # extract RE data
+                target_name = m.group('target_name')
+                if target_name.casefold() == self.the_target.target_name.casefold():
+                    end_combat = True
+
+            # target is slain by player
+            target = r'^You have slain (?P<target_name>[\w` ]+)'
+            m = re.match(target, trunc_line)
+            if m:
+                # extract RE data
+                target_name = m.group('target_name')
+                if target_name.casefold() == self.the_target.target_name.casefold():
+                    end_combat = True
+
+            # combat timeout
+            if self.the_target.combat_timeout_seconds(line) > self.combat_timeout:
+                # ...then the combat timer has time out
+                await self.client.send('*Combat: Timed out*')
+                end_combat = True
+
+
+            # close out damage tracking
+            if end_combat:
+                self.the_target.end_combat(line)
+                await self.the_target.damage_report(self.client)
+                self.the_target.clear()
+
+
+
+        #
+        # check for timeout on spell landed messages
+        #
+        if self.spell_pending:
+
+            # get current time and check for timeout
+            now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
+            elapsed_seconds = (now - self.spell_pending_start)
+            if (elapsed_seconds.total_seconds() > myconfig.SPELL_PENDING_TIMEOUT_SEC):
+                # ...then this spell pending is expired
+                await self.client.send('*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
+                self.spell_pending = None
+                self.spell_pending_start = None
+
+        #
+        # watch for landed messages
+        #
+        if self.spell_pending:
+
+            # get the landed message for the spell that is pending
+            target = self.spell_pending.landed_message
+            m = re.match(target, trunc_line)
+            if m:
+
+                # extract RE data
+                target_name = m.group('target_name')
+
+                # set the attacker name to the player name
+                attacker_name = self.client.elf.char_name
+
+                # any damage event indicates we are in combat
+                if self.the_target.in_combat == False:
+                    self.the_target.start_combat(target_name, line)
+                    await self.client.send('*Combat begun: {}*'.format(target_name))
+
+                # is this spell already in the DE list for the player, and still ticking?  if so, close the existing, and add the new one
+                de_list = self.the_target.damage_events_dict.get(attacker_name)
+                # for each event in the player's DE list
+                if de_list:
+                    for de in de_list:
+                        if de.is_ticking():
+                            if self.spell_pending.spell_name == de.spell_name:
+                                de.set_end_time(line)
+                                await self.client.send('*{} overwritten with new*'.format(de.spell_name))
+
+                # add the DamageEvent
+                de = copy.copy(self.spell_pending)
+                de.set_instance_data(attacker_name, target_name, line)
+                self.the_target.add_damage_event(de)
+
+                # reset the spell pending flag
+                self.spell_pending = None
+                self.spell_pending_start = None
+
+
+        #
+        # watch for spell faded conditions -only check DamageEvents that are not closed, i.e. still ticking
+        #
+        if self.the_target.in_combat:
+            attacker_name = self.client.elf.char_name
+            de_list = self.the_target.damage_events_dict.get(attacker_name)
+            # for each event in the player's DE list
+            if de_list:
+                for de in de_list:
+                    if de.is_ticking():
+                        target = de.faded_message
+                        m = re.match(target, trunc_line)
+                        if m:
+                            de.set_end_time(line)
+                            await self.client.send('*{} faded*'.format(de.spell_name))
+
 
         #
         # watch for casting messages
         #
         target = r'^You begin casting (?P<spell_name>[\w` ]+)\.'
-
-        # return value m is either None of an object with information about the RE search
         m = re.match(target, trunc_line)
         if m:
 
@@ -282,18 +554,64 @@ class DamageTracker:
 
             # does the spell name match one of the pets we know about?
             if spell_name in self.spell_dict:
-                dmg_spell = self.spell_dict[spell_name]
-                await self.client.send('*Spell ({}) being cast*'.format(spell_name))
+                self.spell_pending = self.spell_dict[spell_name]
+                self.spell_pending_start = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
 
 
         #
         # watch for non-melee messages
         #
+        target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
+        m = re.match(target, trunc_line)
+        if m:
+            # extract RE data
+            target_name = m.group('target_name')
+            dmg_type = m.group('dmg_type')
+            damage = int(m.group('damage'))
+
+            # set the attacker name
+            # will usually be player name, unless, this message is from a pet lifetap
+            attacker_name = self.client.elf.char_name
+            if damage < 100:
+                if self.client.pet_tracker.current_pet:
+                    if self.client.pet_tracker.current_pet.lifetap_pending:
+                        attacker_name = self.client.pet_tracker.current_pet.pet_name
+
+            # any damage event indicates we are in combat
+            if self.the_target.in_combat == False:
+                self.the_target.start_combat(target_name, line)
+                await self.client.send('*Combat begun: {}*'.format(target_name))
+
+            # add the DamageEvent
+            dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+            self.the_target.add_damage_event(dde)
 
 
         #
         # watch for melee messages
         #
+        target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        m = re.match(target, trunc_line)
+        if m:
+
+            # extract RE data
+            attacker_name = m.group('attacker_name')
+            dmg_type = m.group('dmg_type')
+            target_name = m.group('target_name')
+            damage = int(m.group('damage'))
+
+            # don't track attacks on player
+            if target_name != 'YOU':
+
+                # any damage event indicates we are in combat
+                if self.the_target.in_combat == False:
+                    self.the_target.start_combat(target_name, line)
+                    await self.client.send('*Combat begun: {}*'.format(target_name))
+
+                # add the DamageEvent
+                dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                self.the_target.add_damage_event(dde)
+
 
 
 
@@ -302,20 +620,6 @@ class DamageTracker:
     # create the dictionary of pet spells, with all pet spell info for each
     #
     def load_spell_dict(self):
-
-#        #
-#        # discrete damage events
-#        #
-#        ev_type = 'Non-melee'
-#        dde = DiscreteDamageEvent(ev_type, r'^(?P<target_name>[\w` ]+) was hit by non-melee for (?P<damage>[\d]+) points of damage')
-#        self.spell_dict[ev_type] = dde
-#
-#        ev_type = 'Melee'
-#        dde = DiscreteDamageEvent(ev_type, r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage')
-#        self.spell_dict[ev_type] = dde
-
-
-
 
         #
         # enchanter DOT spells
@@ -349,11 +653,115 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
 
+        #
+        # necro DOT spells
+        #
+        # all the linear dot spells
+        spell_name = 'Disease Cloud'
+        sp = LinearDOT_Spell(spell_name, 360,   5,   1, r'^(?P<target_name>[\w` ]+) doubles over in pain')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Clinging Darkness'
+        sp = LinearDOT_Spell(spell_name,  36,   0,   5, r'^(?P<target_name>[\w` ]+) is surrounded by darkness')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Poison Bolt'
+        sp = LinearDOT_Spell(spell_name,  42,   6,   5, r'^(?P<target_name>[\w` ]+) has been poisoned')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Engulfing Darkness'
+        sp = LinearDOT_Spell(spell_name,  66,   0,  11, r'^(?P<target_name>[\w` ]+) is engulfed in darkness')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Heat Blood'
+        sp = LinearDOT_Spell(spell_name,  60,   0,  17, r'^(?P<target_name>[\w` ]+)\'s blood simmers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Leach'
+        sp = LinearDOT_Spell(spell_name,  54,   0,   8, r'^(?P<target_name>[\w` ]+) pales')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Heart Flutter'
+        sp = LinearDOT_Spell(spell_name,  72,   0,  12, r'^(?P<target_name>[\w` ]+) clutches their chest')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Infectious Cloud'
+        sp = LinearDOT_Spell(spell_name, 126,  20,   5, r'^(?P<target_name>[\w` ]+) starts to wretch')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Boil Blood'
+        sp = LinearDOT_Spell(spell_name, 126,   0,  24, r'^(?P<target_name>[\w` ]+)\'s blood boils')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Dooming Darkness'
+        sp = LinearDOT_Spell(spell_name,  96,   0,  20, r'^(?P<target_name>[\w` ]+) is engulfed in darkness')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Vampiric Curse'
+        sp = LinearDOT_Spell(spell_name,  54,   0,  21, r'^(?P<target_name>[\w` ]+) pales')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Venom of the Snake'
+        sp = LinearDOT_Spell(spell_name,  48,  40,  59, r'^(?P<target_name>[\w` ]+) has been poisoned')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Scourge'
+        sp = LinearDOT_Spell(spell_name, 126,  40,  24, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Chilling Embrace'
+        sp = LinearDOT_Spell(spell_name,  96,   0,  40, r'^(?P<target_name>[\w` ]+) is wracked by chilling poison')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Asystole'
+        sp = LinearDOT_Spell(spell_name,  60,   0,  69, r'^(?P<target_name>[\w` ]+) clutches their chest')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Bond of Death'
+        sp = LinearDOT_Spell(spell_name,  54,   0,  80, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Cascading Darkness'
+        sp = LinearDOT_Spell(spell_name,  96,   0,  72, r'^(?P<target_name>[\w` ]+) is engulfed in darkness')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Ignite Blood'
+        sp = LinearDOT_Spell(spell_name, 126,   0,  56, r'^(?P<target_name>[\w` ]+)\'s blood ignites')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Envenomed Bolt'
+        sp = LinearDOT_Spell(spell_name,  48, 110, 146, r'^(?P<target_name>[\w` ]+) has been poisoned')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Plague'
+        sp = LinearDOT_Spell(spell_name, 132,  60,  55, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Cessation of Cor'
+        sp = LinearDOT_Spell(spell_name,  60, 100, 100, r'^(?P<target_name>[\w` ]+)\'s blood stills within their veins')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Vexing Mordinia'
+        sp = LinearDOT_Spell(spell_name,  54,   0, 122, r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Pyrocruor'
+        sp = LinearDOT_Spell(spell_name, 114,   0, 111, r'^(?P<target_name>[\w` ]+)\'s blood ignites')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Devouring Darkness'
+        sp = LinearDOT_Spell(spell_name,  78,   0, 107, r'^(?P<target_name>[\w` ]+) is engulfed in devouring darkness')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Torment of Shadows'
+        sp = LinearDOT_Spell(spell_name,  96,   0,  75, r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
+        self.spell_dict[spell_name] = sp
 
 
-
-
-
+        # the only non-linear dot spell
+        spell_name = 'Splurt'
+        sp = Splurt_Spell()
+        self.spell_dict[spell_name] = sp
 
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
@@ -382,42 +790,71 @@ class DamageTracker:
 
 def main():
 
-    sec = 17.999
-    print('ticks = {}'.format(sec/6.0))
-    print('ticks = {}'.format(int(sec/6.0)))
+#    sec = 17.999
+#    print('ticks = {}'.format(sec/6.0))
+#    print('ticks = {}'.format(int(sec/6.0)))
 
     line1 = '[Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.'
     line2 = '[Thu Oct 28 15:28:13 2021] A frost giant captain is engulfed in darkness.'
+#
+#    ds1 = LinearDOT_Spell(None, None, None, 'Cascading Darkness', 96, 0, 72, 'A frost giant captain is engulfed in darkness')
+#    print(ds1)
+#    ds1.set_start_time(line1)
+#    ds1.set_end_time(line2)
+#    print(ds1)
+#
+#    print(ds1.elapsed_ticks())
+#    print(ds1.damage_dealt())
 
-    ds1 = LinearDOT_Spell('Cascading Darkness', 96, 0, 72, 'A frost giant captain is engulfed in darkness')
-    print(ds1)
-    ds1.set_start_time(line1)
-    ds1.set_end_time(line2)
-    print(ds1)
 
-    print(ds1.elapsed_ticks())
-    print(ds1.damage_dealt())
+#    ds2 = LinearDOT_Spell('Envenomed Bolt', 48, 110, 146, 'landed message')
+#    ds22 = copy.copy(ds2)
+#
+#    ds22.set_instance_data('Attakker', 'TheTarget', line1)
+#    ds22.set_end_time(line2)
+#
+#    print(ds2)
+#    print(ds22)
+#
+#    print(ds2.damage_dealt())
+#    print(ds22.damage_dealt())
+
+
+    target_name = 'a stingtooth piranha'
+    the_target = Target()
+    the_target.set_target_name(target_name)
 
 
     ds2 = LinearDOT_Spell('Envenomed Bolt', 48, 110, 146, 'landed message')
-    ds2.set_start_time(line1)
-    ds2.set_end_time(line2)
-    print(ds2)
+    ds22 = copy.copy(ds2)
 
-    print(ds2.damage_dealt())
+    ds22.set_instance_data('Xytl', target_name, line1)
+    ds22.set_end_time(line2)
+    the_target.add_damage_event(ds22)
 
 
     ds3 = Splurt_Spell()
-    ds3.set_start_time(line1)
-    ds3.set_end_time(line2)
-    print(ds3)
+    ds33 = copy.copy(ds3)
 
-    print(ds3.damage_dealt())
+    ds33.set_instance_data('Xytl', target_name, line1)
+    ds33.set_end_time(line2)
+    the_target.add_damage_event(ds33)
+
+
+#
+#    print(ds3)
+#    print(ds3.damage_dealt())
+#
+#    print(ds33)
+#    print(ds33.damage_dealt())
+
 
 
 
     line3 = '[Mon Sep 06 14:01:09 2021] Zarobab hits a stingtooth piranha for 26 points of damage.'
     line4 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 25 points of damage.'
+    line44 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 125 points of damage.'
+    line45 = '[Mon Sep 06 14:01:11 2021] Goliathette hits a stingtooth piranha for 99 points of damage.'
     melee_target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
 
     m = re.match(melee_target, line3[27:], re.IGNORECASE)
@@ -426,36 +863,75 @@ def main():
         dmg_type        = m.group('dmg_type')
         target_name     = m.group('target_name')
         dmg             = m.group('damage')
-        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
-        dde             = DiscreteDamageEvent(dmg_type, dmg, line3)
-        print(dde)
+#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+        dde             = DiscreteDamageEvent(attacker_name, target_name, line3, dmg_type, dmg)
+#        print(dde)
+
+        the_target.add_damage_event(dde)
+
+
     m = re.match(melee_target, line4[27:], re.IGNORECASE)
     if m:
         attacker_name   = m.group('attacker_name')
         dmg_type        = m.group('dmg_type')
         target_name     = m.group('target_name')
         dmg             = m.group('damage')
-        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
-        dde             = DiscreteDamageEvent(dmg_type, dmg, line3)
-        print(dde)
+#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+        dde             = DiscreteDamageEvent(attacker_name, target_name, line4, dmg_type, dmg)
+#        print(dde)
+
+        the_target.add_damage_event(dde)
 
 
-    line5 = '[Wed Dec 01 21:08:15 2021] a kiraikuei was hit by non-melee for 315 points of damage.'
+    m = re.match(melee_target, line44[27:], re.IGNORECASE)
+    if m:
+        attacker_name   = m.group('attacker_name')
+        dmg_type        = m.group('dmg_type')
+        target_name     = m.group('target_name')
+        dmg             = m.group('damage')
+#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+        dde             = DiscreteDamageEvent(attacker_name, target_name, line44, dmg_type, dmg)
+#        print(dde)
+
+        the_target.add_damage_event(dde)
+
+    m = re.match(melee_target, line45[27:], re.IGNORECASE)
+    if m:
+        attacker_name   = m.group('attacker_name')
+        dmg_type        = m.group('dmg_type')
+        target_name     = m.group('target_name')
+        dmg             = m.group('damage')
+#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+        dde             = DiscreteDamageEvent(attacker_name, target_name, line45, dmg_type, dmg)
+#        print(dde)
+
+        the_target.add_damage_event(dde)
+
+
+
+
+
+    line5 = '[Wed Dec 01 21:08:15 2021] a stingtooth piranha was hit by non-melee for 315 points of damage.'
     non_melee_target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
 
     m = re.match(non_melee_target, line5[27:], re.IGNORECASE)
     if m:
+        attacker_name = 'Xytl'
         target_name = m.group('target_name')
         dmg_type        = m.group('dmg_type')
         dmg = m.group('damage')
-        print('Non-Melee: Type / Target / Damage: {}, {}, {}'.format(dmg_type, target_name, dmg))
-        dde = DiscreteDamageEvent('non-melee', dmg, line3)
-        print(dde)
+#        print('Non-Melee: Type / Target / Damage: {}, {}, {}'.format(dmg_type, target_name, dmg))
+        dde = DiscreteDamageEvent(attacker_name, target_name, line5, dmg_type, dmg)
+#        print(dde)
+
+        the_target.add_damage_event(dde)
 
 
+    the_target.damage_report()
 
-    dt = DamageTracker(None)
-    print(dt)
+    print(the_target.damage_events_dict)
+    the_target.clear()
+    print(the_target.damage_events_dict)
 
 
 
