@@ -380,7 +380,17 @@ class PetTracker:
         pet_spell = PetSpell('Animate Dead', 'Necro', caster_level = 20, pet_stats_list = pet_stat_list.copy())
         self.pet_dict['Animate Dead'] = pet_spell
 
-        # need 24, 29, 34, 39, 44 necro pets here
+        pet_stat_list       = []
+        pet_stat_list.append(PetStats(rank = 1, pet_level = 18, max_melee = 18, max_bashkick = 15, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 2, pet_level = 19, max_melee = 20, max_bashkick = 16, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 3, pet_level = 20, max_melee = 22, max_bashkick = 16, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 4, pet_level = 21, max_melee = 23, max_bashkick = 17, max_backstab = 0, lifetap = 0))
+        pet_stat_list.append(PetStats(rank = 5, pet_level = 22, max_melee = 26, max_bashkick = 17, max_backstab = 0, lifetap = 0))
+        pet_spell = PetSpell('Haunting Corpse', 'Necro', caster_level = 24, pet_stats_list = pet_stat_list.copy())
+        self.pet_dict['Haunting Corpse'] = pet_spell
+
+
+        # need 29, 34, 39, 44 necro pets here
 
 
         pet_stat_list       = []
