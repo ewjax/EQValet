@@ -1,4 +1,4 @@
-"myconfig - original.py"
+myconfig-copy.py
 EQValet.py
 smartbuffer.py
 logfile.py
