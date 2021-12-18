@@ -341,18 +341,34 @@ class Target:
     # build a damage report, subtotaled by damage type
     async def damage_report(self, client):
 
-        sb = SmartBuffer()
-
-        sb.add('Damage Report, Target: ====[{:^30}]==============================================\n'.format(self.target_name))
-        sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
+        # total damage dealt to this target
         grand_total = 0
 
-        # for each attacker a...
-        for attacker in self.damage_events_dict:
-            sb.add('        {}\n'.format(attacker))
+        # walk the list initially just to get attacker totals, save in a dictionary, key = attacker names, values = dmg total for that attacker
+        attacker_summary_dict = {}
 
-            # get list of DamageEvents for this attacker
-            attacker_total = 0
+        # for each attacker in the damate_events_dict
+        for attacker in self.damage_events_dict:
+
+            # first one?
+            if attacker not in attacker_summary_dict:
+                attacker_summary_dict[attacker] = 0
+
+            # for each DamageEvent in the list for this attacker...
+            de_list = self.damage_events_dict[attacker]
+            for de in de_list:
+                dd = de.damage_dealt()
+                attacker_summary_dict[attacker] += dd
+                grand_total += dd
+
+        # now create the output report
+        sb = SmartBuffer()
+        sb.add('Damage Report, Target: ====[{:^30}]==============================================\n'.format(self.target_name))
+        sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
+
+        # walk the list of attackers, sort the attacker dictionary on total damage done...
+        for (attacker, attacker_total) in sorted(attacker_summary_dict.items(), key = lambda tuple:tuple[1], reverse = True):
+            sb.add('        {}\n'.format(attacker))
 
             # create a dictionary, keys = damage types, values = integer total damage done for that damage type
             dmg_type_summary_dict = {}
@@ -367,13 +383,11 @@ class Target:
             # sort damage type report from highest to lowest damage
             for (type, type_damage_sum) in sorted(dmg_type_summary_dict.items(), key = lambda tuple:tuple[1], reverse = True):
                 sb.add('{:>35}: {:>5}\n'.format(type, type_damage_sum))
-                attacker_total += type_damage_sum
 
-            sb.add('{:>35}: {:>5}\n'.format('Total', attacker_total))
-            grand_total += attacker_total
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, int(attacker_total/grand_total*100.0)))
 
         sb.add('\n')
-        sb.add('{:>35}: {:>5}\n'.format('Grand Total', grand_total))
+        sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total))
 
         sb.add('---------------------------------------------------------------------------------------------------------\n')
 
