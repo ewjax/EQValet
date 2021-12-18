@@ -274,15 +274,31 @@ class Target:
         self._first_combat_time         = None
         self._last_combat_time          = None
 
+        # max value the target is hitting for
+        self.max_melee                  = 0
+
         # a dictionary of lists, keys = attacker names, values = list[] of all DamageEvents done by that attacker
         self.damage_events_dict = {}
 
+    # process a melee attack
+    def check_melee(self, dmg):
+        if self.max_melee < dmg:
+            self.max_melee = dmg
 
+    # implied target level, from max melee value
+    def implied_level(self):
+        level = 0
+        if self.max_melee <= 60:
+            level = self.max_melee / 2
+        else:
+            level = (self.max_melee  + 60) / 4
+        return level
 
     # start combat
     def start_combat(self, target_name, eq_timestamp):
         self.target_name = target_name
         self._first_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self._last_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
         self.in_combat = True
 
     # end combat
@@ -306,6 +322,7 @@ class Target:
         self.in_combat                  = False
         self._first_combat_time         = None
         self._last_combat_time          = None
+        self.max_melee                  = 0
 
         self.damage_events_dict.clear()
 
@@ -364,6 +381,7 @@ class Target:
         # now create the output report
         sb = SmartBuffer()
         sb.add('Damage Report, Target: ====[{:^30}]==============================================\n'.format(self.target_name))
+        sb.add('Implied Level: {}\n'.format(self.implied_level()))
         sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
@@ -474,7 +492,6 @@ class DamageTracker:
                 # ...then the combat timer has time out
                 await self.client.send('*Combat: Timed out*')
                 end_combat = True
-
 
             # close out damage tracking
             if end_combat:
@@ -602,6 +619,48 @@ class DamageTracker:
 
 
         #
+        # watch for melee misses by me
+        #
+        target = r'^You try to (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+), but miss!'
+        m = re.match(target, trunc_line)
+        if m:
+            # extract RE data
+            attacker_name = self.client.elf.char_name
+            dmg_type = m.group('dmg_type')
+            target_name = m.group('target_name')
+
+            # any damage event indicates we are in combat
+            if self.the_target.in_combat == False:
+                self.the_target.start_combat(target_name, line)
+                await self.client.send('*Combat begun: {}*'.format(target_name))
+
+        #
+        # watch for melee messages by me
+        #
+        target = r'^You (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        m = re.match(target, trunc_line)
+        if m:
+
+            # extract RE data
+            attacker_name = self.client.elf.char_name
+            dmg_type = m.group('dmg_type')
+            target_name = m.group('target_name')
+            damage = int(m.group('damage'))
+
+            # don't track attacks on player
+            if target_name != 'YOU':
+
+                # any damage event indicates we are in combat
+                if self.the_target.in_combat == False:
+                    self.the_target.start_combat(target_name, line)
+                    await self.client.send('*Combat begun: {}*'.format(target_name))
+
+                # add the DamageEvent
+                dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                self.the_target.add_damage_event(dde)
+
+
+        #
         # watch for melee messages
         #
         target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
@@ -614,8 +673,20 @@ class DamageTracker:
             target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
+            # if the target name is YOU, then the attacker is actually the target
+            if target_name == 'YOU':
+                target_name = attacker_name
+
+                if self.the_target:
+                    self.the_target.check_melee(damage)
+
+                # any damage event indicates we are in combat
+                if self.the_target.in_combat == False:
+                    self.the_target.start_combat(target_name, line)
+                    await self.client.send('*Combat begun: {}*'.format(target_name))
+
             # don't track attacks on player
-            if target_name != 'YOU':
+            else:
 
                 # any damage event indicates we are in combat
                 if self.the_target.in_combat == False:

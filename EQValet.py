@@ -49,12 +49,15 @@ class EQValetClient(commands.Bot):
         self.elf                = logfile.EverquestLogFile()
 
         # use a RandomTracker class to deal with all things random numbers and rolls
+        self.random_parse       = True
         self.random_tracker     = randoms.RandomTracker(self)
 
         # use a DamageTracker class to keep track of total damage dealt by spells and by pets
+        self.damage_parse       = True
         self.damage_tracker     = damage.DamageTracker(self)
 
         # use a PetTracker class to deal with all things pets
+        self.pet_parse          = True
         self.pet_tracker        = pets.PetTracker(self)
 
 
@@ -63,14 +66,16 @@ class EQValetClient(commands.Bot):
         print(line, end = '')
 
         # check for a random
-        await self.random_tracker.process_line(line)
+        if self.random_parse:
+            await self.random_tracker.process_line(line)
 
         # check for damage-related content
-        await self.damage_tracker.process_line(line)
+        if self.damage_parse:
+            await self.damage_tracker.process_line(line)
 
         # check for pet-related content
-        await self.pet_tracker.process_line(line)
-
+        if self.pet_parse:
+            await self.pet_tracker.process_line(line)
 
 
     # sound the alert
@@ -173,8 +178,8 @@ async def on_message(message):
 
 
 # ping command
-@client.command()
-async def ping(ctx):
+@client.command(aliases = ['ping'])
+async def gen_ping(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
     await client.send('Latency = {} ms'.format(round(client.latency*1000)))
 
@@ -182,8 +187,8 @@ async def ping(ctx):
 
 # rolls command
 # how many randoms have there been
-@client.command()
-async def rolls(ctx):
+@client.command(aliases = ['rolls'])
+async def ran_rolls(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # create a smart buffer to keep buffers under max size for discord messages (2000)
@@ -205,8 +210,8 @@ async def rolls(ctx):
 
 # show command
 # show all rolls in a specified RandomEvent
-@client.command()
-async def show(ctx, ndx = -1):
+@client.command(aliases = ['show'])
+async def ran_show(ctx, ndx = -1):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # if the ndx value isn't specified, default to showing the last randomevent
@@ -243,8 +248,8 @@ async def show(ctx, ndx = -1):
 
 # regroup command
 # allows user to change the delta window on any given RandomEvent
-@client.command()
-async def regroup(ctx, ndx = -1, new_window = 0):
+@client.command(aliases = ['regroup'])
+async def ran_regroup(ctx, ndx = -1, new_window = 0):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # is ndx in range
@@ -264,8 +269,8 @@ async def regroup(ctx, ndx = -1, new_window = 0):
 
 # window command
 # change the default window for future RandomEvents
-@client.command(aliases = ['win'])
-async def window(ctx, new_window = 0):
+@client.command(aliases = ['win', 'window'])
+async def ran_window(ctx, new_window = 0):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     if (new_window < 0):
@@ -283,8 +288,8 @@ async def window(ctx, new_window = 0):
 
 # firedrill command
 # test the ability to send a message to the #pop channel
-@client.command(aliases = ['fd'])
-async def firedrill(ctx):
+@client.command(aliases = ['fd', 'firedrill'])
+async def gen_firedrill(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     await client.alert('This is a test.  This is only a test.')
@@ -294,8 +299,8 @@ async def firedrill(ctx):
 
 
 # start command
-@client.command(aliases = ['go'])
-async def start(ctx, charname = None):
+@client.command(aliases = ['go', 'start'])
+async def gen_start(ctx, charname = None):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     await client.begin_parsing()
@@ -303,8 +308,8 @@ async def start(ctx, charname = None):
 
 
 # status command
-@client.command()
-async def status(ctx):
+@client.command(aliases = ['status'])
+async def gen_status(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     if client.elf.is_parsing():
@@ -319,8 +324,8 @@ async def status(ctx):
 
 
 # pet command
-@client.command()
-async def pet(ctx):
+@client.command(aliases = ['pet'])
+async def pet_pet(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     if client.pet_tracker.current_pet:
@@ -333,8 +338,8 @@ async def pet(ctx):
 
 # cto command
 # change the combat timeout value
-@client.command()
-async def cto(ctx, new_cto = 0):
+@client.command(aliases = ['cto'])
+async def com_timeout(ctx, new_cto = 0):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     if (new_cto < 0):
@@ -347,6 +352,53 @@ async def cto(ctx, new_cto = 0):
         client.damage_tracker.combat_timeout = new_cto
         await client.send('DamageTracker Combat timeout (CTO) = {}'.format(client.damage_tracker.combat_timeout))
 
+
+
+# toggle combat tracking command
+@client.command(aliases = ['ct'])
+async def com_toggle(ctx, new_cto = 0):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    onoff = 'On'
+    if client.damage_parse:
+        client.damage_parse = False
+        onoff = 'Off'
+    else:
+        client.damage_parse = True
+        onoff = 'On'
+
+    await client.send('Combat Parsing: {}'.format(onoff))
+
+# toggle combat tracking command
+@client.command(aliases = ['pt'])
+async def pet_toggle(ctx, new_cto = 0):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    onoff = 'On'
+    if client.pet_parse:
+        client.pet_parse = False
+        onoff = 'Off'
+    else:
+        client.pet_parse = True
+        onoff = 'On'
+
+    await client.send('Pet Parsing: {}'.format(onoff))
+
+
+# toggle combat tracking command
+@client.command(aliases = ['rt'])
+async def ran_toggle(ctx, new_cto = 0):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    onoff = 'On'
+    if client.random_parse:
+        client.random_parse = False
+        onoff = 'Off'
+    else:
+        client.random_parse = True
+        onoff = 'On'
+
+    await client.send('Random Parsing: {}'.format(onoff))
 
 
 #################################################################################################
