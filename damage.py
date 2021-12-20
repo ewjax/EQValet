@@ -2,6 +2,8 @@
 from datetime import datetime
 import re
 import copy
+import pickle
+
 
 import myconfig
 from smartbuffer import SmartBuffer 
@@ -447,6 +449,46 @@ class DamageTracker:
         # combat timeout
         self.combat_timeout             = myconfig.COMBAT_TIMEOUT_SEC
 
+        # set of player names
+        self.player_names_set           = set()
+        self.player_names_fname         = 'player_names.pickle'
+        self.read_player_names()
+
+    #
+    # read in the player_names
+    #
+    def read_player_names(self):
+
+        # throws and exception if file doesn't exist
+        try:
+            f = open(self.player_names_fname, 'rb')
+            self.player_names_set = pickle.load(f)
+            f.close()
+
+            count = len(self.player_names_set)
+            print('Read {} player names from [{}]'.format(count, self.player_names_fname))
+
+            return True
+        except:
+            print('Unable to open filename: [{}]'.format(self.player_names_fname))
+            return False
+
+    #
+    # write out the player_names
+    #
+    def write_player_names(self):
+        try:
+            f = open(self.player_names_fname, 'wb')
+            pickle.dump(player_set, f)
+            f.close()
+
+            count = len(self.player_names_set)
+            print('Wrote {} player names to [{}]'.format(count, self.player_names_fname))
+
+            return True
+        except:
+            return False
+
 
     #
     # check for damage related items
@@ -592,7 +634,7 @@ class DamageTracker:
         #
         # watch for non-melee messages
         #
-        target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
+        target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) point(s)? of damage'
         m = re.match(target, trunc_line)
         if m:
             # extract RE data
@@ -697,8 +739,49 @@ class DamageTracker:
                 dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
                 self.the_target.add_damage_event(dde)
 
+        #
+        # watch for /who messages
+        #
+        target = r'^Players (in|on) EverQuest'
+        m = re.match(target, trunc_line)
+        if m:
+            processing_names = True
+
+#            # debugging output
+#            print('===============/who detected: {}'.format(trunc_line), end = '')
+
+            # get next line - many dashes
+            nextline = self.client.elf.readline()
+            print(nextline, end = '')
+            trunc_line = nextline[27:]
+
+            # read all the name(s) in the /who report
+            while processing_names:
+
+                # get next line
+                nextline = self.client.elf.readline()
+                print(nextline, end = '')
+                trunc_line = nextline[27:]
+
+                # as a safety net, just presume this is not the next name on the report
+                processing_names = False
+
+                # oddly, sometimes the name lists is preceeded by a completely blank line, usuall when a /who all command has been issued
+                # this regex allows for a blank line
+                name_target = r'(^\[[\w \d]+\] (?P<playername>[\w` ]+)|^$)'
+                m = re.match(name_target, trunc_line)
+                if m:
+                    # since we did successfully find a name, extend the processing for another line
+                    processing_names = True
+
+                    # process the name.  will return None if got here via the empty ^$ line that /who all puts out
+                    player_name = m.group('playername')
+                    if player_name:
+                        print(player_name)
 
 
+#            # debugging output
+#            print('===============/who end')
 
 
     #
