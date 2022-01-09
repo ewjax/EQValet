@@ -1,6 +1,6 @@
 # specific files
 myconfig.py
-player_names.pickle
+players.pickle
 
 # directories for this project
 pics/

@@ -369,6 +369,27 @@ async def com_toggle(ctx, new_cto = 0):
 
     await client.send('Combat Parsing: {}'.format(onoff))
 
+
+# list player names
+@client.command(aliases = ['who'])
+async def com_who(ctx):
+    print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
+
+    sb = SmartBuffer()
+    sb.add('Sorted list of all player names stored in /who database: {}\n'.format(client.damage_tracker.player_names_fname))
+
+    for name in sorted(client.damage_tracker.player_names_set):
+        sb.add('\t{}\n'.format(name))
+
+    # get the list of buffers and send each to discord
+    bufflist = sb.get_bufflist()
+    for b in bufflist:
+        await client.send('{}'.format(b))
+
+
+
+
+
 # toggle combat tracking command
 @client.command(aliases = ['pt'])
 async def pet_toggle(ctx, new_cto = 0):

@@ -451,7 +451,7 @@ class DamageTracker:
 
         # set of player names
         self.player_names_set           = set()
-        self.player_names_fname         = 'player_names.pickle'
+        self.player_names_fname         = 'players.pickle'
         self.read_player_names()
 
     #
@@ -476,19 +476,19 @@ class DamageTracker:
     #
     # write out the player_names
     #
-    def write_player_names(self):
+    async def write_player_names(self):
         try:
             f = open(self.player_names_fname, 'wb')
-            pickle.dump(player_set, f)
+            pickle.dump(self.player_names_set, f)
             f.close()
 
             count = len(self.player_names_set)
-            print('Wrote {} player names to [{}]'.format(count, self.player_names_fname))
+            await self.client.send('Wrote {} player names to [{}]'.format(count, self.player_names_fname))
 
             return True
         except:
-            return False
-
+            print('Unable to open filename: [{}]'.format(self.player_names_fname))
+            # return False
 
     #
     # check for damage related items
@@ -689,17 +689,14 @@ class DamageTracker:
             target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
-            # don't track attacks on player
-            if target_name != 'YOU':
+            # any damage event indicates we are in combat
+            if self.the_target.in_combat == False:
+                self.the_target.start_combat(target_name, line)
+                await self.client.send('*Combat begun: {}*'.format(target_name))
 
-                # any damage event indicates we are in combat
-                if self.the_target.in_combat == False:
-                    self.the_target.start_combat(target_name, line)
-                    await self.client.send('*Combat begun: {}*'.format(target_name))
-
-                # add the DamageEvent
-                dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                self.the_target.add_damage_event(dde)
+            # add the DamageEvent
+            dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+            self.the_target.add_damage_event(dde)
 
 
         #
@@ -715,8 +712,9 @@ class DamageTracker:
             target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
-            # if the target name is YOU, then the attacker is actually the target
-            if target_name == 'YOU':
+            # if the target name is YOU, or target name is a name in the /who player database,
+            # then the attacker is actually the target
+            if (target_name == 'YOU') or (target_name in self.player_names_set):
                 target_name = attacker_name
 
                 if self.the_target:
@@ -746,9 +744,24 @@ class DamageTracker:
         m = re.match(target, trunc_line)
         if m:
             processing_names = True
+            player_names_set_modified = False
 
 #            # debugging output
 #            print('===============/who detected: {}'.format(trunc_line), end = '')
+
+#                [Sun Dec 19 20:33:44 2021] Players on EverQuest:
+#                [Sun Dec 19 20:33:44 2021] ---------------------------
+#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Aijalon 
+#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yihao 
+#                [Sun Dec 19 20:33:44 2021] [54 Disciple] Weth (Iksar) <Safe Space>
+#                [Sun Dec 19 20:33:44 2021] [54 Disciple] Rcva (Iksar) <Kingdom>
+#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yula  <Force of Will>
+#                [Sun Dec 19 20:33:44 2021] [57 Master] Twywu (Iksar) <Safe Space>
+#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Tenedorf  <Safe Space>
+#                [Sun Dec 19 20:33:44 2021] [60 Grave Lord] Gratton (Troll) <Force of Will>
+#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Bloodreign 
+#                [Sun Dec 19 20:33:44 2021] [60 Phantasmist] Azleep (Elemental) <Force of Will>
+#                [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
 
             # get next line - many dashes
             nextline = self.client.elf.readline()
@@ -766,22 +779,43 @@ class DamageTracker:
                 # as a safety net, just presume this is not the next name on the report
                 processing_names = False
 
+#               from ninjalooter:
+#                    MATCH_WHO = re.compile(
+#                        TIMESTAMP +
+#                        r"(?:AFK +)?(?:<LINKDEAD>)?\[(?P<level>\d+ )?(?P<class>[A-z ]+)\] +"
+#                        r"(?P<name>\w+)(?: *\((?P<race>[\w ]+)\))?(?: *<(?P<guild>[\w ]+)>)?")
+
                 # oddly, sometimes the name lists is preceeded by a completely blank line, usuall when a /who all command has been issued
                 # this regex allows for a blank line
-                name_target = r'(^\[[\w \d]+\] (?P<playername>[\w` ]+)|^$)'
+                name_target = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w` ]+)|^$)'
                 m = re.match(name_target, trunc_line)
                 if m:
                     # since we did successfully find a name, extend the processing for another line
                     processing_names = True
 
                     # process the name.  will return None if got here via the empty ^$ line that /who all puts out
-                    player_name = m.group('playername')
+                    player_name = m.group('player_name')
                     if player_name:
                         print(player_name)
 
+                    player_level = m.group('player_level')
+                    if player_level:
+                        print(player_level)
 
-#            # debugging output
-#            print('===============/who end')
+                    player_class = m.group('player_class')
+                    if player_class:
+                        print(player_class)
+
+                    if player_name not in self.player_names_set:
+                        self.player_names_set.add(player_name)
+                        player_names_set_modified = True
+
+            # done processing /who list
+            if player_names_set_modified:
+                await self.write_player_names()
+
+
+
 
 
     #
