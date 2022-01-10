@@ -966,6 +966,16 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
 
+        #
+        # shaman DOT spells
+        #
+        # all the linear dot spells
+        spell_name = 'Sicken'
+        sp = LinearDOT_Spell(spell_name, 126,   8,   2, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        self.spell_dict[spell_name] = sp
+
+
+
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
         return '({}'.format(self.spell_dict)
