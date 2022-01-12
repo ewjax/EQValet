@@ -1,24 +1,17 @@
-import threading
+# import asyncio
 import asyncio
 import time
-import discord
-import random
-import os
-import re
 
+import discord
 from discord.ext import commands
 
-# import the customized settings and file locations etc, found in myconfig.py
-import myconfig
-import randoms
-import pets
 import damage
 import logfile
-from smartbuffer import SmartBuffer 
-
-
-
-
+# import the customized settings and file locations etc, found in myconfig.py
+import myconfig
+import pets
+import randoms
+from smartbuffer import SmartBuffer
 
 # allow for testing, by forcing the bot to read an old log file
 TEST_BOT                = False

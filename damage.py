@@ -236,10 +236,8 @@ class Splurt_Spell(DOT_Spell):
             base_damage = ticks * 11
 
             incremental_damage = 0
-            i = 0
-            while i < ticks:
+            for i in range(ticks):
                 incremental_damage += (i * 12)
-                i += 1
 
             damage = base_damage + incremental_damage
 
@@ -348,7 +346,7 @@ class Target:
 
         # targets must match
         if (self.target_name.casefold() == de.target_name.casefold()) and self.in_combat:
-            
+
             # is there an entry in the dictionary for this attacker?
             if de.attacker_name not in self.damage_events_dict:
                 self.damage_events_dict[de.attacker_name] = []
@@ -1002,47 +1000,46 @@ class DamageTracker:
 
 def main():
 
-#    sec = 17.999
-#    print('ticks = {}'.format(sec/6.0))
-#    print('ticks = {}'.format(int(sec/6.0)))
+    # sec = 17.999
+    # print('ticks = {}'.format(sec/6.0))
+    # print('ticks = {}'.format(int(sec/6.0)))
 
     line1 = '[Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.'
     line2 = '[Thu Oct 28 15:28:13 2021] A frost giant captain is engulfed in darkness.'
-#
-#    ds1 = LinearDOT_Spell(None, None, None, 'Cascading Darkness', 96, 0, 72, 'A frost giant captain is engulfed in darkness')
-#    print(ds1)
-#    ds1.set_start_time(line1)
-#    ds1.set_end_time(line2)
-#    print(ds1)
-#
-#    print(ds1.elapsed_ticks())
-#    print(ds1.damage_dealt())
+    #
+    # ds1 = LinearDOT_Spell(None, None, None, 'Cascading Darkness', 96, 0, 72, 'A frost giant captain is engulfed in darkness')
+    # print(ds1)
+    # ds1.set_start_time(line1)
+    # ds1.set_end_time(line2)
+    # print(ds1)
+    #
+    # print(ds1.elapsed_ticks())
+    # print(ds1.damage_dealt())
 
 
-#    ds2 = LinearDOT_Spell('Envenomed Bolt', 48, 110, 146, 'landed message')
-#    ds22 = copy.copy(ds2)
-#
-#    ds22.set_instance_data('Attakker', 'TheTarget', line1)
-#    ds22.set_end_time(line2)
-#
-#    print(ds2)
-#    print(ds22)
-#
-#    print(ds2.damage_dealt())
-#    print(ds22.damage_dealt())
+    # ds2 = LinearDOT_Spell('Envenomed Bolt', 48, 110, 146, 'landed message')
+    # ds22 = copy.copy(ds2)
+    #
+    # ds22.set_instance_data('Attakker', 'TheTarget', line1)
+    # ds22.set_end_time(line2)
+    #
+    # print(ds2)
+    # print(ds22)
+    #
+    # print(ds2.damage_dealt())
+    # print(ds22.damage_dealt())
 
 
     target_name = 'a stingtooth piranha'
     the_target = Target()
-    the_target.set_target_name(target_name)
-
-
-    ds2 = LinearDOT_Spell('Envenomed Bolt', 48, 110, 146, 'landed message')
-    ds22 = copy.copy(ds2)
-
-    ds22.set_instance_data('Xytl', target_name, line1)
-    ds22.set_end_time(line2)
-    the_target.add_damage_event(ds22)
+    the_target.target_name = target_name
+    #
+    # ds2 = LinearDOT_Spell('Envenomed Bolt', 48, 110, 146, 'landed message')
+    # ds22 = copy.copy(ds2)
+    #
+    # ds22.set_instance_data('Xytl', target_name, line1)
+    # ds22.set_end_time(line2)
+    # the_target.add_damage_event(ds22)
 
 
     ds3 = Splurt_Spell()
@@ -1052,98 +1049,96 @@ def main():
     ds33.set_end_time(line2)
     the_target.add_damage_event(ds33)
 
+    print(ds3)
+    print(ds3.damage_dealt())
 
-#
-#    print(ds3)
-#    print(ds3.damage_dealt())
-#
-#    print(ds33)
-#    print(ds33.damage_dealt())
-
-
-
-
-    line3 = '[Mon Sep 06 14:01:09 2021] Zarobab hits a stingtooth piranha for 26 points of damage.'
-    line4 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 25 points of damage.'
-    line44 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 125 points of damage.'
-    line45 = '[Mon Sep 06 14:01:11 2021] Goliathette hits a stingtooth piranha for 99 points of damage.'
-    melee_target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
-
-    m = re.match(melee_target, line3[27:], re.IGNORECASE)
-    if m:
-        attacker_name   = m.group('attacker_name')
-        dmg_type        = m.group('dmg_type')
-        target_name     = m.group('target_name')
-        dmg             = m.group('damage')
-#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
-        dde             = DiscreteDamageEvent(attacker_name, target_name, line3, dmg_type, dmg)
-#        print(dde)
-
-        the_target.add_damage_event(dde)
-
-
-    m = re.match(melee_target, line4[27:], re.IGNORECASE)
-    if m:
-        attacker_name   = m.group('attacker_name')
-        dmg_type        = m.group('dmg_type')
-        target_name     = m.group('target_name')
-        dmg             = m.group('damage')
-#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
-        dde             = DiscreteDamageEvent(attacker_name, target_name, line4, dmg_type, dmg)
-#        print(dde)
-
-        the_target.add_damage_event(dde)
-
-
-    m = re.match(melee_target, line44[27:], re.IGNORECASE)
-    if m:
-        attacker_name   = m.group('attacker_name')
-        dmg_type        = m.group('dmg_type')
-        target_name     = m.group('target_name')
-        dmg             = m.group('damage')
-#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
-        dde             = DiscreteDamageEvent(attacker_name, target_name, line44, dmg_type, dmg)
-#        print(dde)
-
-        the_target.add_damage_event(dde)
-
-    m = re.match(melee_target, line45[27:], re.IGNORECASE)
-    if m:
-        attacker_name   = m.group('attacker_name')
-        dmg_type        = m.group('dmg_type')
-        target_name     = m.group('target_name')
-        dmg             = m.group('damage')
-#        print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
-        dde             = DiscreteDamageEvent(attacker_name, target_name, line45, dmg_type, dmg)
-#        print(dde)
-
-        the_target.add_damage_event(dde)
-
-
-
-
-
-    line5 = '[Wed Dec 01 21:08:15 2021] a stingtooth piranha was hit by non-melee for 315 points of damage.'
-    non_melee_target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
-
-    m = re.match(non_melee_target, line5[27:], re.IGNORECASE)
-    if m:
-        attacker_name = 'Xytl'
-        target_name = m.group('target_name')
-        dmg_type        = m.group('dmg_type')
-        dmg = m.group('damage')
-#        print('Non-Melee: Type / Target / Damage: {}, {}, {}'.format(dmg_type, target_name, dmg))
-        dde = DiscreteDamageEvent(attacker_name, target_name, line5, dmg_type, dmg)
-#        print(dde)
-
-        the_target.add_damage_event(dde)
-
-
-    the_target.damage_report()
-
-    print(the_target.damage_events_dict)
-    the_target.clear()
-    print(the_target.damage_events_dict)
+    print(ds33)
+    print(ds33.damage_dealt())
+    #
+    #
+    #
+    #
+    # line3 = '[Mon Sep 06 14:01:09 2021] Zarobab hits a stingtooth piranha for 26 points of damage.'
+    # line4 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 25 points of damage.'
+    # line44 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 125 points of damage.'
+    # line45 = '[Mon Sep 06 14:01:11 2021] Goliathette hits a stingtooth piranha for 99 points of damage.'
+    # melee_target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+    #
+    # m = re.match(melee_target, line3[27:], re.IGNORECASE)
+    # if m:
+    #     attacker_name   = m.group('attacker_name')
+    #     dmg_type        = m.group('dmg_type')
+    #     target_name     = m.group('target_name')
+    #     dmg             = m.group('damage')
+    #     # print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+    #     dde             = DiscreteDamageEvent(attacker_name, target_name, line3, dmg_type, dmg)
+    #     # print(dde)
+    #
+    #     the_target.add_damage_event(dde)
+    #
+    #
+    # m = re.match(melee_target, line4[27:], re.IGNORECASE)
+    # if m:
+    #     attacker_name   = m.group('attacker_name')
+    #     dmg_type        = m.group('dmg_type')
+    #     target_name     = m.group('target_name')
+    #     dmg             = m.group('damage')
+    #     # print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+    #     dde             = DiscreteDamageEvent(attacker_name, target_name, line4, dmg_type, dmg)
+    #     # print(dde)
+    #
+    #     the_target.add_damage_event(dde)
+    #
+    #
+    # m = re.match(melee_target, line44[27:], re.IGNORECASE)
+    # if m:
+    #     attacker_name   = m.group('attacker_name')
+    #     dmg_type        = m.group('dmg_type')
+    #     target_name     = m.group('target_name')
+    #     dmg             = m.group('damage')
+    #     # print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+    #     dde             = DiscreteDamageEvent(attacker_name, target_name, line44, dmg_type, dmg)
+    #     # print(dde)
+    #
+    #     the_target.add_damage_event(dde)
+    #
+    # m = re.match(melee_target, line45[27:], re.IGNORECASE)
+    # if m:
+    #     attacker_name   = m.group('attacker_name')
+    #     dmg_type        = m.group('dmg_type')
+    #     target_name     = m.group('target_name')
+    #     dmg             = m.group('damage')
+    #     # print('Melee: Attacker / Type / Target / Damage: {}, {}, {}, {}'.format(attacker_name, dmg_type, target_name, dmg))
+    #     dde             = DiscreteDamageEvent(attacker_name, target_name, line45, dmg_type, dmg)
+    #     # print(dde)
+    #
+    #     the_target.add_damage_event(dde)
+    #
+    #
+    #
+    #
+    #
+    # line5 = '[Wed Dec 01 21:08:15 2021] a stingtooth piranha was hit by non-melee for 315 points of damage.'
+    # non_melee_target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
+    #
+    # m = re.match(non_melee_target, line5[27:], re.IGNORECASE)
+    # if m:
+    #     attacker_name = 'Xytl'
+    #     target_name = m.group('target_name')
+    #     dmg_type        = m.group('dmg_type')
+    #     dmg = m.group('damage')
+    #     # print('Non-Melee: Type / Target / Damage: {}, {}, {}'.format(dmg_type, target_name, dmg))
+    #     dde = DiscreteDamageEvent(attacker_name, target_name, line5, dmg_type, dmg)
+    #     print(dde)
+    #
+    #     the_target.add_damage_event(dde)
+    #
+    #
+    # the_target.damage_report()
+    #
+    # print(the_target.damage_events_dict)
+    # the_target.clear()
+    # print(the_target.damage_events_dict)
 
 
 
