@@ -1,12 +1,9 @@
-
-
+import re
 # import the datetime class from the datetime module
 from datetime import datetime
-import re
 
 # import the customized settings and file locations etc, found in myconfig.py
 import myconfig
-
 
 
 #
@@ -20,26 +17,31 @@ class PlayerRandomRoll:
     # the eq_timestamp must at least include the leading [0:26] time stamp characters from the log file line, or it can also just be the entire line
     def __init__(self, player_name, random_value, low, high, eq_timestamp):
 
-        self.player_name    = player_name
-        self.random_value   = int(random_value)
-        self.low            = int(low)
-        self.high           = int(high)
+        self.player_name = player_name
+        self.random_value = int(random_value)
+        self.low = int(low)
+        self.high = int(high)
 
         # create a datetime object, using the very capable strptime() parsing function built into the datetime module
-        self.time_stamp     = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.time_stamp = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
-        return ('({}, {}, {}, {}, {})'.format(self.player_name, self.random_value, self.low, self.high, self.time_stamp))
-    
+        return (
+            '({}, {}, {}, {}, {})'.format(self.player_name, self.random_value, self.low, self.high, self.time_stamp))
+
     # to make bold text in a Discord message, surround it with double asterisks, i.e. **Example**
-    def report(self, boldname = ''):
+    def report(self, boldname=''):
 
         rv = ''
         if self.player_name.casefold() == boldname.casefold():
             rv += '**'
 
-        rv += '--Player: {} | Random: {} | Time: {}\n'.format(self.player_name, self.random_value, self.time_stamp)
+        rv += '--Player: {} | Random: {} | Range: [{}-{}] | Time: {}\n'.format(self.player_name,
+                                                                               self.random_value,
+                                                                               self.low,
+                                                                               self.high,
+                                                                               self.time_stamp)
 
         if self.player_name.casefold() == boldname.casefold():
             rv += '**'
@@ -47,14 +49,10 @@ class PlayerRandomRoll:
         return rv
 
 
-
-
-
-
 # class for many random rolls, to find random winners etc
 #
 # every roll in the list must:
-#   - have same range (low, high)
+#   - have same range (low, high) (if low_significant and high_significant parameters are True)
 #   - must be within the delta_seconds time span
 #   - presumption is that rolls are added in time-sequential order, so the first roll to be added is assumed to be the 
 #     starting time, and all other rolls must occur within the (starting time + delta_seconds) window
@@ -63,31 +61,42 @@ class PlayerRandomRoll:
 class RandomEvent:
 
     # ctor
-    def __init__(self, low, high, delta_seconds):
+    def __init__(self, low, high, delta_seconds, low_significant=True, high_significant=True):
 
-        self.low                = int(low)
-        self.high               = int(high)
-        self.delta_seconds      = int(delta_seconds)
+        self.low = int(low)
+        self.low_significant = low_significant
+        self.high = int(high)
+        self.high_significant = high_significant
+        self.delta_seconds = int(delta_seconds)
 
-        self.rolls              = list()
-        self.start_time_stamp   = None
+        self.rolls = list()
+        self.start_time_stamp = None
 
         # flag to indicate whether this list is open for adding rolls
-        self.expired            = False
+        self.expired = False
 
-
-    def report_header(self, ndx = -1):
+    def report_header(self, ndx=-1):
         rv = '[Index {}]: ==============================================================\n'.format(ndx)
-        rv += 'Range: [{}-{}] | Rolls: {} | Start Time: {} | Delta (seconds): {}\n'.format(self.low, self.high, len(self.rolls), self.start_time_stamp, self.delta_seconds)
+
+        ll = '?'
+        if self.low_significant:
+            ll = str(self.low)
+        hh = '?'
+        if self.high_significant:
+            hh = str(self.high)
+        rv += 'Range: [{}-{}] | Rolls: {} | Start Time: {} | Delta (seconds): {}\n'.format(ll, hh,
+                                                                                           len(self.rolls),
+                                                                                           self.start_time_stamp,
+                                                                                           self.delta_seconds)
         return rv
 
-    def report_winner(self, boldname = ''):
+    def report_winner(self, boldname=''):
         rv = 'Winner(s):\n'
         for r in self.winner():
             rv += r.report(boldname)
         return rv
 
-    def report_summary(self, ndx = -1, boldname = ''):
+    def report_summary(self, ndx=-1, boldname=''):
         rv = self.report_header(ndx)
         rv += self.report_winner(boldname)
         return rv
@@ -99,7 +108,6 @@ class RandomEvent:
             rv += r.report()
         return rv
 
-
     # does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomEvent
     # returns True if this list toggles from NotExpired to Expired
     def check_expiration(self, line):
@@ -107,14 +115,14 @@ class RandomEvent:
         rv = False
 
         # currently not expired...
-        if (self.expired == False):
+        if not self.expired:
             # ...and there is at least 1 roll in the list...
-            if (len(self.rolls) > 0):
+            if len(self.rolls) > 0:
                 # ...and the time stamp of the passed line parameter is outside the RandomEvent window duration...
                 try:
                     check_time = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                     elapsed_seconds = check_time - self.start_time_stamp
-                    if (elapsed_seconds.total_seconds() > self.delta_seconds):
+                    if elapsed_seconds.total_seconds() > self.delta_seconds:
                         # ...then this RandomEvent is expired
                         self.expired = True
                         self.sort_descending_randoms()
@@ -125,8 +133,6 @@ class RandomEvent:
         # return
         return rv
 
-
-
     #
     # add a roll to the list
     # return True if roll is added, False if not added
@@ -136,18 +142,20 @@ class RandomEvent:
         rv = False
 
         # check if the random low and high limits match
-        if (r.low == self.low) and (r.high == self.high):
+        if ((not self.low_significant) or (r.low == self.low)) and \
+                ((not self.high_significant) or (r.high == self.high)):
 
-            # the assumption is these will be loaded in sequential, time-increasing order, i.e. the first one is the starting time for the random window
+            # the assumption is these will be loaded in sequential, time-increasing order,
+            # i.e. the first one is the starting time for the random window
             if len(self.rolls) == 0:
                 self.start_time_stamp = r.time_stamp
 
             # check if the timestamp to be added is in range
             elapsed_seconds = r.time_stamp - self.start_time_stamp
-            if (elapsed_seconds.total_seconds() <= self.delta_seconds):
+            if elapsed_seconds.total_seconds() <= self.delta_seconds:
 
                 # check that this person hasn't already randomed
-                if (self.player_roll(r.player_name) == None):
+                if self.player_roll(r.player_name) == None:
                     self.rolls.append(r)
                     rv = True
 
@@ -156,12 +164,11 @@ class RandomEvent:
 
     # sort the rolls in descending order, so high roll(s) is at start of list
     def sort_descending_randoms(self):
-        self.rolls.sort(key = lambda x: x.random_value, reverse = True)
+        self.rolls.sort(key=lambda x: x.random_value, reverse=True)
 
     # sort the rolls in ascending time order
     def sort_ascending_timestamps(self):
-        self.rolls.sort(key = lambda x: x.time_stamp)
-
+        self.rolls.sort(key=lambda x: x.time_stamp)
 
     # return high roll(s) in a list()
     def winner(self):
@@ -178,7 +185,6 @@ class RandomEvent:
         # return list of high roll(s)
         return rv
 
-
     # walk the list and return the roll for a particular player
     # not particularly efficient since it just brute force visits every member in the list, but the number of rollers is really never that high,
     # so in this case, simplicity wins over a very slight inefficiency
@@ -190,7 +196,6 @@ class RandomEvent:
         return rv
 
 
-
 #
 # class to do all the random tracking work
 class RandomTracker:
@@ -199,15 +204,14 @@ class RandomTracker:
     def __init__(self, client):
 
         # pointer to the discord client for comms
-        self.client             = client
+        self.client = client
 
         # list of all random rolls, and all RandomEvents
-        self.all_rolls          = list()
-        self.all_random_events  = list()
+        self.all_rolls = list()
+        self.all_random_events = list()
 
         # default time a RandomEvent runs, collecting PlayerRandomRolls
-        self.default_window     = myconfig.DEFAULT_WINDOW
-
+        self.default_window = myconfig.DEFAULT_WINDOW
 
     # check if a random is occurring
     async def process_line(self, line):
@@ -218,7 +222,6 @@ class RandomTracker:
                 toggled = rev.check_expiration(line)
                 if toggled:
                     await self.client.send('{}'.format(rev.report_summary(ndx, self.client.elf.char_name)))
-
 
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
@@ -234,19 +237,19 @@ class RandomTracker:
 
             # get next line
             line = self.client.elf.readline()
-            print(line, end = '')
+            print(line, end='')
             trunc_line = line[27:]
 
             # fetch the low, high, and value numbers
             m = re.match(target2, trunc_line)
             if (m):
-                low     = m.group('low')
-                high    = m.group('high')
-                value   = m.group('value')
+                low = m.group('low')
+                high = m.group('high')
+                value = m.group('value')
 
                 # create the roll object
                 roll = PlayerRandomRoll(player, value, low, high, line)
-#                print(roll)
+                #                print(roll)
 
                 # add it to the list of all rolls
                 self.all_rolls.append(roll)
@@ -265,37 +268,41 @@ class RandomTracker:
                     rev.add_roll(roll)
                     self.all_random_events.append(rev)
 
-
     # regroup random events with a new, different window than what the random events currently have
-    async def regroup(self, ndx = -1, new_window = 0):
+    async def regroup(self, ndx=-1, new_window=0, low_significant=True, high_significant=True):
 
         # is ndx in range
         if (len(self.all_random_events) == 0):
             await self.client.send('Error:  No RandomEvents to regroup!')
 
-        elif ( (ndx < 0) or (ndx >= len(self.all_random_events)) ):
-            await self.client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events)-1))
-
+        elif ((ndx < 0) or (ndx >= len(self.all_random_events))):
+            await self.client.send(
+                'Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx,
+                                                                                                   len(self.all_random_events) - 1))
         elif (new_window <= 0):
-            await self.client.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+            await self.client.send(
+                'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
 
         else:
             # grab the requested random event, and restore it to time-ascending order
-            old_rev = self.all_random_events.pop(ndx)
+            old_rev: RandomEvent = self.all_random_events.pop(ndx)
 
-            low     = old_rev.low
-            high    = old_rev.high
-            rolls   = old_rev.rolls
+            low = old_rev.low
+            high = old_rev.high
+            rolls = old_rev.rolls
 
             # is the new, larger window overlapping into the next random event(s)?
-            if (new_window > old_rev.delta_seconds):
+            if (new_window >= old_rev.delta_seconds):
                 while (ndx < len(self.all_random_events)):
                     next_rev = self.all_random_events[ndx]
                     # get delta t
                     delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
                     delta = delta_seconds.total_seconds()
                     # does next random event and is within new time window?
-                    if ( (low == next_rev.low) and (high == next_rev.high) and (delta <= new_window) ):
+                    # if ((low == next_rev.low) and (high == next_rev.high) and (delta <= new_window)):
+                    if (not low_significant or low == next_rev.low) and \
+                            (not high_significant or high == next_rev.high) and \
+                            (delta <= new_window):
                         # add the next randomm event rolls to the list of rolls to be sorted / readded
                         rolls += next_rev.rolls
                         self.all_random_events.pop(ndx)
@@ -303,27 +310,30 @@ class RandomTracker:
                         ndx += 1
 
             # sort the list of all rolls in time-ascenting order
-            rolls.sort(key = lambda x: x.time_stamp)
+            rolls.sort(key=lambda x: x.time_stamp)
 
             # get all the rolls from the old random event(s)
             for r in rolls:
 
                 added = False
                 # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
+                rev: RandomEvent
                 for rev in self.all_random_events:
-                    if (rev.expired == False):
+                    if not rev.expired:
+                        rev.low_significant = low_significant
+                        rev.high_significant = high_significant
                         if (rev.add_roll(r)):
                             added = True
                             break
 
                 # if the roll wasn't added, create a new RandomEvent to hold this one
                 if (added == False):
-                    rev = RandomEvent(low, high, new_window)
+                    rev = RandomEvent(r.low, r.high, new_window, low_significant, high_significant)
                     rev.add_roll(r)
                     self.all_random_events.append(rev)
 
             # sort the event list to restore it to time-ascending order
-            self.all_random_events.sort(key = lambda x: x.start_time_stamp)
+            self.all_random_events.sort(key=lambda x: x.start_time_stamp)
 
             # if not expired yet, these are the random events just added, so close them, sort them, report them
             for (n, ev) in enumerate(self.all_random_events):
@@ -331,8 +341,6 @@ class RandomTracker:
                     ev.expired = True
                     ev.sort_descending_randoms()
                     await self.client.send('{}'.format(ev.report_summary(n, self.client.elf.char_name)))
-
-
 
 
 def main():
@@ -360,11 +368,10 @@ def main():
     mm.append(('John', 99))
     mm.append(('Jimmy', 12))
     print(mm)
-    mm.sort(key = lambda roll: roll[1])
+    mm.sort(key=lambda roll: roll[1])
     print(mm)
 
     print()
-
 
     print('using dictionary')
     dd = dict()
@@ -374,10 +381,9 @@ def main():
     dd['John'] = (99, 0, 1000)
     dd['Jimmy'] = (12, 0, 1000)
     print(dd)
-    sorted_dd = sorted(dd.items(), key = lambda x:x[1], reverse = True)
+    sorted_dd = sorted(dd.items(), key=lambda x: x[1], reverse=True)
     print(sorted_dd)
     print()
-
 
     print('list of PlayerRandomRolls')
 
@@ -388,7 +394,6 @@ def main():
     line3 = '[Tue Jul 13 00:30:07 2021]'
     line4 = '[Tue Jul 13 00:30:35 2021]'
     line5 = '[Tue Jul 13 00:30:47 2021]'
-
 
     r = PlayerRandomRoll('Susan', 33, 0, 1000, line1)
     rr.append(r)
@@ -402,10 +407,10 @@ def main():
     rr.append(r)
     print(rr)
 
-    rr.sort(key = lambda x: x.random_value)
+    rr.sort(key=lambda x: x.random_value)
     print(rr)
 
-    rr.sort(key = lambda x: x.random_value, reverse = True)
+    rr.sort(key=lambda x: x.random_value, reverse=True)
     print(rr)
     print()
 
@@ -426,7 +431,6 @@ def main():
     r = PlayerRandomRoll('LateRoller', 12, 0, 1000, line5)
     print(rl.add_roll(r))
 
-
     print('roll list as entered')
     print(rl)
     print('roll list sorted')
@@ -446,11 +450,8 @@ def main():
     print(rl.player_roll('LateRoller'))
     print()
 
-
-
     print('Exiting main()')
 
 
 if __name__ == '__main__':
     main()
-

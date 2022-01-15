@@ -459,7 +459,7 @@
 [Fri Jul 30 19:50:42 2021] A snow dervish hits Denniskar for 53 points of damage.
 [Fri Jul 30 19:50:42 2021] Hamedo punches a blizzard dervish for 26 points of damage.
 [Fri Jul 30 19:50:43 2021] Bolep says, 'too late sorry Burning'
-[Fri Jul 30 19:51:43 2021] Bolep says, 'too late sorry Burning'
+[Fri Jul 30 19:55:43 2021] Bolep says, 'too late sorry Burning'
 
 
 [Sat Aug 28 15:08:01 2021] **A Magic Die is rolled by Myuharin.
@@ -686,6 +686,7 @@
 [Tue Aug 31 17:22:11 2021] **It could have been any number from 0 to 23456, but this time it turned up a 388.
 [Tue Aug 31 17:22:14 2021] Your mind begins to clear.
 [Tue Aug 31 17:22:18 2021] You feel replenished.
+[Tue Aug 31 17:32:18 2021] You feel replenished.
 
 
 
@@ -851,6 +852,7 @@
 [Tue Sep 07 17:40:18 2021] Zaedil begins to cast a spell.
 [Tue Sep 07 17:40:19 2021] **A Magic Die is rolled by Venek.
 [Tue Sep 07 17:40:19 2021] **It could have been any number from 0 to 5000, but this time it turned up a 2097.
+[Tue Sep 07 17:45:23 2021] Lacrimosa says, 'Giant Warrior Helmet'
 
 
 [Tue Sep 07 17:41:23 2021] Lacrimosa says, 'Giant Warrior Helmet'
@@ -1144,6 +1146,7 @@
 [Sat Jan 15 00:15:06 2022] froglok krup knight says 'Guarding with my life..oh splendid one.'
 [Sat Jan 15 00:15:16 2022] Ikynixar stands on his tip-toes and does a dance of joy!
 [Sat Jan 15 00:15:17 2022] Beginning to memorize Shield of the Magi...
+[Sat Jan 15 00:20:17 2022] Beginning to memorize Shield of the Magi...
 
 
 

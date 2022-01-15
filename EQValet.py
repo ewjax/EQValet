@@ -14,15 +14,8 @@ import randoms
 from smartbuffer import SmartBuffer
 
 # allow for testing, by forcing the bot to read an old log file
-TEST_BOT                = False
-# TEST_BOT                = True
-
-
-
-
-
-
-
+# TEST_BOT = False
+TEST_BOT = True
 
 
 #################################################################################################
@@ -36,27 +29,26 @@ class EQValetClient(commands.Bot):
     def __init__(self):
 
         # call parent ctor
-        commands.Bot.__init__(self, command_prefix = myconfig.BOT_COMMAND_PREFIX)
+        commands.Bot.__init__(self, command_prefix=myconfig.BOT_COMMAND_PREFIX)
 
         # create the EQ log file parser
-        self.elf                = logfile.EverquestLogFile()
+        self.elf = logfile.EverquestLogFile()
 
         # use a RandomTracker class to deal with all things random numbers and rolls
-        self.random_parse       = True
-        self.random_tracker     = randoms.RandomTracker(self)
+        self.random_parse = True
+        self.random_tracker = randoms.RandomTracker(self)
 
         # use a DamageTracker class to keep track of total damage dealt by spells and by pets
-        self.damage_parse       = True
-        self.damage_tracker     = damage.DamageTracker(self)
+        self.damage_parse = True
+        self.damage_tracker = damage.DamageTracker(self)
 
         # use a PetTracker class to deal with all things pets
-        self.pet_parse          = True
-        self.pet_tracker        = pets.PetTracker(self)
-
+        self.pet_parse = True
+        self.pet_tracker = pets.PetTracker(self)
 
     # process each line
     async def process_line(self, line):
-        print(line, end = '')
+        print(line, end='')
 
         # check for a random
         if self.random_parse:
@@ -70,13 +62,11 @@ class EQValetClient(commands.Bot):
         if self.pet_parse:
             await self.pet_tracker.process_line(line)
 
-
     # sound the alert
     async def alert(self, msg):
 
         special_channel = self.get_channel(myconfig.PERSONAL_SERVER_ALERTID)
         await special_channel.send(msg)
-
 
     # notify of pop
     async def pop(self, msg):
@@ -84,14 +74,11 @@ class EQValetClient(commands.Bot):
         special_channel = self.get_channel(myconfig.PERSONAL_SERVER_POPID)
         await special_channel.send(msg)
 
-
     # send message to the special EQValet channel
     async def send(self, msg):
 
         special_channel = self.get_channel(myconfig.PERSONAL_SERVER_VALETID)
         await special_channel.send(msg)
-        
-
 
     # begin parsing
     async def begin_parsing(self):
@@ -102,22 +89,21 @@ class EQValetClient(commands.Bot):
         else:
 
             # use a back door to force the system to read a test file
-            if TEST_BOT == True:
+            if TEST_BOT:
 
                 # read a sample file with sample random rolls in it
-                # filename = 'randoms.txt'
+                filename = 'randoms.txt'
                 # filename = 'pets.txt'
-                filename = 'fights.txt'
+                # filename = 'fights.txt'
 
-
-                # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
-                rv = self.elf.open(self.user, 'Testing', filename, seek_end = False)
+                # start parsing, but in this case, start reading from the beginning of the file,
+                # rather than the end (default)
+                rv = self.elf.open(self.user, 'Testing', filename, seek_end=False)
 
             # open the latest file
             else:
                 # open the latest file, and kick off the parsing process
                 rv = self.elf.open_latest(self.user)
-
 
             # if the log file was successfully opened, then initiate parsing
             if rv:
@@ -131,9 +117,6 @@ class EQValetClient(commands.Bot):
             else:
                 await self.send('ERROR: Could not open character log file for: [{}]'.format(self.elf.char_name))
                 await self.send('Log filename: [{}]'.format(self.elf.filename))
-
-
-
 
 
 #################################################################################################
@@ -159,7 +142,6 @@ async def on_ready():
     await client.begin_parsing()
 
 
-
 # on_message - catches everything, messages and commands
 # note the final line, which ensures any command gets processed as a command, and not just absorbed here as a message
 @client.event
@@ -171,18 +153,16 @@ async def on_message(message):
     await client.process_commands(message)
 
 
-
 # ping command
-@client.command(aliases = ['ping'])
+@client.command(aliases=['ping'])
 async def gen_ping(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
-    await client.send('Latency = {} ms'.format(round(client.latency*1000)))
-
+    await client.send('Latency = {} ms'.format(round(client.latency * 1000)))
 
 
 # rolls command
 # how many randoms have there been
-@client.command(aliases = ['rolls'])
+@client.command(aliases=['rolls'])
 async def ran_rolls(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
@@ -205,8 +185,8 @@ async def ran_rolls(ctx):
 
 # show command
 # show all rolls in a specified RandomEvent
-@client.command(aliases = ['show'])
-async def ran_show(ctx, ndx = -1):
+@client.command(aliases=['show'])
+async def ran_show(ctx, ndx=-1):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # if the ndx value isn't specified, default to showing the last randomevent
@@ -214,7 +194,7 @@ async def ran_show(ctx, ndx = -1):
         ndx = len(client.random_tracker.all_random_events) - 1
 
     # is ndx in range
-    if ((ndx >= 0) and (ndx < len(client.random_tracker.all_random_events))):
+    if (ndx >= 0) and (ndx < len(client.random_tracker.all_random_events)):
         rev = client.random_tracker.all_random_events[ndx]
 
         # create a smart buffer to keep buffers under max size for discord messages (2000)
@@ -236,42 +216,43 @@ async def ran_show(ctx, ndx = -1):
             await client.send('{}'.format(b))
 
     else:
-        await client.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.random_tracker.all_random_events)-1))
+        await client.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx,
+                                                                                                     len(client.random_tracker.all_random_events) - 1))
         await client.send('Unspecified ndx value = shows most recent random event')
-
 
 
 # regroup command
 # allows user to change the delta window on any given RandomEvent
-@client.command(aliases = ['regroup'])
-async def ran_regroup(ctx, ndx = -1, new_window = 0):
+@client.command(aliases=['regroup'])
+async def ran_regroup(ctx, ndx=-1, new_window=0, low_significant=True, high_significant=True):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     # is ndx in range
-    if (len(client.random_tracker.all_random_events) == 0):
+    if len(client.random_tracker.all_random_events) == 0:
         await client.send('Error:  No RandomEvents to regroup!')
 
-    elif ( (ndx < 0) or (ndx >= len(client.random_tracker.all_random_events)) ):
-        await client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.random_tracker.all_random_events)-1))
-
-    elif (new_window <= 0):
-        await client.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+    elif (ndx < 0) or (ndx >= len(client.random_tracker.all_random_events)):
+        await client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx,
+                                                                                                             len(client.random_tracker.all_random_events) - 1))
+    elif new_window <= 0:
+        await client.send(
+            'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
 
     else:
-        await client.random_tracker.regroup(ndx, new_window)
-
+        await client.random_tracker.regroup(ndx, new_window, low_significant, high_significant)
 
 
 # window command
 # change the default window for future RandomEvents
-@client.command(aliases = ['win', 'window'])
-async def ran_window(ctx, new_window = 0):
+@client.command(aliases=['win', 'window'])
+async def ran_window(ctx, new_window=0):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    if (new_window < 0):
-        await client.send('Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+    if new_window < 0:
+        await client.send(
+            'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
 
-    elif (new_window == 0):
+    elif new_window == 0:
         await client.send('RandomEvent default window = {}'.format(client.random_tracker.default_window))
 
     else:
@@ -279,11 +260,9 @@ async def ran_window(ctx, new_window = 0):
         await client.send('RandomEvent default window = {}'.format(client.random_tracker.default_window))
 
 
-
-
 # firedrill command
 # test the ability to send a message to the #pop channel
-@client.command(aliases = ['fd', 'firedrill'])
+@client.command(aliases=['fd', 'firedrill'])
 async def gen_firedrill(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
@@ -292,18 +271,16 @@ async def gen_firedrill(ctx):
     await client.send('This is a test.  This is only a test.')
 
 
-
 # start command
-@client.command(aliases = ['go', 'start'])
-async def gen_start(ctx, charname = None):
+@client.command(aliases=['go', 'start'])
+async def gen_start(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     await client.begin_parsing()
 
 
-
 # status command
-@client.command(aliases = ['status'])
+@client.command(aliases=['status'])
 async def gen_status(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
@@ -317,9 +294,8 @@ async def gen_status(ctx):
         await client.send('Not currently parsing')
 
 
-
 # pet command
-@client.command(aliases = ['pet'])
+@client.command(aliases=['pet'])
 async def pet_pet(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
@@ -330,17 +306,16 @@ async def pet_pet(ctx):
         await client.send('No pet')
 
 
-
 # cto command
 # change the combat timeout value
-@client.command(aliases = ['cto'])
-async def com_timeout(ctx, new_cto = 0):
+@client.command(aliases=['cto'])
+async def com_timeout(ctx, new_cto=0):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    if (new_cto < 0):
+    if new_cto < 0:
         await client.send('Error:  Requested new_cto value = {}.  Value for new_cto must be > 0'.format(new_cto))
 
-    elif (new_cto == 0):
+    elif new_cto == 0:
         await client.send('DamageTracker combat timeout (CTO) = {}'.format(client.damage_tracker.combat_timeout))
 
     else:
@@ -348,10 +323,9 @@ async def com_timeout(ctx, new_cto = 0):
         await client.send('DamageTracker Combat timeout (CTO) = {}'.format(client.damage_tracker.combat_timeout))
 
 
-
 # toggle combat tracking command
-@client.command(aliases = ['ct'])
-async def com_toggle(ctx, new_cto = 0):
+@client.command(aliases=['ct'])
+async def com_toggle(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     onoff = 'On'
@@ -366,12 +340,13 @@ async def com_toggle(ctx, new_cto = 0):
 
 
 # list player names
-@client.command(aliases = ['who'])
+@client.command(aliases=['who', 'w'])
 async def com_who(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     sb = SmartBuffer()
-    sb.add('Sorted list of all player names stored in /who database: {}\n'.format(client.damage_tracker.player_names_fname))
+    sb.add('Sorted list of all player names stored in /who database: {}\n'.format(
+        client.damage_tracker.player_names_fname))
 
     for name in sorted(client.damage_tracker.player_names_set):
         sb.add('\t{}\n'.format(name))
@@ -382,12 +357,9 @@ async def com_who(ctx):
         await client.send('{}'.format(b))
 
 
-
-
-
 # toggle combat tracking command
-@client.command(aliases = ['pt'])
-async def pet_toggle(ctx, new_cto = 0):
+@client.command(aliases=['pt'])
+async def pet_toggle(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     onoff = 'On'
@@ -402,8 +374,8 @@ async def pet_toggle(ctx, new_cto = 0):
 
 
 # toggle combat tracking command
-@client.command(aliases = ['rt'])
-async def ran_toggle(ctx, new_cto = 0):
+@client.command(aliases=['rt'])
+async def ran_toggle(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
     onoff = 'On'
@@ -422,12 +394,11 @@ async def ran_toggle(ctx, new_cto = 0):
 
 # the background process to parse the log files
 #
-async def parse():                                      
-
+async def parse():
     print('Parsing Started')
 
     # process the log file lines here
-    while client.elf.is_parsing() == True:
+    while client.elf.is_parsing():
 
         # read a line
         line = client.elf.readline()
@@ -438,11 +409,10 @@ async def parse():
             # process this line
             await client.process_line(line)
 
-
         else:
 
             # don't check the heartbeat if we are just testing
-            if TEST_BOT == False:
+            if not TEST_BOT:
 
                 # check the heartbeat.  Has our tracker gone silent?
                 elapsed_seconds = (now - client.elf.prevtime)
@@ -452,7 +422,7 @@ async def parse():
                     client.elf.prevtime = now
 
                     # attempt to open latest log file - returns True if a new logfile is opened
-                    if (client.elf.open_latest(client.user)):
+                    if client.elf.open_latest(client.user):
                         await client.send('Now parsing character log for: [{}]'.format(client.elf.char_name))
 
             # if we didn't read a line, pause just for a 100 msec blink
@@ -461,11 +431,5 @@ async def parse():
     print('Parsing Stopped')
 
 
-
-
 # let's go!!
 client.run(myconfig.BOT_TOKEN)
-
-
-
-
