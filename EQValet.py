@@ -14,8 +14,8 @@ import randoms
 from smartbuffer import SmartBuffer
 
 # allow for testing, by forcing the bot to read an old log file
-# TEST_BOT = False
-TEST_BOT = True
+TEST_BOT = False
+# TEST_BOT = True
 
 
 #################################################################################################
@@ -216,8 +216,7 @@ async def ran_show(ctx, ndx=-1):
             await client.send('{}'.format(b))
 
     else:
-        await client.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx,
-                                                                                                     len(client.random_tracker.all_random_events) - 1))
+        await client.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.random_tracker.all_random_events) - 1))
         await client.send('Unspecified ndx value = shows most recent random event')
 
 
@@ -232,8 +231,7 @@ async def ran_regroup(ctx, ndx=-1, new_window=0, low_significant=True, high_sign
         await client.send('Error:  No RandomEvents to regroup!')
 
     elif (ndx < 0) or (ndx >= len(client.random_tracker.all_random_events)):
-        await client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx,
-                                                                                                             len(client.random_tracker.all_random_events) - 1))
+        await client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(client.random_tracker.all_random_events) - 1))
     elif new_window <= 0:
         await client.send(
             'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
@@ -328,7 +326,6 @@ async def com_timeout(ctx, new_cto=0):
 async def com_toggle(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    onoff = 'On'
     if client.damage_parse:
         client.damage_parse = False
         onoff = 'Off'
@@ -362,7 +359,6 @@ async def com_who(ctx):
 async def pet_toggle(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    onoff = 'On'
     if client.pet_parse:
         client.pet_parse = False
         onoff = 'Off'
@@ -378,7 +374,6 @@ async def pet_toggle(ctx):
 async def ran_toggle(ctx):
     print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
 
-    onoff = 'On'
     if client.random_parse:
         client.random_parse = False
         onoff = 'Off'

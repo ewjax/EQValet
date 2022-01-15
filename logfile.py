@@ -79,12 +79,12 @@ class EverquestLogFile:
 
         # figure out what to do
         # if we are already parsing a file, and it is the lastest file - do nothing
-        if (self.is_parsing() == True) and (self.filename == latest_file):
+        if self.is_parsing() and (self.filename == latest_file):
             # do nothing
             pass
 
         # if we are already parsing a file, but it is not the latest file, close the old and open the latest
-        elif (self.is_parsing() == True) and (self.filename != latest_file):
+        elif self.is_parsing() and (self.filename != latest_file):
             # stop parsing old and open the new file
             self.close()
             rv = self.open(author, char_name, latest_file, seek_end)
