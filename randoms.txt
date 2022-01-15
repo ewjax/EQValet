@@ -1104,6 +1104,50 @@
 [Tue Sep 07 17:53:03 2021] Snorkler hugs Adjutant Velsharek.
 [Tue Sep 07 17:54:03 2021] Snorkler hugs Adjutant Velsharek.
 
+
+[Sat Jan 15 00:13:29 2022] Fria's eyes gleam with heroic resolution.
+[Sat Jan 15 00:13:32 2022] Klearic begins to cast a spell.
+[Sat Jan 15 00:13:37 2022] Fria is cloaked in a shimmer of glowing symbols.
+[Sat Jan 15 00:13:49 2022] You forget Lich.
+[Sat Jan 15 00:13:53 2022] froglok krup knight says 'Guarding with my life..oh splendid one.'
+[Sat Jan 15 00:14:03 2022] Fria says, 'Any weighted rolls for birthday?!!?'
+[Sat Jan 15 00:14:16 2022] **A Magic Die is rolled by Xytl.
+[Sat Jan 15 00:14:16 2022] **It could have been any number from 75 to 999, but this time it turned up a 812.
+[Sat Jan 15 00:14:18 2022] froglok krup wizard begins to cast a spell.
+[Sat Jan 15 00:14:19 2022] **A Magic Die is rolled by Calyenta.
+[Sat Jan 15 00:14:19 2022] **It could have been any number from 675 to 999, but this time it turned up a 808.
+[Sat Jan 15 00:14:22 2022] **A Magic Die is rolled by Saadez.
+[Sat Jan 15 00:14:22 2022] **It could have been any number from 300 to 999, but this time it turned up a 349.
+[Sat Jan 15 00:14:23 2022] froglok krup wizard begins to cast a spell.
+[Sat Jan 15 00:14:23 2022] **A Magic Die is rolled by Klearic.
+[Sat Jan 15 00:14:23 2022] **It could have been any number from 225 to 999, but this time it turned up a 553.
+[Sat Jan 15 00:14:28 2022] **A Magic Die is rolled by Ikynixar.
+[Sat Jan 15 00:14:28 2022] **It could have been any number from 75 to 999, but this time it turned up a 939.
+[Sat Jan 15 00:14:32 2022] **A Magic Die is rolled by Mamasan.
+[Sat Jan 15 00:14:32 2022] **It could have been any number from 600 to 999, but this time it turned up a 714.
+[Sat Jan 15 00:14:35 2022] **A Magic Die is rolled by Xiralc.
+[Sat Jan 15 00:14:35 2022] **It could have been any number from 150 to 999, but this time it turned up a 655.
+[Sat Jan 15 00:14:38 2022] **A Magic Die is rolled by Grendol.
+[Sat Jan 15 00:14:38 2022] **It could have been any number from 450 to 999, but this time it turned up a 536.
+[Sat Jan 15 00:14:38 2022] **A Magic Die is rolled by Ceit.
+[Sat Jan 15 00:14:38 2022] **It could have been any number from 0 to 999, but this time it turned up a 627.
+[Sat Jan 15 00:14:39 2022] Froglok krup knight tries to bash Ceit, but Ceit's magical skin absorbs the blow!
+[Sat Jan 15 00:14:39 2022] Froglok krup knight tries to hit Ceit, but Ceit's magical skin absorbs the blow!
+[Sat Jan 15 00:14:39 2022] Froglok krup knight tries to hit Ceit, but Ceit's magical skin absorbs the blow!
+[Sat Jan 15 00:14:39 2022] Froglok krup knight hits Ceit for 98 points of damage.
+[Sat Jan 15 00:14:39 2022] Froglok krup knight hits Ceit for 136 points of damage.
+[Sat Jan 15 00:14:41 2022] **A Magic Die is rolled by Fria.
+[Sat Jan 15 00:14:41 2022] **It could have been any number from 300 to 999, but this time it turned up a 493.
+[Sat Jan 15 00:14:41 2022] Froglok krup knight hits Ceit for 80 points of damage.
+[Sat Jan 15 00:14:42 2022] froglok krup shaman begins to cast a spell.
+[Sat Jan 15 00:14:42 2022] Ceit regains concentration and continues casting.
+[Sat Jan 15 00:15:06 2022] froglok krup knight says 'Guarding with my life..oh splendid one.'
+[Sat Jan 15 00:15:16 2022] Ikynixar stands on his tip-toes and does a dance of joy!
+[Sat Jan 15 00:15:17 2022] Beginning to memorize Shield of the Magi...
+
+
+
+
 End of file
 
 

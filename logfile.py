@@ -1,13 +1,8 @@
-
 import threading
-import asyncio
 import time
-import discord
-import random
 import os
 import re
 import glob
-
 
 import myconfig
 
@@ -23,27 +18,26 @@ class EverquestLogFile:
     #
     # ctor
     #
-    def __init__(self, char_name = myconfig.DEFAULT_CHAR_NAME):
+    def __init__(self, char_name=myconfig.DEFAULT_CHAR_NAME):
 
         # instance data
         self.base_directory = myconfig.BASE_DIRECTORY
         self.logs_directory = myconfig.LOGS_DIRECTORY
-        self.char_name      = char_name
-        self.server_name    = myconfig.SERVER_NAME
-        self.filename       = self.build_filename(self.char_name)
-        self.file           = None
+        self.char_name = char_name
+        self.server_name = myconfig.SERVER_NAME
+        self.filename = self.build_filename(self.char_name)
+        self.file = None
 
-        self.parsing        = threading.Event()
+        self.parsing = threading.Event()
         self.parsing.clear()
 
-        self.author         = ''
+        self.author = ''
 
-        self.prevtime       = time.time()
-        self.heartbeat      = myconfig.HEARTBEAT
+        self.prevtime = time.time()
+        self.heartbeat = myconfig.HEARTBEAT
 
         # timezone string for current computer
         self.current_tzname = time.tzname[time.daylight]
-
 
     # build the file name
     # call this anytime that the filename attributes change
@@ -63,50 +57,47 @@ class EverquestLogFile:
 
     # open the file with most recent mod time (i.e. latest)
     # returns True if a new file was opened, False otherwise
-    def open_latest(self, author, seek_end = True):
+    def open_latest(self, author, seek_end=True):
         # get a list of all log files, and sort on mod time, latest at top
         mask = self.base_directory + self.logs_directory + 'eqlog_*_' + self.server_name + '.txt'
         files = glob.glob(mask)
-        files.sort(key=os.path.getmtime, reverse = True)
+        files.sort(key=os.path.getmtime, reverse=True)
 
         # foo - what if there are no files in the list?
         latest_file = files[0]
-#        print('Latest file = {}'.format(latest_file))
 
         # extract the character name from the filename
         # note that windows pathnames must usess double-backslashes in the pathname
         # note that backslashes in regular expressions are double-double-backslashes
-        # this expression replaces double \\ with quadruple \\\\, as well as the filename mask asterisk to a named regular expression
+        # this expression replaces double \\ with quadruple \\\\, as well as the filename mask asterisk to a
+        # named regular expression
         charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\w ]+)_')
         m = re.match(charname_regexp, latest_file)
         char_name = m.group('charname')
-#        print('Character = {}'.format(char_name))
 
         rv = False
 
         # figure out what to do
         # if we are already parsing a file, and it is the lastest file - do nothing
-        if ( (self.is_parsing() == True) and (self.filename == latest_file) ):
+        if (self.is_parsing() == True) and (self.filename == latest_file):
             # do nothing
             pass
 
         # if we are already parsing a file, but it is not the latest file, close the old and open the latest
-        elif ( (self.is_parsing() == True) and (self.filename != latest_file) ):
+        elif (self.is_parsing() == True) and (self.filename != latest_file):
             # stop parsing old and open the new file
             self.close()
             rv = self.open(author, char_name, latest_file, seek_end)
 
         # if we aren't parsing any file, then open latest
-        elif (self.is_parsing() == False):
+        elif not self.is_parsing():
             rv = self.open(author, char_name, latest_file, seek_end)
 
         return rv
 
-
-
     # open the file
     # seek file position to end of file if passed parameter 'seek_end' is true
-    def open(self, author, charname, filename, seek_end = True):
+    def open(self, author, charname, filename, seek_end=True):
         try:
             self.file = open(filename, 'r', errors='ignore')
             if seek_end:
@@ -132,5 +123,3 @@ class EverquestLogFile:
             return self.file.readline()
         else:
             return None
-
-

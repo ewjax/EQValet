@@ -144,7 +144,7 @@ class DOT_Spell(DamageEvent):
     # helper function to get number of ticks elapsed 
     def elapsed_ticks(self):
         ticks = 0
-        if (self._end_time and self._eq_time):
+        if self._end_time and self._eq_time:
             elapsed_timedelta = self._end_time - self._eq_time
             elapsed_seconds = elapsed_timedelta.total_seconds()
             if elapsed_seconds > self.max_duration_sec:
@@ -190,13 +190,13 @@ class LinearDOT_Spell(DOT_Spell):
     # ctor
     def __init__(self, spell_name, max_duration_sec, dmg_initial, dmg_per_tick, landed_message, faded_message = None):
         DOT_Spell.__init__(self, spell_name, max_duration_sec, landed_message, faded_message)
-        self.dmg_initial    = int(dmg_initial)
-        self.dmg_per_tick   = int(dmg_per_tick)
+        self.dmg_initial = int(dmg_initial)
+        self.dmg_per_tick = int(dmg_per_tick)
 
     # overload the damage_dealt() function
     def damage_dealt(self):
         damage = 0
-        if (self._end_time and self._eq_time):
+        if self._end_time and self._eq_time:
             ticks = self.elapsed_ticks()
             damage = self.dmg_initial + ticks * self.dmg_per_tick
         return damage
@@ -291,7 +291,7 @@ class Target:
         if self.max_melee <= 60:
             level = self.max_melee / 2
         else:
-            level = (self.max_melee  + 60) / 4
+            level = (self.max_melee + 60) / 4
         return level
 
     # start combat
@@ -449,6 +449,7 @@ class DamageTracker:
 
         # set of player names
         self.player_names_set           = set()
+        self.player_names_count         = 0
         self.player_names_fname         = 'players.pickle'
         self.read_player_names()
 
@@ -463,8 +464,8 @@ class DamageTracker:
             self.player_names_set = pickle.load(f)
             f.close()
 
-            count = len(self.player_names_set)
-            print('Read {} player names from [{}]'.format(count, self.player_names_fname))
+            self.player_names_count = len(self.player_names_set)
+            print('Read {} player names from [{}]'.format(self.player_names_count, self.player_names_fname))
 
             return True
         except:
@@ -480,13 +481,16 @@ class DamageTracker:
             pickle.dump(self.player_names_set, f)
             f.close()
 
-            count = len(self.player_names_set)
-            await self.client.send('Wrote {} player names to [{}]'.format(count, self.player_names_fname))
+            old_count = self.player_names_count
+            new_count = len(self.player_names_set)
+            self.player_names_count = new_count
 
+            await self.client.send('{} new, {} total player names written to [{}]'.format(new_count - old_count, new_count, self.player_names_fname))
             return True
+
         except:
             print('Unable to open filename: [{}]'.format(self.player_names_fname))
-            # return False
+            return False
 
     #
     # check for damage related items
@@ -572,7 +576,7 @@ class DamageTracker:
                 attacker_name = self.client.elf.char_name
 
                 # any damage event indicates we are in combat
-                if self.the_target.in_combat == False:
+                if not self.the_target.in_combat:
                     self.the_target.start_combat(target_name, line)
                     await self.client.send('*Combat begun: {}*'.format(target_name))
 
@@ -649,7 +653,7 @@ class DamageTracker:
                         attacker_name = self.client.pet_tracker.current_pet.pet_name
 
             # any damage event indicates we are in combat
-            if self.the_target.in_combat == False:
+            if not self.the_target.in_combat:
                 self.the_target.start_combat(target_name, line)
                 await self.client.send('*Combat begun: {}*'.format(target_name))
 
@@ -670,7 +674,7 @@ class DamageTracker:
             target_name = m.group('target_name')
 
             # any damage event indicates we are in combat
-            if self.the_target.in_combat == False:
+            if not self.the_target.in_combat:
                 self.the_target.start_combat(target_name, line)
                 await self.client.send('*Combat begun: {}*'.format(target_name))
 
@@ -688,7 +692,7 @@ class DamageTracker:
             damage = int(m.group('damage'))
 
             # any damage event indicates we are in combat
-            if self.the_target.in_combat == False:
+            if not self.the_target.in_combat:
                 self.the_target.start_combat(target_name, line)
                 await self.client.send('*Combat begun: {}*'.format(target_name))
 
@@ -700,6 +704,10 @@ class DamageTracker:
         #
         # watch for melee messages
         #
+        # attacker_name = None
+        # dmg_type = None
+        # target_name = None
+        # damage = None
         target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
         m = re.match(target, trunc_line)
         if m:
@@ -712,6 +720,9 @@ class DamageTracker:
 
             # if the target name is YOU, or target name is a name in the /who player database,
             # then the attacker is actually the target
+            # print(target_name)
+            # print(self.player_names_set)
+            # known = target_name in self.player_names_set
             if (target_name == 'YOU') or (target_name in self.player_names_set):
                 target_name = attacker_name
 
@@ -719,7 +730,7 @@ class DamageTracker:
                     self.the_target.check_melee(damage)
 
                 # any damage event indicates we are in combat
-                if self.the_target.in_combat == False:
+                if not self.the_target.in_combat:
                     self.the_target.start_combat(target_name, line)
                     await self.client.send('*Combat begun: {}*'.format(target_name))
 
@@ -727,7 +738,7 @@ class DamageTracker:
             else:
 
                 # any damage event indicates we are in combat
-                if self.the_target.in_combat == False:
+                if not self.the_target.in_combat:
                     self.the_target.start_combat(target_name, line)
                     await self.client.send('*Combat begun: {}*'.format(target_name))
 
@@ -744,22 +755,21 @@ class DamageTracker:
             processing_names = True
             player_names_set_modified = False
 
-#            # debugging output
-#            print('===============/who detected: {}'.format(trunc_line), end = '')
-
-#                [Sun Dec 19 20:33:44 2021] Players on EverQuest:
-#                [Sun Dec 19 20:33:44 2021] ---------------------------
-#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Aijalon 
-#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yihao 
-#                [Sun Dec 19 20:33:44 2021] [54 Disciple] Weth (Iksar) <Safe Space>
-#                [Sun Dec 19 20:33:44 2021] [54 Disciple] Rcva (Iksar) <Kingdom>
-#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yula  <Force of Will>
-#                [Sun Dec 19 20:33:44 2021] [57 Master] Twywu (Iksar) <Safe Space>
-#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Tenedorf  <Safe Space>
-#                [Sun Dec 19 20:33:44 2021] [60 Grave Lord] Gratton (Troll) <Force of Will>
-#                [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Bloodreign 
-#                [Sun Dec 19 20:33:44 2021] [60 Phantasmist] Azleep (Elemental) <Force of Will>
-#                [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
+            # # debugging output
+            # print('===============/who detected: {}'.format(trunc_line), end = '')
+            # [Sun Dec 19 20:33:44 2021] Players on EverQuest:
+            # [Sun Dec 19 20:33:44 2021] ---------------------------
+            # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Aijalon
+            # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yihao
+            # [Sun Dec 19 20:33:44 2021] [54 Disciple] Weth (Iksar) <Safe Space>
+            # [Sun Dec 19 20:33:44 2021] [54 Disciple] Rcva (Iksar) <Kingdom>
+            # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yula  <Force of Will>
+            # [Sun Dec 19 20:33:44 2021] [57 Master] Twywu (Iksar) <Safe Space>
+            # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Tenedorf  <Safe Space>
+            # [Sun Dec 19 20:33:44 2021] [60 Grave Lord] Gratton (Troll) <Force of Will>
+            # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Bloodreign
+            # [Sun Dec 19 20:33:44 2021] [60 Phantasmist] Azleep (Elemental) <Force of Will>
+            # [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
 
             # get next line - many dashes
             nextline = self.client.elf.readline()
@@ -777,15 +787,15 @@ class DamageTracker:
                 # as a safety net, just presume this is not the next name on the report
                 processing_names = False
 
-#               from ninjalooter:
-#                    MATCH_WHO = re.compile(
-#                        TIMESTAMP +
-#                        r"(?:AFK +)?(?:<LINKDEAD>)?\[(?P<level>\d+ )?(?P<class>[A-z ]+)\] +"
-#                        r"(?P<name>\w+)(?: *\((?P<race>[\w ]+)\))?(?: *<(?P<guild>[\w ]+)>)?")
+                # from ninjalooter:
+                #    MATCH_WHO = re.compile(
+                #        TIMESTAMP +
+                #        r"(?:AFK +)?(?:<LINKDEAD>)?\[(?P<level>\d+ )?(?P<class>[A-z ]+)\] +"
+                #        r"(?P<name>\w+)(?: *\((?P<race>[\w ]+)\))?(?: *<(?P<guild>[\w ]+)>)?")
 
                 # oddly, sometimes the name lists is preceeded by a completely blank line, usuall when a /who all command has been issued
                 # this regex allows for a blank line
-                name_target = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w` ]+)|^$)'
+                name_target = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w]+)|^$)'
                 m = re.match(name_target, trunc_line)
                 if m:
                     # since we did successfully find a name, extend the processing for another line

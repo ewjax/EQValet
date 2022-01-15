@@ -15,7 +15,7 @@ from smartbuffer import SmartBuffer
 
 # allow for testing, by forcing the bot to read an old log file
 TEST_BOT                = False
-#TEST_BOT                = True
+# TEST_BOT                = True
 
 
 
@@ -105,8 +105,10 @@ class EQValetClient(commands.Bot):
             if TEST_BOT == True:
 
                 # read a sample file with sample random rolls in it
-                filename = 'randoms.txt'
-#                filename = 'pets.txt'
+                # filename = 'randoms.txt'
+                # filename = 'pets.txt'
+                filename = 'fights.txt'
+
 
                 # start parsing, but in this case, start reading from the beginning of the file, rather than the end (default)
                 rv = self.elf.open(self.user, 'Testing', filename, seek_end = False)
