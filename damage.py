@@ -936,8 +936,7 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Vexing Mordinia'
-        sp = LinearDotSpell(spell_name, 54, 0, 122,
-                             r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
+        sp = LinearDotSpell(spell_name, 54, 0, 122, r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Pyrocruor'
@@ -965,6 +964,11 @@ class DamageTracker:
         spell_name = 'Sicken'
         sp = LinearDotSpell(spell_name, 126, 8, 2, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
         self.spell_dict[spell_name] = sp
+
+        spell_name = 'Tainted Breath'
+        sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        self.spell_dict[spell_name] = sp
+
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
