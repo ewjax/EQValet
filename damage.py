@@ -460,7 +460,8 @@ class DamageTracker:
             print('Read {} player names from [{}]'.format(self.player_names_count, self.player_names_fname))
 
             return True
-        except:
+        except OSError as err:
+            print("OS error: {0}".format(err))
             print('Unable to open filename: [{}]'.format(self.player_names_fname))
             return False
 
@@ -482,7 +483,8 @@ class DamageTracker:
                                                                        self.player_names_fname))
             return True
 
-        except:
+        except OSError as err:
+            print("OS error: {0}".format(err))
             print('Unable to open filename: [{}]'.format(self.player_names_fname))
             return False
 
@@ -659,8 +661,8 @@ class DamageTracker:
         m = re.match(target, trunc_line)
         if m:
             # extract RE data
-            attacker_name = self.client.elf.char_name
-            dmg_type = m.group('dmg_type')
+            # attacker_name = self.client.elf.char_name
+            # dmg_type = m.group('dmg_type')
             target_name = m.group('target_name')
 
             # any damage event indicates we are in combat
@@ -948,8 +950,7 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Torment of Shadows'
-        sp = LinearDotSpell(spell_name, 96, 0, 75,
-                             r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
+        sp = LinearDotSpell(spell_name, 96, 0, 75, r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
         self.spell_dict[spell_name] = sp
 
         # the only non-linear dot spell
@@ -968,7 +969,6 @@ class DamageTracker:
         spell_name = 'Tainted Breath'
         sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
         self.spell_dict[spell_name] = sp
-
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):

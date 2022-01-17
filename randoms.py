@@ -6,16 +6,21 @@ from datetime import datetime
 import myconfig
 
 
-#
-# class for a single random roll by a particular player
-#
-# keep track of player names, the random range (low, high), the actual random roll value, and the timestamp of the roll
-#
 class PlayerRandomRoll:
+    """class for a single random roll by a particular player
+
+    keeps track of
+        player names,
+        the random range (low, high),
+        the actual random roll value,
+        and the timestamp of the roll
+    """
 
     # ctor
-    # the eq_timestamp must at least include the leading [0:26] time stamp characters from the log file line, or it can also just be the entire line
     def __init__(self, player_name, random_value, low, high, eq_timestamp):
+        """the eq_timestamp must at least include the leading [0:26] time stamp characters from the log file line,
+        or it can also just be the entire line
+        """
 
         self.player_name = player_name
         self.random_value = int(random_value)
@@ -25,13 +30,15 @@ class PlayerRandomRoll:
         # create a datetime object, using the very capable strptime() parsing function built into the datetime module
         self.time_stamp = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
+        """overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+        """
         return (
             '({}, {}, {}, {}, {})'.format(self.player_name, self.random_value, self.low, self.high, self.time_stamp))
 
-    # to make bold text in a Discord message, surround it with double asterisks, i.e. **Example**
     def report(self, boldname=''):
+        """to make bold text in a Discord message, surround it with double asterisks, i.e. **Example**
+        """
 
         rv = ''
         if self.player_name.casefold() == boldname.casefold():
@@ -49,16 +56,16 @@ class PlayerRandomRoll:
         return rv
 
 
-# class for many random rolls, to find random winners etc
-#
-# every roll in the list must:
-#   - have same range (low, high) (if low_significant and high_significant parameters are True)
-#   - must be within the delta_seconds time span
-#   - presumption is that rolls are added in time-sequential order, so the first roll to be added is assumed to be the 
-#     starting time, and all other rolls must occur within the (starting time + delta_seconds) window
-#   - players can only random once.  any subsequent random will not be added to the RandomList
-#
 class RandomEvent:
+    """class for many random rolls, to find random winners etc
+
+    every roll in the list must:
+      - have same range (low, high) (if low_significant and high_significant parameters are True)
+      - must be within the delta_seconds time span
+      - presumption is that rolls are added in time-sequential order, so the first roll to be added is assumed to be the
+        starting time, and all other rolls must occur within the (starting time + delta_seconds) window
+      - players can only random once.  any subsequent random will not be added to the RandomList
+    """
 
     # ctor
     def __init__(self, low, high, delta_seconds, low_significant=True, high_significant=True):
@@ -155,7 +162,7 @@ class RandomEvent:
             if elapsed_seconds.total_seconds() <= self.delta_seconds:
 
                 # check that this person hasn't already randomed
-                if self.player_roll(r.player_name) == None:
+                if self.player_roll(r.player_name) is None:
                     self.rolls.append(r)
                     rv = True
 
@@ -186,7 +193,8 @@ class RandomEvent:
         return rv
 
     # walk the list and return the roll for a particular player
-    # not particularly efficient since it just brute force visits every member in the list, but the number of rollers is really never that high,
+    # not particularly efficient since it just brute force visits every member in the list,
+    # but the number of rollers is really never that high,
     # so in this case, simplicity wins over a very slight inefficiency
     def player_roll(self, player):
         rv = None
@@ -196,9 +204,8 @@ class RandomEvent:
         return rv
 
 
-#
-# class to do all the random tracking work
 class RandomTracker:
+    """class to do all the random tracking work"""
 
     # ctor
     def __init__(self, client):
@@ -218,7 +225,7 @@ class RandomTracker:
 
         # begin by checking if any of the RandomEvents is due to expire
         for (ndx, rev) in enumerate(self.all_random_events):
-            if (rev.expired == False):
+            if not rev.expired:
                 toggled = rev.check_expiration(line)
                 if toggled:
                     await self.client.send('{}'.format(rev.report_summary(ndx, self.client.elf.char_name)))
@@ -230,7 +237,7 @@ class RandomTracker:
 
         # return value m is either None of an object with information about the RE search
         m = re.match(target1, trunc_line)
-        if (m):
+        if m:
 
             # fetch the player name
             player = m.group('playername')
@@ -242,7 +249,7 @@ class RandomTracker:
 
             # fetch the low, high, and value numbers
             m = re.match(target2, trunc_line)
-            if (m):
+            if m:
                 low = m.group('low')
                 high = m.group('high')
                 value = m.group('value')
@@ -257,13 +264,13 @@ class RandomTracker:
                 added = False
                 # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
                 for rev in self.all_random_events:
-                    if (rev.expired == False):
-                        if (rev.add_roll(roll)):
+                    if not rev.expired:
+                        if rev.add_roll(roll):
                             added = True
                             break
 
                 # if the roll wasn't added, create a new RandomEvent to hold this one
-                if (added == False):
+                if not added:
                     rev = RandomEvent(low, high, self.default_window)
                     rev.add_roll(roll)
                     self.all_random_events.append(rev)
@@ -272,14 +279,13 @@ class RandomTracker:
     async def regroup(self, ndx=-1, new_window=0, low_significant=True, high_significant=True):
 
         # is ndx in range
-        if (len(self.all_random_events) == 0):
+        if len(self.all_random_events) == 0:
             await self.client.send('Error:  No RandomEvents to regroup!')
 
-        elif ((ndx < 0) or (ndx >= len(self.all_random_events))):
+        elif (ndx < 0) or (ndx >= len(self.all_random_events)):
             await self.client.send(
-                'Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx,
-                                                                                                   len(self.all_random_events) - 1))
-        elif (new_window <= 0):
+                'Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events) - 1))
+        elif new_window <= 0:
             await self.client.send(
                 'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
 
@@ -292,8 +298,8 @@ class RandomTracker:
             rolls = old_rev.rolls
 
             # is the new, larger window overlapping into the next random event(s)?
-            if (new_window >= old_rev.delta_seconds):
-                while (ndx < len(self.all_random_events)):
+            if new_window >= old_rev.delta_seconds:
+                while ndx < len(self.all_random_events):
                     next_rev = self.all_random_events[ndx]
                     # get delta t
                     delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
@@ -322,12 +328,12 @@ class RandomTracker:
                     if not rev.expired:
                         rev.low_significant = low_significant
                         rev.high_significant = high_significant
-                        if (rev.add_roll(r)):
+                        if rev.add_roll(r):
                             added = True
                             break
 
                 # if the roll wasn't added, create a new RandomEvent to hold this one
-                if (added == False):
+                if not added:
                     rev = RandomEvent(r.low, r.high, new_window, low_significant, high_significant)
                     rev.add_roll(r)
                     self.all_random_events.append(rev)
@@ -337,7 +343,7 @@ class RandomTracker:
 
             # if not expired yet, these are the random events just added, so close them, sort them, report them
             for (n, ev) in enumerate(self.all_random_events):
-                if (ev.expired == False):
+                if not ev.expired:
                     ev.expired = True
                     ev.sort_descending_randoms()
                     await self.client.send('{}'.format(ev.report_summary(n, self.client.elf.char_name)))
@@ -415,7 +421,7 @@ def main():
     print()
 
     print('use RandomEvent class')
-    rl = RandomEvent(0, 1000)
+    rl = RandomEvent(0, 1000, 30)
     r = PlayerRandomRoll('FirstRoll', 33, 0, 1000, line1)
     print(rl.add_roll(r))
     r = PlayerRandomRoll('HighRoller', 47, 0, 1000, line2)

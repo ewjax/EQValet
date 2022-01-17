@@ -1,8 +1,8 @@
-import threading
-import time
+import glob
 import os
 import re
-import glob
+import threading
+import time
 
 import myconfig
 
@@ -108,7 +108,9 @@ class EverquestLogFile:
             self.filename = filename
             self.set_parsing()
             return True
-        except:
+        except OSError as err:
+            print("OS error: {0}".format(err))
+            print('Unable to open filename: [{}]'.format(filename))
             return False
 
     # close the file
