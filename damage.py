@@ -23,7 +23,7 @@ from smartbuffer import SmartBuffer
 # common data:
 #       attacker_name       
 #       target_name
-#       eq_time         (for discrete events, the time.  For DOT's, the start time)
+#       event_datetime  (for discrete events, the time.  For DOT's, the start time)
 #
 # common methods:
 #       set_instance_data(attacker_name, target_name, eq_timestamp)     (set instance info)
@@ -44,17 +44,17 @@ class DamageEvent:
         # common data, to be set when an instance of the DamageEvent is created
         self.attacker_name = None
         self.target_name = None
-        self._eq_time = None
+        self.event_datetime = None
 
     # set instance data
     # eq_timestamp assumed to be in the format of EQ logfile timestamp
-    def set_instance_data(self, attacker_name, target_name, eq_timestamp):
+    def set_instance_data(self, attacker_name: str, target_name: str, eq_timestamp: str):
         self.attacker_name = attacker_name
         self.target_name = target_name
-        self._eq_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.event_datetime = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # function to be overloaded by child classes
-    def damage_dealt(self):
+    def damage_dealt(self) -> int:
         return int(0)
 
     # function to return type of damage - spell name, or melee type, or non-melee, etc
@@ -62,7 +62,7 @@ class DamageEvent:
         return None
 
     # only returns true for DOT spells that are not yet closed out
-    def is_ticking(self):
+    def is_ticking(self) -> bool:
         return False
 
 
@@ -76,25 +76,25 @@ class DiscreteDamageEvent(DamageEvent):
     # ctor
     # for the time parameter, pass at least, or all, of the actual log file line containing the timestamp
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
-    def __init__(self, attacker_name, target_name, eq_timestamp, dmg_type, dmg_amount):
+    def __init__(self, attacker_name: str, target_name: str, eq_timestamp: str, dmg_type: str, dmg_amount: int):
         DamageEvent.__init__(self)
         self.set_instance_data(attacker_name, target_name, eq_timestamp)
         self.dmg_type = dmg_type
         self.dmg_amount = int(dmg_amount)
 
     # function to be overloaded by child classes
-    def damage_dealt(self):
+    def damage_dealt(self) -> int:
         return self.dmg_amount
 
     # function to return type of damage - spell name, or melee type, or non-melee, etc
-    def damage_type(self):
+    def damage_type(self) -> str:
         return self.dmg_type
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '({}, {}, {}, {}, {})'.format(self.attacker_name,
                                              self.target_name,
-                                             self._eq_time,
+                                             self.event_datetime,
                                              self.dmg_type,
                                              self.dmg_amount)
 
@@ -111,7 +111,7 @@ class DotSpell(DamageEvent):
     #
     # the 'faded_message' parameter is an opportunity to provide a custom message.  Passing 'None' will cause 
     # the default faded message to be set to 'Your XXX spell has worn off'
-    def __init__(self, spell_name, max_duration_sec, landed_message, faded_message=None):
+    def __init__(self, spell_name: str, max_duration_sec: int, landed_message: str, faded_message: str = None):
         DamageEvent.__init__(self)
 
         self.spell_name = spell_name
@@ -123,25 +123,25 @@ class DotSpell(DamageEvent):
             self.faded_message = '^Your ' + self.spell_name + ' spell has worn off'
 
         # this will get set later
-        self._end_time = None
+        self.end_datetime = None
 
     # set the start time - shouldn't need this, normally would be set in set_instance_info(), but provide just in case
     # using the very capable strptime() parsing function built into the datetime module
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
-    def set_start_time(self, eq_timestamp):
-        self._eq_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+    def set_start_time(self, eq_timestamp: str):
+        self.event_datetime = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # set the end time
     # using the very capable strptime() parsing function built into the datetime module
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
-    def set_end_time(self, eq_timestamp):
-        self._end_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+    def set_end_time(self, eq_timestamp: str):
+        self.end_datetime = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
     # helper function to get number of ticks elapsed 
-    def elapsed_ticks(self):
+    def elapsed_ticks(self) -> int:
         ticks = 0
-        if self._end_time and self._eq_time:
-            elapsed_timedelta = self._end_time - self._eq_time
+        if self.end_datetime and self.event_datetime:
+            elapsed_timedelta = self.end_datetime - self.event_datetime
             elapsed_seconds = elapsed_timedelta.total_seconds()
             if elapsed_seconds > self.max_duration_sec:
                 elapsed_seconds = self.max_duration_sec
@@ -149,26 +149,26 @@ class DotSpell(DamageEvent):
         return ticks
 
     # function to be overloaded by child classes
-    def damage_dealt(self):
+    def damage_dealt(self) -> int:
         return 0
 
     # function to return type of damage - spell name, or melee type, or non-melee, etc
-    def damage_type(self):
+    def damage_type(self) -> str:
         return self.spell_name
 
     # returns true if end time has not yet been set in this spell
-    def is_ticking(self):
+    def is_ticking(self) -> bool:
         rv = False
-        if self._end_time is None:
+        if self.end_datetime is None:
             rv = True
         return rv
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '({}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
                                                          self.target_name,
-                                                         self._eq_time,
-                                                         self._end_time,
+                                                         self.event_datetime,
+                                                         self.end_datetime,
                                                          self.spell_name,
                                                          self.max_duration_sec,
                                                          self.landed_message,
@@ -184,25 +184,26 @@ class DotSpell(DamageEvent):
 class LinearDotSpell(DotSpell):
 
     # ctor
-    def __init__(self, spell_name, max_duration_sec, dmg_initial, dmg_per_tick, landed_message, faded_message=None):
+    def __init__(self, spell_name: str, max_duration_sec: int, dmg_initial: int, dmg_per_tick: int,
+                 landed_message: str, faded_message: str = None):
         DotSpell.__init__(self, spell_name, max_duration_sec, landed_message, faded_message)
         self.dmg_initial = int(dmg_initial)
         self.dmg_per_tick = int(dmg_per_tick)
 
     # overload the damage_dealt() function
-    def damage_dealt(self):
+    def damage_dealt(self) -> int:
         damage = 0
-        if self._end_time and self._eq_time:
+        if self.end_datetime and self.event_datetime:
             ticks = self.elapsed_ticks()
             damage = self.dmg_initial + ticks * self.dmg_per_tick
         return damage
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '({}, {}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
                                                                  self.target_name,
-                                                                 self._eq_time,
-                                                                 self._end_time,
+                                                                 self.event_datetime,
+                                                                 self.end_datetime,
                                                                  self.spell_name,
                                                                  self.max_duration_sec,
                                                                  self.dmg_initial,
@@ -224,9 +225,9 @@ class SplurtSpell(DotSpell):
         DotSpell.__init__(self, 'Splurt', 102, r'^(?P<target_name>[\w` ]+)\'s body begins to splurt', None)
 
     # overload the damage_dealt() function
-    def damage_dealt(self):
+    def damage_dealt(self) -> int:
         damage = 0
-        if self._end_time and self._eq_time:
+        if self.end_datetime and self.event_datetime:
 
             ticks = self.elapsed_ticks()
             base_damage = ticks * 11
@@ -240,11 +241,11 @@ class SplurtSpell(DotSpell):
         return damage
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '({}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
                                                      self.target_name,
-                                                     self._eq_time,
-                                                     self._end_time,
+                                                     self.event_datetime,
+                                                     self.end_datetime,
                                                      self.spell_name,
                                                      self.max_duration_sec,
                                                      self.landed_message)
@@ -258,27 +259,40 @@ class SplurtSpell(DotSpell):
 class Target:
 
     # ctor
-    def __init__(self):
+    def __init__(self, target_name=None):
 
         # target name
-        self.target_name = None
+        self.target_name = target_name
         self.in_combat = False
-        self._first_combat_time = None
-        self._last_combat_time = None
+        self.first_combat_datetime = None
+        self.last_combat_datetime = None
 
         # max value the target is hitting for
         self.max_melee = 0
 
-        # a dictionary of lists, keys = attacker names, values = list[] of all DamageEvents done by that attacker
-        self.damage_events_dict = {}
+        # running total of discrete damage - use this to help guess which target just died, if more than
+        # one are active
+        self.discrete_damage_sum = 0
+
+        # incoming damage TO this target
+        # a dictionary of lists,
+        #   keys = attacker (player) names,
+        #   values = list[] of all DamageEvents done by that attacker to this target (mob)
+        self.incoming_damage_events_dict = {}
+
+        # outgoing damage BY this target
+        # a dictionary of lists,
+        #   keys = target names (player names)
+        #   values = list[] of all DamageEvents done by this Target (mob) to that Player
+        self.outgoing_damage_events_dict = {}
 
     # process a melee attack
-    def check_melee(self, dmg):
+    def check_max_melee(self, dmg: int):
         if self.max_melee < dmg:
             self.max_melee = dmg
 
     # implied target level, from max melee value
-    def implied_level(self):
+    def implied_level(self) -> float:
         if self.max_melee <= 60:
             level = self.max_melee / 2
         else:
@@ -286,104 +300,130 @@ class Target:
         return level
 
     # start combat
-    def start_combat(self, target_name, eq_timestamp):
-        self.target_name = target_name
-        self._first_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
-        self._last_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+    def start_combat(self, eq_timestamp: str):
+        self.first_combat_datetime = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.last_combat_datetime = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
         self.in_combat = True
 
     # end combat
-    def end_combat(self, eq_timestamp):
+    def end_combat(self, eq_timestamp: str):
 
-        self._last_combat_time = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+        self.last_combat_datetime = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
         self.in_combat = False
 
         # for each attacker..
-        for attacker in self.damage_events_dict:
+        for attacker in self.incoming_damage_events_dict:
             # get the list of DE events for this attacker
-            de_list = self.damage_events_dict[attacker]
+            de_list = self.incoming_damage_events_dict[attacker]
             # for each event in the list
             for de in de_list:
                 if de.is_ticking():
                     de.set_end_time(eq_timestamp)
 
-    # clear DE list
-    def clear(self):
-        self.target_name = None
-        self.in_combat = False
-        self._first_combat_time = None
-        self._last_combat_time = None
-        self.max_melee = 0
-
-        self.damage_events_dict.clear()
+        # for each target..
+        for target in self.outgoing_damage_events_dict:
+            # get the list of DE events for this target
+            de_list = self.outgoing_damage_events_dict[target]
+            # for each event in the list
+            for de in de_list:
+                if de.is_ticking():
+                    de.set_end_time(eq_timestamp)
 
     # combat timeout time in seconds - time since last DamageEvent
-    def combat_timeout_seconds(self, eq_timestamp):
+    def combat_timeout_seconds(self, eq_timestamp: str) -> float:
         now = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
-        elapsed_timedelta = now - self._last_combat_time
+        elapsed_timedelta = now - self.last_combat_datetime
         elapsed_seconds = elapsed_timedelta.total_seconds()
         return elapsed_seconds
 
     # combat duration in seconds - first to last
-    def combat_duration_seconds(self):
-        elapsed_timedelta = self._last_combat_time - self._first_combat_time
+    def combat_duration_seconds(self) -> float:
+        elapsed_timedelta = self.last_combat_datetime - self.first_combat_datetime
         elapsed_seconds = elapsed_timedelta.total_seconds()
         return elapsed_seconds
 
-    # add a damage event to the list
-    def add_damage_event(self, de):
+    # add an incoming damage event to the incoming list
+    # e.g. player hits mob for XXX
+    def add_incoming_damage_event(self, de: DamageEvent):
 
-        # targets must match
-        if (self.target_name.casefold() == de.target_name.casefold()) and self.in_combat:
+        # is there an entry in the dictionary for this attacker?
+        if de.attacker_name not in self.incoming_damage_events_dict:
+            self.incoming_damage_events_dict[de.attacker_name] = []
 
-            # is there an entry in the dictionary for this attacker?
-            if de.attacker_name not in self.damage_events_dict:
-                self.damage_events_dict[de.attacker_name] = []
+        de_list = self.incoming_damage_events_dict[de.attacker_name]
+        de_list.append(de)
+        self.last_combat_datetime = de.event_datetime
 
-            de_list = self.damage_events_dict[de.attacker_name]
-            de_list.append(de)
-            self._last_combat_time = de._eq_time
+        self.discrete_damage_sum += de.damage_dealt()
+
+    # add an outgoing damage event to the outgoing list
+    # e.g. mob hits player for XXX
+    def add_outgoing_damage_event(self, de: DamageEvent):
+
+        # is there an entry in the dictionary for this player?
+        if de.target_name not in self.outgoing_damage_events_dict:
+            self.outgoing_damage_events_dict[de.target_name] = []
+
+        de_list = self.outgoing_damage_events_dict[de.target_name]
+        de_list.append(de)
+        self.last_combat_datetime = de.event_datetime
 
     # build a damage report, subtotaled by damage type
     async def damage_report(self, client):
 
         # total damage dealt to this target
-        grand_total = 0
+        grand_total_incoming = 0        # damage incoming, i.e. TO this Target
+        grand_total_outgoing = 0        # damage outgoing, i.e. BY this Target
 
         # walk the list initially just to get attacker totals, save in a dictionary,
-        # key = attacker names,
-        # values = dmg total for that attacker
-        attacker_summary_dict = {}
+        incoming_summary_dict = {}      # {k:V} = {attacker_name : damage total for that attacker}
+        outgoing_summary_dict = {}      # {k:v} = {target_name : damage total done to that target}
 
-        # for each attacker in the damate_events_dict
-        for attacker in self.damage_events_dict:
+        # for each attacker in the incoming_damage_events_dict
+        for attacker in self.incoming_damage_events_dict:
 
             # first one?
-            if attacker not in attacker_summary_dict:
-                attacker_summary_dict[attacker] = 0
+            if attacker not in incoming_summary_dict:
+                incoming_summary_dict[attacker] = 0
 
             # for each DamageEvent in the list for this attacker...
-            de_list = self.damage_events_dict[attacker]
+            de_list = self.incoming_damage_events_dict[attacker]
             for de in de_list:
                 dd = de.damage_dealt()
-                attacker_summary_dict[attacker] += dd
-                grand_total += dd
+                incoming_summary_dict[attacker] += dd
+                grand_total_incoming += dd
+
+        # for each target in the damage_events_dict
+        for target in self.outgoing_damage_events_dict:
+
+            # first one?
+            if target not in outgoing_summary_dict:
+                outgoing_summary_dict[target] = 0
+
+            # for each DamageEvent in the list for this target...
+            de_list = self.outgoing_damage_events_dict[target]
+            for de in de_list:
+                dd = de.damage_dealt()
+                outgoing_summary_dict[target] += dd
+                grand_total_outgoing += dd
 
         # now create the output report
         sb = SmartBuffer()
-        sb.add('Damage Report, Target: ====[{:^30}]==============================================\n'.format(
-            self.target_name))
+        name = '**' + self.target_name + '**'
+        sb.add('=========================================================================\n')
+        # sb.add('Damage Report, Target: ====[{:^30}]====\n'.format(name))
+        sb.add('Damage Report, Target: **{}**\n'.format(self.target_name))
         sb.add('Implied Level: {}\n'.format(self.implied_level()))
         sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
+        sb.add('Outgoing Damage:\n')
 
-        # walk the list of attackers, sort the attacker dictionary on total damage done...
-        for (attacker, attacker_total) in sorted(attacker_summary_dict.items(), key=lambda val: val[1],
-                                                 reverse=True):
-            sb.add('        {}\n'.format(attacker))
+        # walk the list of targets, sort the target dictionary on total damage done...
+        for (target, target_total) in sorted(outgoing_summary_dict.items(), key=lambda val: val[1], reverse=True):
+            sb.add('        {}\n'.format(target))
 
             # create a dictionary, keys = damage types, values = integer total damage done for that damage type
             dmg_type_summary_dict = {}
-            de_list = self.damage_events_dict[attacker]
+            de_list = self.outgoing_damage_events_dict[target]
 
             # for each DamageEvent in the list...
             for de in de_list:
@@ -395,13 +435,37 @@ class Target:
             for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
                 sb.add('{:>35}: {:>5}\n'.format(dmg_type, dmg_type_sum))
 
-            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, int(attacker_total / grand_total * 100.0)))
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', target_total, int(target_total / grand_total_outgoing * 100.0)))
 
         sb.add('\n')
-        sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total))
+        sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_outgoing))
+        sb.add('-------------------------------------------------------------------------\n')
+        sb.add('Incoming Damage:\n')
 
-        sb.add(
-            '---------------------------------------------------------------------------------------------------------\n')
+        # walk the list of attackers, sort the attacker dictionary on total damage done...
+        for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
+            sb.add('        {}\n'.format(attacker))
+
+            # create a dictionary, keys = damage types, values = integer total damage done for that damage type
+            dmg_type_summary_dict = {}
+            de_list = self.incoming_damage_events_dict[attacker]
+
+            # for each DamageEvent in the list...
+            for de in de_list:
+                if de.damage_type() not in dmg_type_summary_dict:
+                    dmg_type_summary_dict[de.damage_type()] = 0
+                dmg_type_summary_dict[de.damage_type()] += de.damage_dealt()
+
+            # sort damage type report from highest to lowest damage
+            for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
+                sb.add('{:>35}: {:>5}\n'.format(dmg_type, dmg_type_sum))
+
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, int(attacker_total / grand_total_incoming * 100.0)))
+
+        sb.add('\n')
+        sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_incoming))
+
+        sb.add('-------------------------------------------------------------------------\n')
 
         # get the list of buffers and send each to discord
         bufflist = sb.get_bufflist()
@@ -425,7 +489,9 @@ class DamageTracker:
         self.client = client
 
         # the target that is being attacked
-        self.the_target = Target()
+        # dictionary of {k:v} = {target_name, Target object}
+        self.active_target_dict = {}
+        self.inactive_target_list = []
 
         # dictionary of all known DOT_Spells, keys = spell names, contents = DOT_Spell objects
         self.spell_dict = {}
@@ -445,10 +511,7 @@ class DamageTracker:
         self.player_names_fname = 'players.pickle'
         self.read_player_names()
 
-    #
-    # read in the player_names
-    #
-    def read_player_names(self):
+    def read_player_names(self) -> bool:
 
         # throws and exception if file doesn't exist
         try:
@@ -468,7 +531,7 @@ class DamageTracker:
     #
     # write out the player_names
     #
-    async def write_player_names(self):
+    async def write_player_names(self) -> bool:
         try:
             f = open(self.player_names_fname, 'wb')
             pickle.dump(self.player_names_set, f)
@@ -489,9 +552,48 @@ class DamageTracker:
             return False
 
     #
+    # check if there is currently a target by this name, and
+    #   if so, return that Target object
+    #   if not, create a new Target() and return that one
+    #
+    def get_target(self, target_name: str) -> Target:
+        if target_name in self.active_target_dict:
+            rv = self.active_target_dict[target_name]
+        else:
+            rv = Target(target_name)
+            self.active_target_dict[target_name] = rv
+        return rv
+
+    #
+    # if we know combat has ended (exp message perhaps) but we DON'T know which Target just died, we have to guess
+    #
+    def get_likely_target(self) -> Target:
+
+        # just guess that the mob in the current list with the most accumulated melee damage = what just died
+        max_dmg = -1
+        likely_target = None
+        for t in self.active_target_dict.values():
+            if t.discrete_damage_sum > max_dmg:
+                max_dmg = t.discrete_damage_sum
+                likely_target = t
+
+        return likely_target
+
+    #
+    # end combat sequence of events on target_name
+    #
+    async def end_combat(self, target_name: str, line: str):
+
+        # remove this target from the active Target dictionary, and add it to the inactive target list
+        the_target = self.active_target_dict.pop(target_name)
+        self.inactive_target_list.append(the_target)
+        the_target.end_combat(line)
+        await the_target.damage_report(self.client)
+
+    #
     # check for damage related items
     #
-    async def process_line(self, line):
+    async def process_line(self, line: str):
 
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
@@ -499,45 +601,56 @@ class DamageTracker:
         #
         # watch for conditions indicating combat is finished
         #
-        if self.the_target.in_combat:
-
-            end_combat = False
+        if len(self.active_target_dict) > 0:
 
             # exp message
-            target = r'^(You gain experience|You gain party experience)'
-            m = re.match(target, trunc_line)
+            exp_regexp = r'^(You gain experience|You gain party experience)'
+            m = re.match(exp_regexp, trunc_line)
             if m:
-                end_combat = True
+                # have to guess which target just died
+                the_target = self.get_likely_target()
+                if the_target:
+                    await self.end_combat(the_target.target_name, line)
+                else:
+                    await self.client.send('Error:  Exp message received, but no Target identified')
 
             # target is slain by pet or anyone else
-            target = r'^(?P<target_name>[\w` ]+) has been slain'
-            m = re.match(target, trunc_line)
+            slain_regexp = r'^(?P<target_name>[\w` ]+) has been slain'
+            m = re.match(slain_regexp, trunc_line)
             if m:
                 # extract RE data
                 target_name = m.group('target_name')
-                if target_name.casefold() == self.the_target.target_name.casefold():
-                    end_combat = True
+                if target_name not in self.player_names_set:
+                    target_name = target_name.casefold()
+                    await self.end_combat(target_name, line)
 
             # target is slain by player
-            target = r'^You have slain (?P<target_name>[\w` ]+)'
-            m = re.match(target, trunc_line)
+            you_slain_regexp = r'^You have slain (?P<target_name>[\w` ]+)'
+            m = re.match(you_slain_regexp, trunc_line)
             if m:
                 # extract RE data
                 target_name = m.group('target_name')
-                if target_name.casefold() == self.the_target.target_name.casefold():
-                    end_combat = True
+                if target_name not in self.player_names_set:
+                    target_name = target_name.casefold()
+                    await self.end_combat(target_name, line)
 
-            # combat timeout
-            if self.the_target.combat_timeout_seconds(line) > self.combat_timeout:
-                # ...then the combat timer has time out
-                await self.client.send('*Combat: Timed out*')
-                end_combat = True
+            # combat timeout - have to make a copy because the call to end_combat will modify the dictionary,
+            # which would break the for loop
+            for target_name in self.active_target_dict.copy():
+                the_target = self.get_target(target_name)
+                if the_target.combat_timeout_seconds(line) > self.combat_timeout:
+                    # ...then the combat timer has time out
+                    await self.client.send('*Combat: Timed out*')
+                    await self.end_combat(target_name, line)
 
-            # close out damage tracking
-            if end_combat:
-                self.the_target.end_combat(line)
-                await self.the_target.damage_report(self.client)
-                self.the_target.clear()
+            # zoning
+            zoning_regexp = 'LOADING, PLEASE WAIT'
+            m = re.match(zoning_regexp, trunc_line)
+            if m:
+                await self.client.send('*Player Zoned*')
+                # close all open targets
+                for target_name in self.active_target_dict.copy():
+                    await self.end_combat(target_name, line)
 
         #
         # check for timeout on spell landed messages
@@ -549,8 +662,7 @@ class DamageTracker:
             elapsed_seconds = (now - self.spell_pending_start)
             if elapsed_seconds.total_seconds() > myconfig.SPELL_PENDING_TIMEOUT_SEC:
                 # ...then this spell pending is expired
-                await self.client.send(
-                    '*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
+                await self.client.send('*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
                 self.spell_pending = None
                 self.spell_pending_start = None
 
@@ -560,24 +672,25 @@ class DamageTracker:
         if self.spell_pending:
 
             # get the landed message for the spell that is pending
-            target = self.spell_pending.landed_message
-            m = re.match(target, trunc_line)
+            pending_regexp = self.spell_pending.landed_message
+            m = re.match(pending_regexp, trunc_line)
             if m:
 
                 # extract RE data
-                target_name = m.group('target_name')
+                target_name = m.group('target_name').casefold()
 
                 # set the attacker name to the player name
                 attacker_name = self.client.elf.char_name
 
                 # any damage event indicates we are in combat
-                if not self.the_target.in_combat:
-                    self.the_target.start_combat(target_name, line)
-                    await self.client.send('*Combat begun: {}*'.format(target_name))
+                the_target = self.get_target(target_name)
+                if not the_target.in_combat:
+                    the_target.start_combat(line)
+                    await self.client.send('*Combat begun (spell landed): {}*'.format(target_name))
 
                 # is this spell already in the DE list for the player, and still ticking?
                 # if so, close the existing, and add the new one
-                de_list = self.the_target.damage_events_dict.get(attacker_name)
+                de_list = the_target.incoming_damage_events_dict.get(attacker_name)
                 # for each event in the player's DE list
                 if de_list:
                     for de in de_list:
@@ -589,7 +702,7 @@ class DamageTracker:
                 # add the DamageEvent
                 de = copy.copy(self.spell_pending)
                 de.set_instance_data(attacker_name, target_name, line)
-                self.the_target.add_damage_event(de)
+                the_target.add_incoming_damage_event(de)
 
                 # reset the spell pending flag
                 self.spell_pending = None
@@ -598,24 +711,25 @@ class DamageTracker:
         #
         # watch for spell faded conditions -only check DamageEvents that are not closed, i.e. still ticking
         #
-        if self.the_target.in_combat:
-            attacker_name = self.client.elf.char_name
-            de_list = self.the_target.damage_events_dict.get(attacker_name)
-            # for each event in the player's DE list
-            if de_list:
-                for de in de_list:
-                    if de.is_ticking():
-                        target = de.faded_message
-                        m = re.match(target, trunc_line)
-                        if m:
-                            de.set_end_time(line)
-                            await self.client.send('*{} faded*'.format(de.spell_name))
+        for targ in self.active_target_dict.values():
+            if targ.in_combat:
+                attacker_name = self.client.elf.char_name
+                de_list = targ.incoming_damage_events_dict.get(attacker_name)
+                # for each event in the player's DE list
+                if de_list:
+                    for de in de_list:
+                        if de.is_ticking():
+                            faded_target = de.faded_message
+                            m = re.match(faded_target, trunc_line)
+                            if m:
+                                de.set_end_time(line)
+                                await self.client.send('*{} faded*'.format(de.spell_name))
 
         #
         # watch for casting messages
         #
-        target = r'^You begin casting (?P<spell_name>[\w` ]+)\.'
-        m = re.match(target, trunc_line)
+        casting_regexp = r'^You begin casting (?P<spell_name>[\w` ]+)\.'
+        m = re.match(casting_regexp, trunc_line)
         if m:
 
             # fetch the spell name
@@ -629,11 +743,11 @@ class DamageTracker:
         #
         # watch for non-melee messages
         #
-        target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) point(s)? of damage'
-        m = re.match(target, trunc_line)
+        non_melee_regexp = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        m = re.match(non_melee_regexp, trunc_line)
         if m:
             # extract RE data
-            target_name = m.group('target_name')
+            target_name = m.group('target_name').casefold()
             dmg_type = m.group('dmg_type')
             damage = int(m.group('damage'))
 
@@ -646,61 +760,60 @@ class DamageTracker:
                         attacker_name = self.client.pet_tracker.current_pet.pet_name
 
             # any damage event indicates we are in combat
-            if not self.the_target.in_combat:
-                self.the_target.start_combat(target_name, line)
-                await self.client.send('*Combat begun: {}*'.format(target_name))
+            the_target = self.get_target(target_name)
+            if not the_target.in_combat:
+                the_target.start_combat(line)
+                await self.client.send('*Combat begun (non-melee event): {}*'.format(target_name))
 
             # add the DamageEvent
             dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-            self.the_target.add_damage_event(dde)
+            the_target.add_incoming_damage_event(dde)
 
         #
         # watch for melee misses by me
         #
-        target = r'^You try to (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+), but miss!'
-        m = re.match(target, trunc_line)
+        my_miss_regexp = r'^You try to (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+), but miss!'
+        m = re.match(my_miss_regexp, trunc_line)
         if m:
             # extract RE data
             # attacker_name = self.client.elf.char_name
             # dmg_type = m.group('dmg_type')
-            target_name = m.group('target_name')
+            target_name = m.group('target_name').casefold()
 
             # any damage event indicates we are in combat
-            if not self.the_target.in_combat:
-                self.the_target.start_combat(target_name, line)
-                await self.client.send('*Combat begun: {}*'.format(target_name))
+            the_target = self.get_target(target_name)
+            if not the_target.in_combat:
+                the_target.start_combat(line)
+                await self.client.send('*Combat begun (your melee misses): {}*'.format(target_name))
 
         #
         # watch for melee messages by me
         #
-        target = r'^You (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
-        m = re.match(target, trunc_line)
+        my_hit_regexp = r'^You (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        m = re.match(my_hit_regexp, trunc_line)
         if m:
 
             # extract RE data
             attacker_name = self.client.elf.char_name
             dmg_type = m.group('dmg_type')
-            target_name = m.group('target_name')
+            target_name = m.group('target_name').casefold()
             damage = int(m.group('damage'))
 
             # any damage event indicates we are in combat
-            if not self.the_target.in_combat:
-                self.the_target.start_combat(target_name, line)
-                await self.client.send('*Combat begun: {}*'.format(target_name))
+            the_target = self.get_target(target_name)
+            if not the_target.in_combat:
+                the_target.start_combat(line)
+                await self.client.send('*Combat begun (your melee hits): {}*'.format(target_name))
 
             # add the DamageEvent
             dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-            self.the_target.add_damage_event(dde)
+            the_target.add_incoming_damage_event(dde)
 
         #
         # watch for melee messages
         #
-        # attacker_name = None
-        # dmg_type = None
-        # target_name = None
-        # damage = None
-        target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
-        m = re.match(target, trunc_line)
+        melee_regexp = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        m = re.match(melee_regexp, trunc_line)
         if m:
 
             # extract RE data
@@ -709,39 +822,40 @@ class DamageTracker:
             target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
-            # if the target name is YOU, or target name is a name in the /who player database,
-            # then the attacker is actually the target
-            # print(target_name)
-            # print(self.player_names_set)
-            # known = target_name in self.player_names_set
+            # the case where the Mob is attacking a Player
             if (target_name == 'YOU') or (target_name in self.player_names_set):
-                target_name = attacker_name
-
-                if self.the_target:
-                    self.the_target.check_melee(damage)
 
                 # any damage event indicates we are in combat
-                if not self.the_target.in_combat:
-                    self.the_target.start_combat(target_name, line)
-                    await self.client.send('*Combat begun: {}*'.format(target_name))
+                attacker_name = attacker_name.casefold()
+                the_target = self.get_target(attacker_name)
+                if not the_target.in_combat:
+                    the_target.start_combat(line)
+                    await self.client.send('*Combat begun (melee event vs YOU or Player): {}*'.format(attacker_name))
 
-            # don't track attacks on player
-            else:
-
-                # any damage event indicates we are in combat
-                if not self.the_target.in_combat:
-                    self.the_target.start_combat(target_name, line)
-                    await self.client.send('*Combat begun: {}*'.format(target_name))
+                the_target.check_max_melee(damage)
 
                 # add the DamageEvent
                 dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                self.the_target.add_damage_event(dde)
+                the_target.add_outgoing_damage_event(dde)
+
+            # the case where a Player is attacking the Mob
+            else:
+                # any damage event indicates we are in combat
+                target_name = target_name.casefold()
+                the_target = self.get_target(target_name)
+                if not the_target.in_combat:
+                    the_target.start_combat(line)
+                    await self.client.send('*Combat begun (melee event vs mob): {}*'.format(target_name))
+
+                # add the DamageEvent
+                dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                the_target.add_incoming_damage_event(dde)
 
         #
         # watch for /who messages
         #
-        target = r'^Players (in|on) EverQuest'
-        m = re.match(target, trunc_line)
+        who_regexp = r'^Players (in|on) EverQuest'
+        m = re.match(who_regexp, trunc_line)
         if m:
             processing_names = True
             player_names_set_modified = False
@@ -786,8 +900,8 @@ class DamageTracker:
                 # oddly, sometimes the name lists is preceeded by a completely blank line,
                 # usuall when a /who all command has been issued
                 # this regex allows for a blank line
-                name_target = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w]+)|^$)'
-                m = re.match(name_target, trunc_line)
+                name_regexp = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w]+)|^$)'
+                m = re.match(name_regexp, trunc_line)
                 if m:
                     # since we did successfully find a name, extend the processing for another line
                     processing_names = True
@@ -938,7 +1052,8 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Vexing Mordinia'
-        sp = LinearDotSpell(spell_name, 54, 0, 122, r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
+        sp = LinearDotSpell(spell_name, 54, 0, 122,
+                            r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Pyrocruor'
@@ -950,7 +1065,8 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Torment of Shadows'
-        sp = LinearDotSpell(spell_name, 96, 0, 75, r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
+        sp = LinearDotSpell(spell_name, 96, 0, 75,
+                            r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
         self.spell_dict[spell_name] = sp
 
         # the only non-linear dot spell
@@ -967,11 +1083,11 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Tainted Breath'
-        sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) has been poisoned')
         self.spell_dict[spell_name] = sp
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '({}'.format(self.spell_dict)
 
 
@@ -1020,7 +1136,7 @@ def main():
 
     ds33.set_instance_data('Xytl', target_name, line1)
     ds33.set_end_time(line2)
-    the_target.add_damage_event(ds33)
+    the_target.add_incoming_damage_event(ds33)
 
     print(ds3)
     print(ds3.damage_dealt())
@@ -1109,9 +1225,9 @@ def main():
     #
     # the_target.damage_report()
     #
-    # print(the_target.damage_events_dict)
+    # print(the_target.incoming_damage_events_dict)
     # the_target.clear()
-    # print(the_target.damage_events_dict)
+    # print(the_target.incoming_damage_events_dict)
 
 
 if __name__ == '__main__':
