@@ -175,7 +175,7 @@ class PetTracker:
         #
         # if the flag is set that we have a pet and don't know the name yet, search for pet name
         #
-        if (self.current_pet) and (self.current_pet.name_pending):
+        if self.current_pet and self.current_pet.name_pending:
             target = r'^(?P<pet_name>[\w ]+) says \'At your service Master.'
 
             # return value m is either None of an object with information about the RE search
@@ -220,7 +220,7 @@ class PetTracker:
 
             # 
             # look for lifetap 'beams a smile' message coming from our pet
-            #
+            # fixme should this create a DD DamageEvent??
             target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
             m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
@@ -229,8 +229,8 @@ class PetTracker:
             #
             # look for max melee value
             #
-            target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(
-                self.current_pet.pet_name)
+            target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches) \
+                     (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(self.current_pet.pet_name)
             # return value m is either None of an object with information about the RE search
             m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
@@ -378,7 +378,7 @@ class PetTracker:
         pet_spell = PetSpell('Haunting Corpse', 'Necro', caster_level=24, pet_stats_list=pet_stat_list.copy())
         self.pet_dict['Haunting Corpse'] = pet_spell
 
-        # need 29, 34, 39, 44 necro pets here
+        #todo need 29, 34, 39, 44 necro pets here
 
         pet_stat_list = []
         pet_stat_list.append(PetStats(rank=1, pet_level=37, max_melee=47, max_bashkick=22, max_backstab=0, lifetap=38))

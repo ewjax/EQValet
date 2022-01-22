@@ -12,13 +12,13 @@ from smartbuffer import SmartBuffer
 # 
 # Inheritance Diagram:
 #         
-#                         DamageEvent
-#                            /   \
-#                           /     \
-#          DiscreteDamageEvent   DotSpell
-#                                    /   \
-#                                   /     \
-#                      LinearDotSpell   SplurtSpell
+#                           DamageEvent
+#                            /    \   \___________
+#                           /      \              \
+#           DiscreteDamageEvent  DotSpell      DirectDamageSpell
+#                                  /   \
+#                                 /     \
+#                      LinearDotSpell  SplurtSpell
 #         
 # common data:
 #       attacker_name       
@@ -101,6 +101,24 @@ class DiscreteDamageEvent(DamageEvent):
 
 #################################################################################################
 
+#
+# class for a DD spell
+#
+class DirectDamageSpell(DamageEvent):
+
+    # ctor
+    #
+    def __init__(self, spell_name: str, landed_message: str):
+        DamageEvent.__init__(self)
+        self.spell_name = spell_name
+        self.landed_message = landed_message
+
+    # function to return type of damage - spell name, or melee type, or non-melee, etc
+    def damage_type(self) -> str:
+        return self.spell_name
+
+
+#################################################################################################
 
 #
 # base class for other DOT spells
@@ -195,7 +213,9 @@ class LinearDotSpell(DotSpell):
         damage = 0
         if self.end_datetime and self.event_datetime:
             ticks = self.elapsed_ticks()
-            damage = self.dmg_initial + ticks * self.dmg_per_tick
+            # actually, the initial damage is detectable as non-melee, so don't double count it here
+            # damage = self.dmg_initial + ticks * self.dmg_per_tick
+            damage = ticks * self.dmg_per_tick
         return damage
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
@@ -409,13 +429,12 @@ class Target:
 
         # now create the output report
         sb = SmartBuffer()
-        name = '**' + self.target_name + '**'
         sb.add('=========================================================================\n')
         # sb.add('Damage Report, Target: ====[{:^30}]====\n'.format(name))
         sb.add('Damage Report, Target: **{}**\n'.format(self.target_name))
         sb.add('Implied Level: {}\n'.format(self.implied_level()))
         sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
-        sb.add('Outgoing Damage:\n')
+        sb.add('Damage To:\n')
 
         # walk the list of targets, sort the target dictionary on total damage done...
         for (target, target_total) in sorted(outgoing_summary_dict.items(), key=lambda val: val[1], reverse=True):
@@ -440,7 +459,7 @@ class Target:
         sb.add('\n')
         sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_outgoing))
         sb.add('-------------------------------------------------------------------------\n')
-        sb.add('Incoming Damage:\n')
+        sb.add('Damage By:\n')
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
         for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
@@ -494,13 +513,13 @@ class DamageTracker:
         self.inactive_target_list = []
 
         # dictionary of all known DOT_Spells, keys = spell names, contents = DOT_Spell objects
-        self.spell_dict = {}
+        self.spell_dict = dict()
         self.load_spell_dict()
 
         # use this flag for when we have detected the start of a spell cast and need to watch for the landed message
         # this is a pointer to the actual spell that is pending
         self.spell_pending = None
-        self.spell_pending_start = None
+        # self.spell_pending_start = None
 
         # combat timeout
         self.combat_timeout = myconfig.COMBAT_TIMEOUT_SEC
@@ -593,6 +612,7 @@ class DamageTracker:
     #
     # check for damage related items
     #
+    # todo ensure pets function well in a multi-target environment
     async def process_line(self, line: str):
 
         # cut off the leading date-time stamp info
@@ -620,6 +640,7 @@ class DamageTracker:
             if m:
                 # extract RE data
                 target_name = m.group('target_name')
+                # fixme ensure pet deaths don't trigger this
                 if target_name not in self.player_names_set:
                     target_name = target_name.casefold()
                     await self.end_combat(target_name, line)
@@ -659,12 +680,13 @@ class DamageTracker:
 
             # get current time and check for timeout
             now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
-            elapsed_seconds = (now - self.spell_pending_start)
+            # elapsed_seconds = (now - self.spell_pending_start)
+            elapsed_seconds = (now - self.spell_pending.event_datetime)
             if elapsed_seconds.total_seconds() > myconfig.SPELL_PENDING_TIMEOUT_SEC:
                 # ...then this spell pending is expired
                 await self.client.send('*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
                 self.spell_pending = None
-                self.spell_pending_start = None
+                # self.spell_pending_start = None
 
         #
         # watch for landed messages
@@ -706,7 +728,7 @@ class DamageTracker:
 
                 # reset the spell pending flag
                 self.spell_pending = None
-                self.spell_pending_start = None
+                # self.spell_pending_start = None
 
         #
         # watch for spell faded conditions -only check DamageEvents that are not closed, i.e. still ticking
@@ -738,7 +760,9 @@ class DamageTracker:
             # does the spell name match one of the pets we know about?
             if spell_name in self.spell_dict:
                 self.spell_pending = self.spell_dict[spell_name]
-                self.spell_pending_start = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
+                self.spell_pending.attacker_name = self.client.elf.char_name
+                self.spell_pending.event_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
+                # self.spell_pending_start = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
 
         #
         # watch for non-melee messages
@@ -764,6 +788,10 @@ class DamageTracker:
             if not the_target.in_combat:
                 the_target.start_combat(line)
                 await self.client.send('*Combat begun (non-melee event): {}*'.format(target_name))
+
+            # if there is a spell pending, then assume that this event represents the DD component of that spell
+            if self.spell_pending:
+                dmg_type = self.spell_pending.damage_type()
 
             # add the DamageEvent
             dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
@@ -823,6 +851,7 @@ class DamageTracker:
             damage = int(m.group('damage'))
 
             # the case where the Mob is attacking a Player
+            # fixme ensure pets don't trigger this
             if (target_name == 'YOU') or (target_name in self.player_names_set):
 
                 # any damage event indicates we are in combat
@@ -933,6 +962,10 @@ class DamageTracker:
     def load_spell_dict(self):
 
         #
+        # enchanter DD spells
+        #
+
+        #
         # enchanter DOT spells
         #
         spell_name = 'Shallow Breath'
@@ -964,9 +997,31 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         #
+        # necro DD spells
+        #
+        spell_name = 'Shock of Poison'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) screams in agony')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Ignite Bones'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin burns away')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Incinerate Bones'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) shrieks as their bones are set ablaze')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Chill Bones'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin freezes and cracks off')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Conglaciation of Bones'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s bones freezes and crack')
+        self.spell_dict[spell_name] = sp
+
+        #
         # necro DOT spells
         #
-        # all the linear dot spells
         spell_name = 'Disease Cloud'
         sp = LinearDotSpell(spell_name, 360, 5, 1, r'^(?P<target_name>[\w` ]+) doubles over in pain')
         self.spell_dict[spell_name] = sp
@@ -1052,8 +1107,7 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Vexing Mordinia'
-        sp = LinearDotSpell(spell_name, 54, 0, 122,
-                            r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
+        sp = LinearDotSpell(spell_name, 54, 0, 122, r'^(?P<target_name>[\w` ]+) staggers under the curse of Vexing Mordinia')
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Pyrocruor'
@@ -1065,8 +1119,7 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Torment of Shadows'
-        sp = LinearDotSpell(spell_name, 96, 0, 75,
-                            r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
+        sp = LinearDotSpell(spell_name, 96, 0, 75, r'^(?P<target_name>[\w` ]+) is gripped by shadows of fear and terror')
         self.spell_dict[spell_name] = sp
 
         # the only non-linear dot spell
@@ -1075,9 +1128,19 @@ class DamageTracker:
         self.spell_dict[spell_name] = sp
 
         #
+        # shaman DD spells
+        #
+        spell_name = 'Burst of Flame'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) singes as the Burst of Flame hits them')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Frost Rift'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) is struck by the frost rift')
+        self.spell_dict[spell_name] = sp
+
+        #
         # shaman DOT spells
         #
-        # all the linear dot spells
         spell_name = 'Sicken'
         sp = LinearDotSpell(spell_name, 126, 8, 2, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
         self.spell_dict[spell_name] = sp
@@ -1151,7 +1214,9 @@ def main():
     # line4 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 25 points of damage.'
     # line44 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 125 points of damage.'
     # line45 = '[Mon Sep 06 14:01:11 2021] Goliathette hits a stingtooth piranha for 99 points of damage.'
-    # melee_target = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+    # melee_target = r'^(?P<attacker_name>[\w` ]+) \
+    #                (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs)) \
+    #                (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
     #
     # m = re.match(melee_target, line3[27:], re.IGNORECASE)
     # if m:

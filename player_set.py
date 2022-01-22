@@ -1,11 +1,9 @@
 import pickle
 
 
-
 def main():
 
-
-    initial_set = set()
+    # set of player_name strings
     new_set = set()
 
     f = open('players.pickle', 'rb')
@@ -16,7 +14,6 @@ def main():
         stripped_n = n.strip()
         new_set.add(stripped_n)
         print('[{}], [{}]'.format(n, stripped_n))
-
 
     print(initial_set)
     print(new_set)
@@ -49,8 +46,6 @@ def main():
     #         print(t)
     #
 
-
-
     #
     # name_list = ['aaa ', 'bbb ', 'ccc ', 'ddd ']
     # stripped_name_list = []
@@ -63,10 +58,6 @@ def main():
     # print(name_list)
     # print(stripped_name_list)
     #
-
-
-
-
 
     pass
 
