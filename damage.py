@@ -90,7 +90,7 @@ class DiscreteDamageEvent(DamageEvent):
     def damage_type(self) -> str:
         return self.dmg_type
 
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
         return '({}, {}, {}, {}, {})'.format(self.attacker_name,
                                              self.target_name,
@@ -116,6 +116,14 @@ class DirectDamageSpell(DamageEvent):
     # function to return type of damage - spell name, or melee type, or non-melee, etc
     def damage_type(self) -> str:
         return self.spell_name
+
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
+    def __repr__(self) -> str:
+        return '({}, {}, {}, {}, {})'.format(self.attacker_name,
+                                             self.target_name,
+                                             self.event_datetime,
+                                             self.spell_name,
+                                             self.landed_message)
 
 
 #################################################################################################
@@ -519,7 +527,6 @@ class DamageTracker:
         # use this flag for when we have detected the start of a spell cast and need to watch for the landed message
         # this is a pointer to the actual spell that is pending
         self.spell_pending = None
-        # self.spell_pending_start = None
 
         # combat timeout
         self.combat_timeout = myconfig.COMBAT_TIMEOUT_SEC
@@ -680,13 +687,11 @@ class DamageTracker:
 
             # get current time and check for timeout
             now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
-            # elapsed_seconds = (now - self.spell_pending_start)
             elapsed_seconds = (now - self.spell_pending.event_datetime)
             if elapsed_seconds.total_seconds() > myconfig.SPELL_PENDING_TIMEOUT_SEC:
                 # ...then this spell pending is expired
                 await self.client.send('*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
                 self.spell_pending = None
-                # self.spell_pending_start = None
 
         #
         # watch for landed messages
@@ -728,7 +733,6 @@ class DamageTracker:
 
                 # reset the spell pending flag
                 self.spell_pending = None
-                # self.spell_pending_start = None
 
         #
         # watch for spell faded conditions -only check DamageEvents that are not closed, i.e. still ticking
@@ -760,9 +764,7 @@ class DamageTracker:
             # does the spell name match one of the pets we know about?
             if spell_name in self.spell_dict:
                 self.spell_pending = self.spell_dict[spell_name]
-                self.spell_pending.attacker_name = self.client.elf.char_name
                 self.spell_pending.event_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
-                # self.spell_pending_start = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
 
         #
         # watch for non-melee messages
@@ -963,7 +965,7 @@ class DamageTracker:
 
         #
         # enchanter DD spells
-        #
+        # todo add enchanter DD spells
 
         #
         # enchanter DOT spells

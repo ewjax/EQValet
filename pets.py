@@ -18,7 +18,7 @@ class PetStats:
         self.max_backstab = max_backstab
         self.lifetap = lifetap
 
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
         return '({}, {}, {}, {}, {}, {})\n'.format(self.rank,
                                                    self.pet_level,
@@ -49,7 +49,7 @@ class PetSpell:
         self.caster_level = caster_level
         self.pet_stats_list = pet_stats_list
 
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
         return '({}, {}, {}, \n{})'.format(self.spell_name,
                                            self.eq_class,
@@ -229,8 +229,7 @@ class PetTracker:
             #
             # look for max melee value
             #
-            target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches) \
-                     (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(self.current_pet.pet_name)
+            target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(self.current_pet.pet_name)
             # return value m is either None of an object with information about the RE search
             m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
@@ -378,7 +377,7 @@ class PetTracker:
         pet_spell = PetSpell('Haunting Corpse', 'Necro', caster_level=24, pet_stats_list=pet_stat_list.copy())
         self.pet_dict['Haunting Corpse'] = pet_spell
 
-        #todo need 29, 34, 39, 44 necro pets here
+        # todo need 29, 34, 39, 44 necro pets here
 
         pet_stat_list = []
         pet_stat_list.append(PetStats(rank=1, pet_level=37, max_melee=47, max_bashkick=22, max_backstab=0, lifetap=38))
