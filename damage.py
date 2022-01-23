@@ -619,7 +619,6 @@ class DamageTracker:
     #
     # check for damage related items
     #
-    # todo ensure pets function well in a multi-target environment
     async def process_line(self, line: str):
 
         # cut off the leading date-time stamp info
@@ -647,8 +646,7 @@ class DamageTracker:
             if m:
                 # extract RE data
                 target_name = m.group('target_name')
-                # fixme ensure pet deaths don't trigger this
-                if target_name not in self.player_names_set:
+                if (target_name not in self.player_names_set) and (target_name != self.client.pet_tracker.current_pet.pet_name):
                     target_name = target_name.casefold()
                     await self.end_combat(target_name, line)
 
@@ -668,7 +666,7 @@ class DamageTracker:
                 the_target = self.get_target(target_name)
                 if the_target.combat_timeout_seconds(line) > self.combat_timeout:
                     # ...then the combat timer has time out
-                    await self.client.send('*Combat: Timed out*')
+                    await self.client.send('*Combat vs {}: Timed out*'.format(target_name))
                     await self.end_combat(target_name, line)
 
             # zoning
@@ -852,9 +850,8 @@ class DamageTracker:
             target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
-            # the case where the Mob is attacking a Player
-            # fixme ensure pets don't trigger this
-            if (target_name == 'YOU') or (target_name in self.player_names_set):
+            # the case where the Mob is attacking a Player or my pet
+            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name == self.client.pet_tracker.current_pet.pet_name):
 
                 # any damage event indicates we are in combat
                 attacker_name = attacker_name.casefold()
@@ -1001,6 +998,46 @@ class DamageTracker:
         #
         # necro DD spells
         #
+        spell_name = 'Lifetap'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Lifespike'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Vampiric Embrace'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Lifedraw'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Siphon Life'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Spirit Tap'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Drain Spirit'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Deflux'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Touch of Night'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Gangrenous Touch of Zum`uul'
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
         spell_name = 'Shock of Poison'
         sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) screams in agony')
         self.spell_dict[spell_name] = sp
