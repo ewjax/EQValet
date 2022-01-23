@@ -851,7 +851,7 @@ class DamageTracker:
             damage = int(m.group('damage'))
 
             # the case where the Mob is attacking a Player or my pet
-            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name == self.client.pet_tracker.current_pet.pet_name):
+            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name == self.client.pet_tracker.get_pet_name()):
 
                 # any damage event indicates we are in combat
                 attacker_name = attacker_name.casefold()
@@ -1187,6 +1187,11 @@ class DamageTracker:
         spell_name = 'Tainted Breath'
         sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) has been poisoned')
         self.spell_dict[spell_name] = sp
+
+        spell_name = 'Spirit Strike'
+        sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        self.spell_dict[spell_name] = sp
+
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:

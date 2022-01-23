@@ -120,6 +120,14 @@ class PetTracker:
         self.pet_dict = {}
         self.load_pet_dict()
 
+    # get pet name
+    def get_pet_name(self):
+        rv = 'No Pet'
+        if self.current_pet:
+            if self.current_pet.pet_name:
+                rv = self.current_pet.pet_name
+        return rv
+
     #
     # check for pet related items
     #
