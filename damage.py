@@ -5,6 +5,8 @@ import re
 from datetime import datetime
 
 import myconfig
+
+from CaseInsensitiveDict import CaseInsensitiveDict
 from smartbuffer import SmartBuffer
 
 
@@ -517,7 +519,7 @@ class DamageTracker:
 
         # the target that is being attacked
         # dictionary of {k:v} = {target_name, Target object}
-        self.active_target_dict = {}
+        self.active_target_dict = CaseInsensitiveDict()
         self.inactive_target_list = []
 
         # dictionary of all known DOT_Spells, keys = spell names, contents = DOT_Spell objects
@@ -646,8 +648,7 @@ class DamageTracker:
             if m:
                 # extract RE data
                 target_name = m.group('target_name')
-                if (target_name not in self.player_names_set) and (target_name != self.client.pet_tracker.current_pet.pet_name):
-                    target_name = target_name.casefold()
+                if (target_name not in self.player_names_set) and (target_name != self.client.pet_tracker.pet_name()):
                     await self.end_combat(target_name, line)
 
             # target is slain by player
@@ -657,12 +658,11 @@ class DamageTracker:
                 # extract RE data
                 target_name = m.group('target_name')
                 if target_name not in self.player_names_set:
-                    target_name = target_name.casefold()
                     await self.end_combat(target_name, line)
 
             # combat timeout - have to make a copy because the call to end_combat will modify the dictionary,
             # which would break the for loop
-            for target_name in self.active_target_dict.copy():
+            for target_name in copy.deepcopy(self.active_target_dict):
                 the_target = self.get_target(target_name)
                 if the_target.combat_timeout_seconds(line) > self.combat_timeout:
                     # ...then the combat timer has time out
@@ -702,7 +702,7 @@ class DamageTracker:
             if m:
 
                 # extract RE data
-                target_name = m.group('target_name').casefold()
+                target_name = m.group('target_name')
 
                 # set the attacker name to the player name
                 attacker_name = self.client.elf.char_name
@@ -771,7 +771,7 @@ class DamageTracker:
         m = re.match(non_melee_regexp, trunc_line)
         if m:
             # extract RE data
-            target_name = m.group('target_name').casefold()
+            target_name = m.group('target_name')
             dmg_type = m.group('dmg_type')
             damage = int(m.group('damage'))
 
@@ -781,7 +781,7 @@ class DamageTracker:
             if damage < 100:
                 if self.client.pet_tracker.current_pet:
                     if self.client.pet_tracker.current_pet.lifetap_pending:
-                        attacker_name = self.client.pet_tracker.current_pet.pet_name
+                        attacker_name = self.client.pet_tracker.pet_name()
 
             # any damage event indicates we are in combat
             the_target = self.get_target(target_name)
@@ -806,7 +806,7 @@ class DamageTracker:
             # extract RE data
             # attacker_name = self.client.elf.char_name
             # dmg_type = m.group('dmg_type')
-            target_name = m.group('target_name').casefold()
+            target_name = m.group('target_name')
 
             # any damage event indicates we are in combat
             the_target = self.get_target(target_name)
@@ -824,7 +824,7 @@ class DamageTracker:
             # extract RE data
             attacker_name = self.client.elf.char_name
             dmg_type = m.group('dmg_type')
-            target_name = m.group('target_name').casefold()
+            target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
             # any damage event indicates we are in combat
@@ -851,10 +851,9 @@ class DamageTracker:
             damage = int(m.group('damage'))
 
             # the case where the Mob is attacking a Player or my pet
-            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name == self.client.pet_tracker.get_pet_name()):
+            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name == self.client.pet_tracker.pet_name()):
 
                 # any damage event indicates we are in combat
-                attacker_name = attacker_name.casefold()
                 the_target = self.get_target(attacker_name)
                 if not the_target.in_combat:
                     the_target.start_combat(line)
@@ -869,7 +868,6 @@ class DamageTracker:
             # the case where a Player is attacking the Mob
             else:
                 # any damage event indicates we are in combat
-                target_name = target_name.casefold()
                 the_target = self.get_target(target_name)
                 if not the_target.in_combat:
                     the_target.start_combat(line)
