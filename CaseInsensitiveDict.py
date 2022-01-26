@@ -14,12 +14,13 @@ class CaseInsensitiveDict(MutableMapping):
     def __setitem__(self, key, value):
         self.__dict__[key] = value
 
+    # the only method which we need to override
     def __getitem__(self, key):
         for (k, v) in self.__dict__.items():
             if key.casefold() == k.casefold():
                 return v
         # if we reach this point without finding a match, this key is not in the dictionary
-        raise KeyError
+        raise KeyError(key)
 
     def __delitem__(self, key):
         del self.__dict__[key]
@@ -84,12 +85,18 @@ def main():
     search = 'cCc'
     print('Search: {}, Value: {}'.format(search, cid[search]))
 
+
+
     # should throw a KeyError exception
+    # search = 'Xxx'
+    # print('Search: {}, Value: {}'.format(search, cid[search]))
+
+
     try:
         search = 'Xxx'
         print('Search: {}, Value: {}'.format(search, cid[search]))
-    except KeyError:
-        print('caught KeyError exception')
+    except KeyError as ke:
+        print('caught KeyError exception: {}'.format(ke))
 
     # test pop
     print(cid)

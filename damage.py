@@ -399,7 +399,7 @@ class Target:
         self.last_combat_datetime = de.event_datetime
 
     # build a damage report, subtotaled by damage type
-    async def damage_report(self, client):
+    async def damage_report_discord(self, client):
 
         # total damage dealt to this target
         grand_total_incoming = 0        # damage incoming, i.e. TO this Target
@@ -464,7 +464,7 @@ class Target:
             for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
                 sb.add('{:>35}: {:>5}\n'.format(dmg_type, dmg_type_sum))
 
-            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', target_total, int(target_total / grand_total_outgoing * 100.0)))
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', target_total, round(target_total / grand_total_outgoing * 100.0)))
 
         sb.add('\n')
         sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_outgoing))
@@ -489,7 +489,7 @@ class Target:
             for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
                 sb.add('{:>35}: {:>5}\n'.format(dmg_type, dmg_type_sum))
 
-            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, int(attacker_total / grand_total_incoming * 100.0)))
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, round(attacker_total / grand_total_incoming * 100.0)))
 
         sb.add('\n')
         sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_incoming))
@@ -502,6 +502,45 @@ class Target:
             # surrounding the text with 3 back-ticks makes the resulting output code-formatted,
             # i.e. a fixed width font for each table creation
             await client.send('```{}```'.format(b))
+
+    # create a damage report and force it into the windows clipboard, ready to paste into game
+    def damage_report_clipboard(self) -> None:
+
+        # sample
+        # Leatherfoot Deputy in 113s, 467 @4 // Kenobtik 321 [68.74%] // Xythe 146 [31.26%]
+
+        # total damage dealt to this target
+        grand_total_incoming = 0        # damage incoming, i.e. TO this Target
+
+        # walk the list initially just to get attacker totals, save in a dictionary,
+        incoming_summary_dict = {}      # {k:V} = {attacker_name : damage total for that attacker}
+
+        # for each attacker in the incoming_damage_events_dict
+        for attacker in self.incoming_damage_events_dict:
+
+            # first one?
+            if attacker not in incoming_summary_dict:
+                incoming_summary_dict[attacker] = 0
+
+            # for each DamageEvent in the list for this attacker...
+            de_list = self.incoming_damage_events_dict[attacker]
+            for de in de_list:
+                dd = de.damage_dealt()
+                incoming_summary_dict[attacker] += dd
+                grand_total_incoming += dd
+
+        # start with the target
+        clipboard_report = '{} in {} sec, {}'.format(self.target_name, self.combat_duration_seconds(), grand_total_incoming)
+
+        # walk the list of attackers, sort the attacker dictionary on total damage done...
+        for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
+            fraction = round(attacker_total / grand_total_incoming * 100.0)
+            clipboard_report += ' // {} {} [{}%]'.format(attacker, attacker_total, fraction)
+
+        # todo send this to clipboard
+        # OS method: echo "buffer contents here" | clip
+        # unsavory = this leaves the quote marks
+        print(clipboard_report)
 
 
 #################################################################################################
@@ -538,6 +577,10 @@ class DamageTracker:
         self.player_names_count = 0
         self.player_names_fname = 'players.pickle'
         self.read_player_names()
+
+        # set of pet names
+        self.pet_names_set = set()
+        self.read_pet_names()
 
     def read_player_names(self) -> bool:
 
@@ -613,10 +656,12 @@ class DamageTracker:
     async def end_combat(self, target_name: str, line: str):
 
         # remove this target from the active Target dictionary, and add it to the inactive target list
-        the_target = self.active_target_dict.pop(target_name)
-        self.inactive_target_list.append(the_target)
-        the_target.end_combat(line)
-        await the_target.damage_report(self.client)
+        if target_name in self.active_target_dict
+            the_target = self.active_target_dict.pop(target_name)
+            self.inactive_target_list.append(the_target)
+            the_target.end_combat(line)
+            await the_target.damage_report_discord(self.client)
+            the_target.damage_report_clipboard()
 
     #
     # check for damage related items
@@ -648,7 +693,8 @@ class DamageTracker:
             if m:
                 # extract RE data
                 target_name = m.group('target_name')
-                if (target_name not in self.player_names_set) and (target_name != self.client.pet_tracker.pet_name()):
+                # ensure slain target was not a player and was not a pet
+                if (target_name not in self.player_names_set) and (target_name not in self.pet_names_set):
                     await self.end_combat(target_name, line)
 
             # target is slain by player
@@ -662,6 +708,7 @@ class DamageTracker:
 
             # combat timeout - have to make a copy because the call to end_combat will modify the dictionary,
             # which would break the for loop
+            # todo-does it have to be a deepcopy, or will regular copy be sufficient?
             for target_name in copy.deepcopy(self.active_target_dict):
                 the_target = self.get_target(target_name)
                 if the_target.combat_timeout_seconds(line) > self.combat_timeout:
@@ -675,7 +722,8 @@ class DamageTracker:
             if m:
                 await self.client.send('*Player Zoned*')
                 # close all open targets
-                for target_name in self.active_target_dict.copy():
+                # todo - deepcopy or copy?
+                for target_name in copy.deepcopy(self.active_target_dict):
                     await self.end_combat(target_name, line)
 
         #
@@ -725,7 +773,8 @@ class DamageTracker:
                                 await self.client.send('*{} overwritten with new*'.format(de.spell_name))
 
                 # add the DamageEvent
-                de = copy.copy(self.spell_pending)
+                # todo - deepcopy or copy?
+                de = copy.deepcopy(self.spell_pending)
                 de.set_instance_data(attacker_name, target_name, line)
                 the_target.add_incoming_damage_event(de)
 
@@ -812,7 +861,7 @@ class DamageTracker:
             the_target = self.get_target(target_name)
             if not the_target.in_combat:
                 the_target.start_combat(line)
-                await self.client.send('*Combat begun (your melee misses): {}*'.format(target_name))
+                await self.client.send('*Combat begun (melee miss by you): {}*'.format(target_name))
 
         #
         # watch for melee messages by me
@@ -831,7 +880,7 @@ class DamageTracker:
             the_target = self.get_target(target_name)
             if not the_target.in_combat:
                 the_target.start_combat(line)
-                await self.client.send('*Combat begun (your melee hits): {}*'.format(target_name))
+                await self.client.send('*Combat begun (melee hit by you): {}*'.format(target_name))
 
             # add the DamageEvent
             dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
@@ -850,14 +899,14 @@ class DamageTracker:
             target_name = m.group('target_name')
             damage = int(m.group('damage'))
 
-            # the case where the Mob is attacking a Player or my pet
-            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name == self.client.pet_tracker.pet_name()):
+            # the case where the Mob is attacking YOU, or a Player, or any pet
+            if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name in self.pet_names_set):
 
                 # any damage event indicates we are in combat
                 the_target = self.get_target(attacker_name)
                 if not the_target.in_combat:
                     the_target.start_combat(line)
-                    await self.client.send('*Combat begun (melee event vs YOU or Player): {}*'.format(attacker_name))
+                    await self.client.send('*Combat begun (melee event vs you, or Player, or Pet): {}*'.format(attacker_name))
 
                 the_target.check_max_melee(damage)
 
@@ -952,6 +1001,125 @@ class DamageTracker:
             # done processing /who list
             if player_names_set_modified:
                 await self.write_player_names()
+
+    #
+    # create a set of allowable pet names
+    # source:  p99 forums
+    #
+    def read_pet_names(self):
+
+        self.pet_names_set = {'Gabab', 'Gabanab', 'Gabaner', 'Gabann', 'Gabantik', 'Gabarab', 'Gabarer', 'Gabarn', 'Gabartik', 'Gabekab',
+                              'Gabeker', 'Gabekn', 'Gaber', 'Gabn', 'Gabobab', 'Gabober', 'Gabobn', 'Gabobtik', 'Gabtik', 'Ganab',
+                              'Ganer', 'Gann', 'Gantik', 'Garab', 'Garanab', 'Garaner', 'Garann', 'Garantik', 'Gararab', 'Gararer',
+                              'Gararn', 'Garartik', 'Garekab', 'Gareker', 'Garekn', 'Garer', 'Garn', 'Garobab', 'Garober', 'Garobn',
+                              'Garobtik', 'Gartik', 'Gasab', 'Gasanab', 'Gasaner', 'Gasann', 'Gasantik', 'Gasarab', 'Gasarer', 'Gasarn',
+                              'Gasartik', 'Gasekab', 'Gaseker', 'Gasekn', 'Gaser', 'Gasn', 'Gasobab', 'Gasober', 'Gasobn', 'Gasobtik',
+                              'Gastik', 'Gebab', 'Gebanab', 'Gebaner', 'Gebann', 'Gebantik', 'Gebarab', 'Gebarer', 'Gebarn', 'Gebartik',
+                              'Gebekab', 'Gebeker', 'Gebekn', 'Geber', 'Gebn', 'Gebobab', 'Gebober', 'Gebobn', 'Gebobtik', 'Gebtik',
+                              'Gekab', 'Geker', 'Gekn', 'Genab', 'Genanab', 'Genaner', 'Genann', 'Genantik', 'Genarab', 'Genarer',
+                              'Genarn', 'Genartik', 'Genekab', 'Geneker', 'Genekn', 'Gener', 'Genn', 'Genobab', 'Genober', 'Genobn',
+                              'Genobtik', 'Gentik', 'Gibab', 'Gibanab', 'Gibaner', 'Gibann', 'Gibantik', 'Gibarab', 'Gibarer', 'Gibarn',
+                              'Gibartik', 'Gibekab', 'Gibeker', 'Gibekn', 'Giber', 'Gibn', 'Gibobab', 'Gibober', 'Gibobn', 'Gibobtik',
+                              'Gibtik', 'Gobab', 'Gobanab', 'Gobaner', 'Gobann', 'Gobantik', 'Gobarab', 'Gobarer', 'Gobarn', 'Gobartik',
+                              'Gobekab', 'Gobeker', 'Gobekn', 'Gober', 'Gobn', 'Gobobab', 'Gobober', 'Gobobn', 'Gobobtik', 'Gobtik',
+                              'Gonab', 'Gonanab', 'Gonaner', 'Gonann', 'Gonantik', 'Gonarab', 'Gonarer', 'Gonarn', 'Gonartik', 'Gonekab',
+                              'Goneker', 'Gonekn', 'Goner', 'Gonn', 'Gonobab', 'Gonober', 'Gonobn', 'Gonobtik', 'Gontik', 'Jabab',
+                              'Jabanab', 'Jabaner', 'Jabann', 'Jabantik', 'Jabarab', 'Jabarer', 'Jabarn', 'Jabartik', 'Jabekab', 'Jabeker',
+                              'Jabekn', 'Jaber', 'Jabn', 'Jabobab', 'Jabober', 'Jabobn', 'Jabobtik', 'Jabtik', 'Janab', 'Janer',
+                              'Jann', 'Jantik', 'Jarab', 'Jaranab', 'Jaraner', 'Jarann', 'Jarantik', 'Jararab', 'Jararer', 'Jararn',
+                              'Jarartik', 'Jarekab', 'Jareker', 'Jarekn', 'Jarer', 'Jarn', 'Jarobab', 'Jarober', 'Jarobn', 'Jarobtik',
+                              'Jartik', 'Jasab', 'Jasanab', 'Jasaner', 'Jasann', 'Jasantik', 'Jasarab', 'Jasarer', 'Jasarn', 'Jasartik',
+                              'Jasekab', 'Jaseker', 'Jasekn', 'Jaser', 'Jasn', 'Jasobab', 'Jasober', 'Jasobn', 'Jasobtik', 'Jastik',
+                              'Jebab', 'Jebanab', 'Jebaner', 'Jebann', 'Jebantik', 'Jebarab', 'Jebarer', 'Jebarn', 'Jebartik', 'Jebekab',
+                              'Jebeker', 'Jebekn', 'Jeber', 'Jebn', 'Jebobab', 'Jebober', 'Jebobn', 'Jebobtik', 'Jebtik', 'Jekab',
+                              'Jeker', 'Jekn', 'Jenab', 'Jenanab', 'Jenaner', 'Jenann', 'Jenantik', 'Jenarab', 'Jenarer', 'Jenarn',
+                              'Jenartik', 'Jenekab', 'Jeneker', 'Jenekn', 'Jener', 'Jenn', 'Jenobab', 'Jenober', 'Jenobn', 'Jenobtik',
+                              'Jentik', 'Jibab', 'Jibanab', 'Jibaner', 'Jibann', 'Jibantik', 'Jibarab', 'Jibarer', 'Jibarn', 'Jibartik',
+                              'Jibekab', 'Jibeker', 'Jibekn', 'Jiber', 'Jibn', 'Jibobab', 'Jibober', 'Jibobn', 'Jibobtik', 'Jibtik',
+                              'Jobab', 'Jobanab', 'Jobaner', 'Jobann', 'Jobantik', 'Jobarab', 'Jobarer', 'Jobarn', 'Jobartik', 'Jobekab',
+                              'Jobeker', 'Jobekn', 'Jober', 'Jobn', 'Jobobab', 'Jobober', 'Jobobn', 'Jobobtik', 'Jobtik', 'Jonab',
+                              'Jonanab', 'Jonaner', 'Jonann', 'Jonantik', 'Jonarab', 'Jonarer', 'Jonarn', 'Jonartik', 'Jonekab', 'Joneker',
+                              'Jonekn', 'Joner', 'Jonn', 'Jonobab', 'Jonober', 'Jonobn', 'Jonobtik', 'Jontik', 'Kabab', 'Kabanab',
+                              'Kabaner', 'Kabann', 'Kabantik', 'Kabarab', 'Kabarer', 'Kabarn', 'Kabartik', 'Kabekab', 'Kabeker', 'Kabekn',
+                              'Kaber', 'Kabn', 'Kabobab', 'Kabober', 'Kabobn', 'Kabobtik', 'Kabtik', 'Kanab', 'Kaner', 'Kann',
+                              'Kantik', 'Karab', 'Karanab', 'Karaner', 'Karann', 'Karantik', 'Kararab', 'Kararer', 'Kararn', 'Karartik',
+                              'Karekab', 'Kareker', 'Karekn', 'Karer', 'Karn', 'Karobab', 'Karober', 'Karobn', 'Karobtik', 'Kartik',
+                              'Kasab', 'Kasanab', 'Kasaner', 'Kasann', 'Kasantik', 'Kasarab', 'Kasarer', 'Kasarn', 'Kasartik', 'Kasekab',
+                              'Kaseker', 'Kasekn', 'Kaser', 'Kasn', 'Kasobab', 'Kasober', 'Kasobn', 'Kasobtik', 'Kastik', 'Kebab',
+                              'Kebanab', 'Kebaner', 'Kebann', 'Kebantik', 'Kebarab', 'Kebarer', 'Kebarn', 'Kebartik', 'Kebekab', 'Kebeker',
+                              'Kebekn', 'Keber', 'Kebn', 'Kebobab', 'Kebober', 'Kebobn', 'Kebobtik', 'Kebtik', 'Kekab', 'Keker',
+                              'Kekn', 'Kenab', 'Kenanab', 'Kenaner', 'Kenann', 'Kenantik', 'Kenarab', 'Kenarer', 'Kenarn', 'Kenartik',
+                              'Kenekab', 'Keneker', 'Kenekn', 'Kener', 'Kenn', 'Kenobab', 'Kenober', 'Kenobn', 'Kenobtik', 'Kentik',
+                              'Kibab', 'Kibanab', 'Kibaner', 'Kibann', 'Kibantik', 'Kibarab', 'Kibarer', 'Kibarn', 'Kibartik', 'Kibekab',
+                              'Kibeker', 'Kibekn', 'Kiber', 'Kibn', 'Kibobab', 'Kibober', 'Kibobn', 'Kibobtik', 'Kibtik', 'Kobab',
+                              'Kobanab', 'Kobaner', 'Kobann', 'Kobantik', 'Kobarab', 'Kobarer', 'Kobarn', 'Kobartik', 'Kobekab', 'Kobeker',
+                              'Kobekn', 'Kober', 'Kobn', 'Kobobab', 'Kobober', 'Kobobn', 'Kobobtik', 'Kobtik', 'Konab', 'Konanab',
+                              'Konaner', 'Konann', 'Konantik', 'Konarab', 'Konarer', 'Konarn', 'Konartik', 'Konekab', 'Koneker', 'Konekn',
+                              'Koner', 'Konn', 'Konobab', 'Konober', 'Konobn', 'Konobtik', 'Kontik', 'Labab', 'Labanab', 'Labaner',
+                              'Labann', 'Labantik', 'Labarab', 'Labarer', 'Labarn', 'Labartik', 'Labekab', 'Labeker', 'Labekn', 'Laber',
+                              'Labn', 'Labobab', 'Labober', 'Labobn', 'Labobtik', 'Labtik', 'Lanab', 'Laner', 'Lann', 'Lantik',
+                              'Larab', 'Laranab', 'Laraner', 'Larann', 'Larantik', 'Lararab', 'Lararer', 'Lararn', 'Larartik', 'Larekab',
+                              'Lareker', 'Larekn', 'Larer', 'Larn', 'Larobab', 'Larober', 'Larobn', 'Larobtik', 'Lartik', 'Lasab',
+                              'Lasanab', 'Lasaner', 'Lasann', 'Lasantik', 'Lasarab', 'Lasarer', 'Lasarn', 'Lasartik', 'Lasekab', 'Laseker',
+                              'Lasekn', 'Laser', 'Lasn', 'Lasobab', 'Lasober', 'Lasobn', 'Lasobtik', 'Lastik', 'Lebab', 'Lebanab',
+                              'Lebaner', 'Lebann', 'Lebantik', 'Lebarab', 'Lebarer', 'Lebarn', 'Lebartik', 'Lebekab', 'Lebeker', 'Lebekn',
+                              'Leber', 'Lebn', 'Lebobab', 'Lebober', 'Lebobn', 'Lebobtik', 'Lebtik', 'Lekab', 'Leker', 'Lekn',
+                              'Lenab', 'Lenanab', 'Lenaner', 'Lenann', 'Lenantik', 'Lenarab', 'Lenarer', 'Lenarn', 'Lenartik', 'Lenekab',
+                              'Leneker', 'Lenekn', 'Lener', 'Lenn', 'Lenobab', 'Lenober', 'Lenobn', 'Lenobtik', 'Lentik', 'Libab',
+                              'Libanab', 'Libaner', 'Libann', 'Libantik', 'Libarab', 'Libarer', 'Libarn', 'Libartik', 'Libekab', 'Libeker',
+                              'Libekn', 'Liber', 'Libn', 'Libobab', 'Libober', 'Libobn', 'Libobtik', 'Libtik', 'Lobab', 'Lobanab',
+                              'Lobaner', 'Lobann', 'Lobantik', 'Lobarab', 'Lobarer', 'Lobarn', 'Lobartik', 'Lobekab', 'Lobeker', 'Lobekn',
+                              'Lober', 'Lobn', 'Lobobab', 'Lobober', 'Lobobn', 'Lobobtik', 'Lobtik', 'Lonab', 'Lonanab', 'Lonaner',
+                              'Lonann', 'Lonantik', 'Lonarab', 'Lonarer', 'Lonarn', 'Lonartik', 'Lonekab', 'Loneker', 'Lonekn', 'Loner',
+                              'Lonn', 'Lonobab', 'Lonober', 'Lonobn', 'Lonobtik', 'Lontik', 'Vabab', 'Vabanab', 'Vabaner', 'Vabann',
+                              'Vabantik', 'Vabarab', 'Vabarer', 'Vabarn', 'Vabartik', 'Vabekab', 'Vabeker', 'Vabekn', 'Vaber', 'Vabn',
+                              'Vabobab', 'Vabober', 'Vabobn', 'Vabobtik', 'Vabtik', 'Vanab', 'Vaner', 'Vann', 'Vantik', 'Varab',
+                              'Varanab', 'Varaner', 'Varann', 'Varantik', 'Vararab', 'Vararer', 'Vararn', 'Varartik', 'Varekab', 'Vareker',
+                              'Varekn', 'Varer', 'Varn', 'Varobab', 'Varober', 'Varobn', 'Varobtik', 'Vartik', 'Vasab', 'Vasanab',
+                              'Vasaner', 'Vasann', 'Vasantik', 'Vasarab', 'Vasarer', 'Vasarn', 'Vasartik', 'Vasekab', 'Vaseker', 'Vasekn',
+                              'Vaser', 'Vasn', 'Vasobab', 'Vasober', 'Vasobn', 'Vasobtik', 'Vastik', 'Vebab', 'Vebanab', 'Vebaner',
+                              'Vebann', 'Vebantik', 'Vebarab', 'Vebarer', 'Vebarn', 'Vebartik', 'Vebekab', 'Vebeker', 'Vebekn', 'Veber',
+                              'Vebn', 'Vebobab', 'Vebober', 'Vebobn', 'Vebobtik', 'Vebtik', 'Vekab', 'Veker', 'Vekn', 'Venab',
+                              'Venanab', 'Venaner', 'Venann', 'Venantik', 'Venarab', 'Venarer', 'Venarn', 'Venartik', 'Venekab', 'Veneker',
+                              'Venekn', 'Vener', 'Venn', 'Venobab', 'Venober', 'Venobn', 'Venobtik', 'Ventik', 'Vibab', 'Vibanab',
+                              'Vibaner', 'Vibann', 'Vibantik', 'Vibarab', 'Vibarer', 'Vibarn', 'Vibartik', 'Vibekab', 'Vibeker', 'Vibekn',
+                              'Viber', 'Vibn', 'Vibobab', 'Vibober', 'Vibobn', 'Vibobtik', 'Vibtik', 'Vobab', 'Vobanab', 'Vobaner',
+                              'Vobann', 'Vobantik', 'Vobarab', 'Vobarer', 'Vobarn', 'Vobartik', 'Vobekab', 'Vobeker', 'Vobekn', 'Vober',
+                              'Vobn', 'Vobobab', 'Vobober', 'Vobobn', 'Vobobtik', 'Vobtik', 'Vonab', 'Vonanab', 'Vonaner', 'Vonann',
+                              'Vonantik', 'Vonarab', 'Vonarer', 'Vonarn', 'Vonartik', 'Vonekab', 'Voneker', 'Vonekn', 'Voner', 'Vonn',
+                              'Vonobab', 'Vonober', 'Vonobn', 'Vonobtik', 'Vontik', 'Vtik', 'Xabab', 'Xabanab', 'Xabaner', 'Xabann',
+                              'Xabantik', 'Xabarab', 'Xabarer', 'Xabarn', 'Xabartik', 'Xabekab', 'Xabeker', 'Xabekn', 'Xaber', 'Xabn',
+                              'Xabobab', 'Xabober', 'Xabobn', 'Xabobtik', 'Xabtik', 'Xanab', 'Xaner', 'Xann', 'Xantik', 'Xarab',
+                              'Xaranab', 'Xaraner', 'Xarann', 'Xarantik', 'Xararab', 'Xararer', 'Xararn', 'Xarartik', 'Xarekab', 'Xareker',
+                              'Xarekn', 'Xarer', 'Xarn', 'Xarobab', 'Xarober', 'Xarobn', 'Xarobtik', 'Xartik', 'Xasab', 'Xasanab',
+                              'Xasaner', 'Xasann', 'Xasantik', 'Xasarab', 'Xasarer', 'Xasarn', 'Xasartik', 'Xasekab', 'Xaseker', 'Xasekn',
+                              'Xaser', 'Xasn', 'Xasobab', 'Xasober', 'Xasobn', 'Xasobtik', 'Xastik', 'Xebab', 'Xebanab', 'Xebaner',
+                              'Xebann', 'Xebantik', 'Xebarab', 'Xebarer', 'Xebarn', 'Xebartik', 'Xebekab', 'Xebeker', 'Xebekn', 'Xeber',
+                              'Xebn', 'Xebobab', 'Xebober', 'Xebobn', 'Xebobtik', 'Xebtik', 'Xekab', 'Xeker', 'Xekn', 'Xenab',
+                              'Xenanab', 'Xenaner', 'Xenann', 'Xenantik', 'Xenarab', 'Xenarer', 'Xenarn', 'Xenartik', 'Xenekab', 'Xeneker',
+                              'Xenekn', 'Xener', 'Xenn', 'Xenobab', 'Xenober', 'Xenobn', 'Xenobtik', 'Xentik', 'Xibab', 'Xibanab',
+                              'Xibaner', 'Xibann', 'Xibantik', 'Xibarab', 'Xibarer', 'Xibarn', 'Xibartik', 'Xibekab', 'Xibeker', 'Xibekn',
+                              'Xiber', 'Xibn', 'Xibobab', 'Xibober', 'Xibobn', 'Xibobtik', 'Xibtik', 'Xobab', 'Xobanab', 'Xobaner',
+                              'Xobann', 'Xobantik', 'Xobarab', 'Xobarer', 'Xobarn', 'Xobartik', 'Xobekab', 'Xobeker', 'Xobekn', 'Xober',
+                              'Xobn', 'Xobobab', 'Xobober', 'Xobobn', 'Xobobtik', 'Xobtik', 'Xonab', 'Xonanab', 'Xonaner', 'Xonann',
+                              'Xonantik', 'Xonarab', 'Xonarer', 'Xonarn', 'Xonartik', 'Xonekab', 'Xoneker', 'Xonekn', 'Xoner', 'Xonn',
+                              'Xonobab', 'Xonober', 'Xonobn', 'Xonobtik', 'Xontik', 'Xtik', 'Zabab', 'Zabanab', 'Zabaner', 'Zabann',
+                              'Zabantik', 'Zabarab', 'Zabarer', 'Zabarn', 'Zabartik', 'Zabekab', 'Zabeker', 'Zabekn', 'Zaber', 'Zabn',
+                              'Zabobab', 'Zabober', 'Zabobn', 'Zabobtik', 'Zabtik', 'Zanab', 'Zaner', 'Zann', 'Zantik', 'Zarab',
+                              'Zaranab', 'Zaraner', 'Zarann', 'Zarantik', 'Zararab', 'Zararer', 'Zararn', 'Zarartik', 'Zarekab', 'Zareker',
+                              'Zarekn', 'Zarer', 'Zarn', 'Zarobab', 'Zarober', 'Zarobn', 'Zarobtik', 'Zartik', 'Zasab', 'Zasanab',
+                              'Zasaner', 'Zasann', 'Zasantik', 'Zasarab', 'Zasarer', 'Zasarn', 'Zasartik', 'Zasekab', 'Zaseker', 'Zasekn',
+                              'Zaser', 'Zasn', 'Zasobab', 'Zasober', 'Zasobn', 'Zasobtik', 'Zastik', 'Zebab', 'Zebanab', 'Zebaner',
+                              'Zebann', 'Zebantik', 'Zebarab', 'Zebarer', 'Zebarn', 'Zebartik', 'Zebekab', 'Zebeker', 'Zebekn', 'Zeber',
+                              'Zebn', 'Zebobab', 'Zebober', 'Zebobn', 'Zebobtik', 'Zebtik', 'Zekab', 'Zeker', 'Zekn', 'Zenab',
+                              'Zenanab', 'Zenaner', 'Zenann', 'Zenantik', 'Zenarab', 'Zenarer', 'Zenarn', 'Zenartik', 'Zenekab', 'Zeneker',
+                              'Zenekn', 'Zener', 'Zenn', 'Zenobab', 'Zenober', 'Zenobn', 'Zenobtik', 'Zentik', 'Zibab', 'Zibanab',
+                              'Zibaner', 'Zibann', 'Zibantik', 'Zibarab', 'Zibarer', 'Zibarn', 'Zibartik', 'Zibekab', 'Zibeker', 'Zibekn',
+                              'Ziber', 'Zibn', 'Zibobab', 'Zibober', 'Zibobn', 'Zibobtik', 'Zibtik', 'Zobab', 'Zobanab', 'Zobaner',
+                              'Zobann', 'Zobantik', 'Zobarab', 'Zobarer', 'Zobarn', 'Zobartik', 'Zobekab', 'Zobeker', 'Zobekn', 'Zober',
+                              'Zobn', 'Zobobab', 'Zobober', 'Zobobn', 'Zobobtik', 'Zobtik', 'Zonab', 'Zonanab', 'Zonaner', 'Zonann',
+                              'Zonantik', 'Zonarab', 'Zonarer', 'Zonarn', 'Zonartik', 'Zonekab', 'Zoneker', 'Zonekn', 'Zoner', 'Zonn',
+                              'Zonobab', 'Zonober', 'Zonobn', 'Zonobtik', 'Zontik', 'Ztik'}
 
     #
     # create the dictionary of pet spells, with all pet spell info for each
@@ -1189,7 +1357,6 @@ class DamageTracker:
         spell_name = 'Spirit Strike'
         sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
         self.spell_dict[spell_name] = sp
-
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
