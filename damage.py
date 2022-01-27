@@ -656,7 +656,7 @@ class DamageTracker:
     async def end_combat(self, target_name: str, line: str):
 
         # remove this target from the active Target dictionary, and add it to the inactive target list
-        if target_name in self.active_target_dict
+        if target_name in self.active_target_dict:
             the_target = self.active_target_dict.pop(target_name)
             self.inactive_target_list.append(the_target)
             the_target.end_combat(line)
@@ -982,21 +982,26 @@ class DamageTracker:
                     processing_names = True
 
                     # process the name.  will return None if got here via the empty ^$ line that /who all puts out
+                    record = ''
                     player_name = m.group('player_name')
                     if player_name:
-                        print(player_name)
+                        record += player_name
+                        if player_name not in self.player_names_set:
+                            self.player_names_set.add(player_name)
+                            player_names_set_modified = True
 
                     player_level = m.group('player_level')
                     if player_level:
-                        print(player_level)
+                        record += ' '
+                        record += player_level
 
                     player_class = m.group('player_class')
                     if player_class:
-                        print(player_class)
+                        record += ' '
+                        record += player_class
 
-                    if player_name not in self.player_names_set:
-                        self.player_names_set.add(player_name)
-                        player_names_set_modified = True
+                    if record != '':
+                        print(record)
 
             # done processing /who list
             if player_names_set_modified:
