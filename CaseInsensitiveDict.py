@@ -12,18 +12,25 @@ class CaseInsensitiveDict(MutableMapping):
         self.__dict__.update(*args, **kwargs)
 
     def __setitem__(self, key, value):
+        for (k, v) in self.__dict__.items():
+            if k.casefold() == key.casefold():
+                self.__dict__[k] = value
+                return
+        # if we reach this point without finding a match, this key is not in the dictionary
         self.__dict__[key] = value
 
-    # the only method which we need to override
     def __getitem__(self, key):
         for (k, v) in self.__dict__.items():
-            if key.casefold() == k.casefold():
+            if k.casefold() == key.casefold():
                 return v
         # if we reach this point without finding a match, this key is not in the dictionary
         raise KeyError(key)
 
     def __delitem__(self, key):
-        del self.__dict__[key]
+        for (k, v) in self.__dict__.items():
+            if k.casefold() == key.casefold():
+                del self.__dict__[k]
+                break
 
     def __iter__(self):
         return iter(self.__dict__)
@@ -40,12 +47,17 @@ class CaseInsensitiveDict(MutableMapping):
 
 
 def main():
+    rd = dict()
     cid = CaseInsensitiveDict()
     # cid = CIDict()
 
     cid['aaa'] = '111'
     cid['bbb'] = '222'
     cid['ccc'] = '333'
+
+    rd['aaa'] = '111'
+    rd['bbb'] = '222'
+    rd['ccc'] = '333'
 
     # test IN and NOT IN
     search = 'aaa'
@@ -73,24 +85,29 @@ def main():
         print('{} is NOT in'.format(search))
 
     # test get
-    search = 'aaa'
-    print('Search: {}, Value: {}'.format(search, cid[search]))
+    try:
+        search = 'aaa'
+        print('Search: {}, Value: {}'.format(search, cid[search]))
+    except KeyError as ke:
+        print('caught KeyError exception: {}'.format(ke))
 
-    search = 'AAA'
-    print('Search: {}, Value: {}'.format(search, cid[search]))
+    try:
+        search = 'AAA'
+        print('Search: {}, Value: {}'.format(search, cid[search]))
+    except KeyError as ke:
+        print('caught KeyError exception: {}'.format(ke))
 
-    search = 'Aaa'
-    print('Search: {}, Value: {}'.format(search, cid[search]))
+    try:
+        search = 'Aaa'
+        print('Search: {}, Value: {}'.format(search, cid[search]))
+    except KeyError as ke:
+        print('caught KeyError exception: {}'.format(ke))
 
-    search = 'cCc'
-    print('Search: {}, Value: {}'.format(search, cid[search]))
-
-
-
-    # should throw a KeyError exception
-    # search = 'Xxx'
-    # print('Search: {}, Value: {}'.format(search, cid[search]))
-
+    try:
+        search = 'cCc'
+        print('Search: {}, Value: {}'.format(search, cid[search]))
+    except KeyError as ke:
+        print('caught KeyError exception: {}'.format(ke))
 
     try:
         search = 'Xxx'
@@ -99,9 +116,62 @@ def main():
         print('caught KeyError exception: {}'.format(ke))
 
     # test pop
-    print(cid)
+    print('cid before pop: {}'.format(cid))
+    print('rd  before pop: {}'.format(rd))
+
     cid.pop('bbb')
-    print(cid)
+    rd.pop('bbb')
+
+    print('cid after pop: {}'.format(cid))
+    print('rd  after pop: {}'.format(rd))
+
+    # cid2 = dict()
+    cid2 = CaseInsensitiveDict()
+
+    uc = 'A drowned citizen'
+    lc = 'a drowned citizen'
+    xx = 'a new key'
+
+    cid2[uc] = 1
+    cid2[uc] = 11
+    cid2[lc] = 2
+    cid2[xx] = 3
+    print(cid2)
+
+    print('IN tests -------------------')
+    if lc in cid2:
+        print('lc is IN')
+    else:
+        print('lc is NOT IN')
+
+    print('pop tests -------------------')
+    print(cid2)
+    if lc in cid2:
+        cid2.pop(lc)
+    else:
+        print('not in')
+    print(cid2)
+
+    if lc in cid2:
+        cid2.pop(lc)
+    else:
+        print('not in')
+    print(cid2)
+
+    if lc in cid2:
+        cid2.pop(lc)
+    else:
+        print('not in')
+    print(cid2)
+
+    if xx in cid2:
+        cid2.pop(xx)
+    else:
+        print('not in')
+    print(cid2)
+    x = 3
+
+    print(x)
 
 
 if __name__ == '__main__':

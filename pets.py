@@ -228,7 +228,7 @@ class PetTracker:
 
             # 
             # look for lifetap 'beams a smile' message coming from our pet
-            # fixme should this create a DD DamageEvent??
+            #
             target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
             m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
