@@ -6,7 +6,9 @@ from collections.abc import MutableMapping
 class CaseInsensitiveDict(MutableMapping):
     """
     A dictionary class which uses/allows case-insensitive keys, by inheriting from the
-    abstract base class MutableMapping and overriding the member function __getitem__
+    abstract base class MutableMapping and overriding the member functions that use a key,
+    so that those member functions behave in a key-case-insensitive manner
+    Functions re-written:  __setitem__, __getitem__, __delitem__
     """
     def __init__(self, *args, **kwargs):
         self.__dict__.update(*args, **kwargs)

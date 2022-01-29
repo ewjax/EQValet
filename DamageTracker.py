@@ -7,7 +7,7 @@ from datetime import datetime
 import myconfig
 
 from CaseInsensitiveDict import CaseInsensitiveDict
-from smartbuffer import SmartBuffer
+from SmartBuffer import SmartBuffer
 
 
 #################################################################################################
@@ -571,6 +571,7 @@ class DamageTracker:
 
         # combat timeout
         self.combat_timeout = myconfig.COMBAT_TIMEOUT_SEC
+        self.slain_datetime = None
 
         # set of player names
         self.player_names_set = set()
@@ -612,9 +613,9 @@ class DamageTracker:
             new_count = len(self.player_names_set)
             self.player_names_count = new_count
 
-            await self.client.send(
-                '{} new, {} total player names written to [{}]'.format(new_count - old_count, new_count,
-                                                                       self.player_names_fname))
+            await self.client.send('{} new, {} total player names written to [{}]'.format(new_count - old_count,
+                                                                                          new_count,
+                                                                                          self.player_names_fname))
             return True
 
         except OSError as err:
@@ -662,6 +663,8 @@ class DamageTracker:
             the_target.end_combat(line)
             await the_target.damage_report_discord(self.client)
             the_target.damage_report_clipboard()
+        else:
+            await self.client.send('Warning: End of combat on target: [{}], but that name not in tracking list'.format(target_name))
 
     #
     # check for damage related items
@@ -676,17 +679,6 @@ class DamageTracker:
         #
         if len(self.active_target_dict) > 0:
 
-            # exp message
-            exp_regexp = r'^(You gain experience|You gain party experience)'
-            m = re.match(exp_regexp, trunc_line)
-            if m:
-                # have to guess which target just died
-                the_target = self.get_likely_target()
-                if the_target:
-                    await self.end_combat(the_target.target_name, line)
-                else:
-                    await self.client.send('Error:  Exp message received, but no Target identified')
-
             # target is slain by pet or anyone else
             slain_regexp = r'^(?P<target_name>[\w` ]+) has been slain'
             m = re.match(slain_regexp, trunc_line)
@@ -695,6 +687,8 @@ class DamageTracker:
                 target_name = m.group('target_name')
                 # ensure slain target was not a player and was not a pet
                 if (target_name not in self.player_names_set) and (target_name not in self.pet_names_set):
+                    # save for exp message comparison
+                    self.slain_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                     await self.end_combat(target_name, line)
 
             # target is slain by player
@@ -704,7 +698,27 @@ class DamageTracker:
                 # extract RE data
                 target_name = m.group('target_name')
                 if target_name not in self.player_names_set:
+                    # save for exp message comparison
+                    self.slain_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                     await self.end_combat(target_name, line)
+
+            # exp message
+            exp_regexp = r'^(You gain experience|You gain party experience)'
+            m = re.match(exp_regexp, trunc_line)
+            if m:
+                # EQ can put out multiple indications that combat has ended for a single target
+                #   - a 'slain' message
+                #   - an 'exp' message
+                # if that happens they will have same date/time stamp, so only react to this exp message
+                # if it hasn't already been processed by a 'slain' message
+                now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
+                if now != self.slain_datetime:
+                    # have to guess which target just died
+                    the_target = self.get_likely_target()
+                    if the_target:
+                        await self.end_combat(the_target.target_name, line)
+                    else:
+                        await self.client.send('Error:  Exp message received, but no Target identified')
 
             # combat timeout - have to make a copy because the call to end_combat will modify the dictionary,
             # which would break the for loop
