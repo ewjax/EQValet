@@ -1,6 +1,7 @@
 # import the datetime class from the datetime module
 import copy
 import pickle
+import pyperclip
 import re
 from datetime import datetime
 
@@ -324,7 +325,7 @@ class Target:
     # implied target level, from max melee value
     def implied_level(self) -> float:
         if self.max_melee <= 60:
-            level = self.max_melee / 2
+            level = (self.max_melee / 2) - 1
         else:
             level = (self.max_melee + 60) / 4
         return level
@@ -464,7 +465,10 @@ class Target:
             for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
                 sb.add('{:>35}: {:>5}\n'.format(dmg_type, dmg_type_sum))
 
-            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', target_total, round(target_total / grand_total_outgoing * 100.0)))
+            frac = 0
+            if grand_total_outgoing != 0:
+                frac = round(target_total / grand_total_outgoing * 100.0)
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', target_total, frac))
 
         sb.add('\n')
         sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_outgoing))
@@ -489,7 +493,10 @@ class Target:
             for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
                 sb.add('{:>35}: {:>5}\n'.format(dmg_type, dmg_type_sum))
 
-            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, round(attacker_total / grand_total_incoming * 100.0)))
+            frac = 0
+            if grand_total_incoming != 0:
+                frac = round(attacker_total / grand_total_incoming * 100)
+            sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, frac))
 
         sb.add('\n')
         sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_incoming))
@@ -508,6 +515,7 @@ class Target:
 
         # sample
         # Leatherfoot Deputy in 113s, 467 @4 // Kenobtik 321 [68.74%] // Xythe 146 [31.26%]
+        # Veteran Yllhaydm in 190s, 24512 @129 | Alou 10987@(63 in 174s) | Sergeant Brunfel 7132@(39 in 185s) | Lonobtik 4707@(25 in 190s)
 
         # total damage dealt to this target
         grand_total_incoming = 0        # damage incoming, i.e. TO this Target
@@ -534,13 +542,13 @@ class Target:
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
         for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
-            fraction = round(attacker_total / grand_total_incoming * 100.0)
+            fraction = 0
+            if grand_total_incoming != 0:
+                fraction = round(attacker_total / grand_total_incoming * 100.0)
             clipboard_report += ' // {} {} [{}%]'.format(attacker, attacker_total, fraction)
 
-        # todo send this to clipboard
-        # OS method: echo "buffer contents here" | clip
-        # unsavory = this leaves the quote marks
-        print(clipboard_report)
+        # send this to clipboard
+        pyperclip.copy(clipboard_report)
 
 
 #################################################################################################
