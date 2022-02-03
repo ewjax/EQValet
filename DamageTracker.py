@@ -538,14 +538,14 @@ class Target:
                 grand_total_incoming += dd
 
         # start with the target
-        clipboard_report = '{} in {} sec, {}'.format(self.target_name, self.combat_duration_seconds(), grand_total_incoming)
+        clipboard_report = '{}, {} in {} sec'.format(self.target_name, grand_total_incoming, self.combat_duration_seconds())
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
         for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
             fraction = 0
             if grand_total_incoming != 0:
                 fraction = round(attacker_total / grand_total_incoming * 100.0)
-            clipboard_report += ' // {} {} [{}%]'.format(attacker, attacker_total, fraction)
+            clipboard_report += ' | {} {} [{}%]'.format(attacker, attacker_total, fraction)
 
         # send this to clipboard
         pyperclip.copy(clipboard_report)
