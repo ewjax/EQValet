@@ -120,6 +120,14 @@ class PetTracker:
         self.pet_dict = {}
         self.load_pet_dict()
 
+    # get pet name
+    def pet_name(self):
+        rv = 'No Pet'
+        if self.current_pet:
+            if self.current_pet.pet_name:
+                rv = self.current_pet.pet_name
+        return rv
+
     #
     # check for pet related items
     #
@@ -220,7 +228,7 @@ class PetTracker:
 
             # 
             # look for lifetap 'beams a smile' message coming from our pet
-            # fixme should this create a DD DamageEvent??
+            #
             target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
             m = re.match(target, trunc_line, re.IGNORECASE)
             if m:
@@ -398,12 +406,15 @@ class PetTracker:
         self.pet_dict['Minion of Shadows'] = pet_spell
 
         pet_stat_list.clear()
-        pet_stat_list.append(PetStats(rank=1, pet_level=41, max_melee=52, max_bashkick=65, max_backstab=0, lifetap=42))
-        pet_stat_list.append(PetStats(rank=2, pet_level=42, max_melee=55, max_bashkick=66, max_backstab=0, lifetap=43))
-        pet_stat_list.append(PetStats(rank=3, pet_level=43, max_melee=56, max_bashkick=68, max_backstab=0, lifetap=44))
-        pet_stat_list.append(PetStats(rank=4, pet_level=44, max_melee=59, max_bashkick=69, max_backstab=0, lifetap=45))
+        pet_stat_list.append(PetStats(rank=1, pet_level=40, max_melee=51, max_bashkick=63, max_backstab=0, lifetap=41))
+        pet_stat_list.append(PetStats(rank=2, pet_level=41, max_melee=52, max_bashkick=65, max_backstab=0, lifetap=42))
+        pet_stat_list.append(PetStats(rank=3, pet_level=42, max_melee=55, max_bashkick=66, max_backstab=0, lifetap=43))
+        pet_stat_list.append(PetStats(rank=4, pet_level=43, max_melee=56, max_bashkick=68, max_backstab=0, lifetap=44))
+        pet_stat_list.append(PetStats(rank=5, pet_level=44, max_melee=59, max_bashkick=69, max_backstab=0, lifetap=45))
         pet_spell = PetSpell('Servant of Bones', 'Necro', caster_level=56, pet_stats_list=pet_stat_list.copy())
         self.pet_dict['Servant of Bones'] = pet_spell
+
+        # todo add Emissary of Thule pet
 
         #
         # Enchanter pets

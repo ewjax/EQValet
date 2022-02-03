@@ -11,12 +11,15 @@ def main():
     f.close()
 
     for n in initial_set:
-        stripped_n = n.strip()
-        new_set.add(stripped_n)
-        print('[{}], [{}]'.format(n, stripped_n))
+        if n is not None:
+            stripped_n = n.strip()
+            new_set.add(stripped_n)
+            # print('[{}], [{}]'.format(n, stripped_n))
+        else:
+            print('found a None')
 
-    print(initial_set)
-    print(new_set)
+    # print(initial_set)
+    # print(new_set)
 
     f = open('players.pickle', 'wb')
     pickle.dump(new_set, f)

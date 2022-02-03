@@ -5,13 +5,13 @@ import time
 import discord
 from discord.ext import commands
 
-import damage
-import logfile
+import DamageTracker
+import EverquestLogFile
 # import the customized settings and file locations etc, found in myconfig.py
 import myconfig
-import pets
-import randoms
-from smartbuffer import SmartBuffer
+import PetTracker
+import RandomTracker
+from SmartBuffer import SmartBuffer
 
 # allow for testing, by forcing the bot to read an old log file
 TEST_BOT = False
@@ -32,19 +32,19 @@ class EQValetClient(commands.Bot):
         commands.Bot.__init__(self, command_prefix=myconfig.BOT_COMMAND_PREFIX)
 
         # create the EQ log file parser
-        self.elf = logfile.EverquestLogFile()
+        self.elf = EverquestLogFile.EverquestLogFile()
 
         # use a RandomTracker class to deal with all things random numbers and rolls
         self.random_parse = True
-        self.random_tracker = randoms.RandomTracker(self)
+        self.random_tracker = RandomTracker.RandomTracker(self)
 
         # use a DamageTracker class to keep track of total damage dealt by spells and by pets
         self.damage_parse = True
-        self.damage_tracker = damage.DamageTracker(self)
+        self.damage_tracker = DamageTracker.DamageTracker(self)
 
         # use a PetTracker class to deal with all things pets
         self.pet_parse = True
-        self.pet_tracker = pets.PetTracker(self)
+        self.pet_tracker = PetTracker.PetTracker(self)
 
     # process each line
     async def process_line(self, line):
