@@ -438,13 +438,17 @@ class Target:
                 outgoing_summary_dict[target] += dd
                 grand_total_outgoing += dd
 
+        dps_outgoing = 0.0
+        if self.combat_duration_seconds() > 0:
+            dps_outgoing = grand_total_outgoing / self.combat_duration_seconds()
+
         # now create the output report
         sb = SmartBuffer()
         sb.add('=========================================================================\n')
         # sb.add('Damage Report, Target: ====[{:^30}]====\n'.format(name))
         sb.add('Damage Report, Target: **{}**\n'.format(self.target_name))
         sb.add('Implied Level: {}\n'.format(self.implied_level()))
-        sb.add('Combat Duration (sec): {}\n'.format(self.combat_duration_seconds()))
+        sb.add('Combat Duration (sec): {:.0f}\n'.format(self.combat_duration_seconds()))
         sb.add('Damage To:\n')
 
         # walk the list of targets, sort the target dictionary on total damage done...
@@ -471,7 +475,7 @@ class Target:
             sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', target_total, frac))
 
         sb.add('\n')
-        sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_outgoing))
+        sb.add('{:>35}: {:>5} (100%) (@{:.1f} dps)\n'.format('Grand Total', grand_total_outgoing, dps_outgoing))
         sb.add('-------------------------------------------------------------------------\n')
         sb.add('Damage By:\n')
 
@@ -498,8 +502,12 @@ class Target:
                 frac = round(attacker_total / grand_total_incoming * 100)
             sb.add('{:>35}: {:>5} ({}%)\n'.format('Total', attacker_total, frac))
 
+        dps_incoming = 0.0
+        if self.combat_duration_seconds() > 0:
+            dps_incoming = grand_total_incoming / self.combat_duration_seconds()
+
         sb.add('\n')
-        sb.add('{:>35}: {:>5} (100%)\n'.format('Grand Total', grand_total_incoming))
+        sb.add('{:>35}: {:>5} (100%) (@{:.1f} dps)\n'.format('Grand Total', grand_total_incoming, dps_incoming))
 
         sb.add('-------------------------------------------------------------------------\n')
 
@@ -538,7 +546,10 @@ class Target:
                 grand_total_incoming += dd
 
         # start with the target
-        clipboard_report = '{}, {} in {} sec'.format(self.target_name, grand_total_incoming, self.combat_duration_seconds())
+        dps = 0.0
+        if self.combat_duration_seconds() > 0:
+            dps = grand_total_incoming / self.combat_duration_seconds()
+        clipboard_report = '{}, {} hp in {:.0f} s (@{:.1f} dps)'.format(self.target_name, grand_total_incoming, self.combat_duration_seconds(), dps)
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
         for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
