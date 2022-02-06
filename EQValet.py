@@ -91,7 +91,7 @@ class EQValetClient(commands.Bot):
             # use a back door to force the system to read a test file
             if TEST_BOT:
 
-                # read a sample file with sample random rolls in it
+                # read a sample file for testing
                 filename = 'randoms.txt'
                 # filename = 'pets.txt'
                 # filename = 'fights.txt'
