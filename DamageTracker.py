@@ -610,7 +610,7 @@ class DamageTracker:
         # set of player names
         self.player_names_set = set()
         self.player_names_count = 0
-        self.player_names_fname = 'players.pickle'
+        self.player_names_fname = 'players.dat'
         self.read_player_names()
 
         # set of pet names
@@ -1401,6 +1401,25 @@ class DamageTracker:
         sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
         self.spell_dict[spell_name] = sp
 
+        spell_name = 'Frost Strike'    # level 24
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Poison Rain'      # level 24, rain spell, 3x waves of 60 each
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin blisters')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Shock of the Tainted'      # level 34
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) screams in pain')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Winter\'s Roar'      # level 34
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        self.spell_dict[spell_name] = sp
+
+
+
+
         #
         # shaman DOT spells
         #
@@ -1419,6 +1438,15 @@ class DamageTracker:
         spell_name = 'Infectious Cloud'   # level 19, Targeted AOE
         sp = LinearDotSpell(spell_name, 126, 20, 5, r'^(?P<target_name>[\w` ]+) starts to wretch', aoe=True)
         self.spell_dict[spell_name] = sp
+
+        spell_name = 'Envenomed Breath'   # level 24
+        sp = LinearDotSpell(spell_name, 42, 30, 27, r'^(?P<target_name>[\w` ]+) has been poisoned')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Scourge'   # level 34
+        sp = LinearDotSpell(spell_name, 126, 40, 24, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        self.spell_dict[spell_name] = sp
+
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:

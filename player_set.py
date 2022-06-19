@@ -6,7 +6,7 @@ def main():
     # set of player_name strings
     new_set = set()
 
-    f = open('players.pickle', 'rb')
+    f = open('players.dat', 'rb')
     initial_set = pickle.load(f)
     f.close()
 
@@ -21,7 +21,7 @@ def main():
     # print(initial_set)
     # print(new_set)
 
-    f = open('players.pickle', 'wb')
+    f = open('players.dat', 'wb')
     pickle.dump(new_set, f)
     f.close()
 
