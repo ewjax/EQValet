@@ -33,6 +33,7 @@ from SmartBuffer import SmartBuffer
 #       damage_dealt()  (returns amount of damage in this particular DamageEvent)
 #       damage_type()   (returns the type of damage for summing)
 #       is_ticking()    (only returns true for DOT spells that have yet to close out)
+#       is_aoe()        (only returns true for AOE spells that could hit more than one target)
 #
 
 #################################################################################################
@@ -48,6 +49,7 @@ class DamageEvent:
         self.attacker_name = None
         self.target_name = None
         self.event_datetime = None
+        self.aoe = False
 
     # set instance data
     # eq_timestamp assumed to be in the format of EQ logfile timestamp
@@ -68,6 +70,10 @@ class DamageEvent:
     def is_ticking(self) -> bool:
         return False
 
+    # only returns true for AOE spells that could hit more than one target
+    def is_aoe(self) -> bool:
+        return self.aoe
+
 
 #################################################################################################
 
@@ -79,11 +85,12 @@ class DiscreteDamageEvent(DamageEvent):
     # ctor
     # for the time parameter, pass at least, or all, of the actual log file line containing the timestamp
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
-    def __init__(self, attacker_name: str, target_name: str, eq_timestamp: str, dmg_type: str, dmg_amount: int):
+    def __init__(self, attacker_name: str, target_name: str, eq_timestamp: str, dmg_type: str, dmg_amount: int, aoe: bool = False):
         DamageEvent.__init__(self)
         self.set_instance_data(attacker_name, target_name, eq_timestamp)
         self.dmg_type = dmg_type
         self.dmg_amount = int(dmg_amount)
+        self.aoe = aoe
 
     # function to be overloaded by child classes
     def damage_dealt(self) -> int:
@@ -95,11 +102,12 @@ class DiscreteDamageEvent(DamageEvent):
 
     # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
-        return '({}, {}, {}, {}, {})'.format(self.attacker_name,
-                                             self.target_name,
-                                             self.event_datetime,
-                                             self.dmg_type,
-                                             self.dmg_amount)
+        return '({}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                 self.target_name,
+                                                 self.event_datetime,
+                                                 self.dmg_type,
+                                                 self.dmg_amount,
+                                                 self.aoe)
 
 
 #################################################################################################
@@ -111,10 +119,11 @@ class DirectDamageSpell(DamageEvent):
 
     # ctor
     #
-    def __init__(self, spell_name: str, landed_message: str):
+    def __init__(self, spell_name: str, landed_message: str, aoe: bool = False):
         DamageEvent.__init__(self)
         self.spell_name = spell_name
         self.landed_message = landed_message
+        self.aoe = aoe
 
     # function to return type of damage - spell name, or melee type, or non-melee, etc
     def damage_type(self) -> str:
@@ -122,11 +131,12 @@ class DirectDamageSpell(DamageEvent):
 
     # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
-        return '({}, {}, {}, {}, {})'.format(self.attacker_name,
-                                             self.target_name,
-                                             self.event_datetime,
-                                             self.spell_name,
-                                             self.landed_message)
+        return '({}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                 self.target_name,
+                                                 self.event_datetime,
+                                                 self.spell_name,
+                                                 self.landed_message,
+                                                 self.aoe)
 
 
 #################################################################################################
@@ -140,13 +150,14 @@ class DotSpell(DamageEvent):
     #
     # the 'faded_message' parameter is an opportunity to provide a custom message.  Passing 'None' will cause 
     # the default faded message to be set to 'Your XXX spell has worn off'
-    def __init__(self, spell_name: str, max_duration_sec: int, landed_message: str, faded_message: str = None):
+    def __init__(self, spell_name: str, max_duration_sec: int, landed_message: str, faded_message: str = None, aoe: bool = False):
         DamageEvent.__init__(self)
 
         self.spell_name = spell_name
         self.max_duration_sec = int(max_duration_sec)
         self.landed_message = landed_message
         self.faded_message = faded_message
+        self.aoe = aoe
 
         if self.faded_message is None:
             self.faded_message = '^Your ' + self.spell_name + ' spell has worn off'
@@ -194,14 +205,15 @@ class DotSpell(DamageEvent):
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
-        return '({}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
-                                                         self.target_name,
-                                                         self.event_datetime,
-                                                         self.end_datetime,
-                                                         self.spell_name,
-                                                         self.max_duration_sec,
-                                                         self.landed_message,
-                                                         self.faded_message)
+        return '({}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                             self.target_name,
+                                                             self.event_datetime,
+                                                             self.end_datetime,
+                                                             self.spell_name,
+                                                             self.max_duration_sec,
+                                                             self.landed_message,
+                                                             self.faded_message,
+                                                             self.aoe)
 
 
 #################################################################################################
@@ -214,10 +226,11 @@ class LinearDotSpell(DotSpell):
 
     # ctor
     def __init__(self, spell_name: str, max_duration_sec: int, dmg_initial: int, dmg_per_tick: int,
-                 landed_message: str, faded_message: str = None):
+                 landed_message: str, faded_message: str = None, aoe: bool = False):
         DotSpell.__init__(self, spell_name, max_duration_sec, landed_message, faded_message)
         self.dmg_initial = int(dmg_initial)
         self.dmg_per_tick = int(dmg_per_tick)
+        self.aoe = aoe
 
     # overload the damage_dealt() function
     def damage_dealt(self) -> int:
@@ -231,16 +244,17 @@ class LinearDotSpell(DotSpell):
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
-        return '({}, {}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
-                                                                 self.target_name,
-                                                                 self.event_datetime,
-                                                                 self.end_datetime,
-                                                                 self.spell_name,
-                                                                 self.max_duration_sec,
-                                                                 self.dmg_initial,
-                                                                 self.dmg_per_tick,
-                                                                 self.landed_message,
-                                                                 self.faded_message)
+        return '({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                                     self.target_name,
+                                                                     self.event_datetime,
+                                                                     self.end_datetime,
+                                                                     self.spell_name,
+                                                                     self.max_duration_sec,
+                                                                     self.dmg_initial,
+                                                                     self.dmg_per_tick,
+                                                                     self.landed_message,
+                                                                     self.faded_message,
+                                                                     self.aoe)
 
 
 #################################################################################################
@@ -273,13 +287,14 @@ class SplurtSpell(DotSpell):
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
-        return '({}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
-                                                     self.target_name,
-                                                     self.event_datetime,
-                                                     self.end_datetime,
-                                                     self.spell_name,
-                                                     self.max_duration_sec,
-                                                     self.landed_message)
+        return '({}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
+                                                         self.target_name,
+                                                         self.event_datetime,
+                                                         self.end_datetime,
+                                                         self.spell_name,
+                                                         self.max_duration_sec,
+                                                         self.landed_message,
+                                                         self.aoe)
 
 
 #################################################################################################
@@ -595,7 +610,7 @@ class DamageTracker:
         # set of player names
         self.player_names_set = set()
         self.player_names_count = 0
-        self.player_names_fname = 'players.pickle'
+        self.player_names_fname = 'players.dat'
         self.read_player_names()
 
         # set of pet names
@@ -812,7 +827,8 @@ class DamageTracker:
                 the_target.add_incoming_damage_event(de)
 
                 # reset the spell pending flag
-                self.spell_pending = None
+                if not self.spell_pending.is_aoe():
+                    self.spell_pending = None
 
         #
         # watch for spell faded conditions -only check DamageEvents that are not closed, i.e. still ticking
@@ -1373,28 +1389,64 @@ class DamageTracker:
         #
         # shaman DD spells
         #
-        spell_name = 'Burst of Flame'
+        spell_name = 'Burst of Flame'   # level 1
         sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) singes as the Burst of Flame hits them')
         self.spell_dict[spell_name] = sp
 
-        spell_name = 'Frost Rift'
+        spell_name = 'Frost Rift'   # level 5
         sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) is struck by the frost rift')
         self.spell_dict[spell_name] = sp
+
+        spell_name = 'Spirit Strike'    # level 14
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Frost Strike'    # level 24
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Poison Rain'      # level 24, rain spell, 3x waves of 60 each
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin blisters')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Shock of the Tainted'      # level 34
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) screams in pain')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Winter\'s Roar'      # level 34
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        self.spell_dict[spell_name] = sp
+
+
+
 
         #
         # shaman DOT spells
         #
-        spell_name = 'Sicken'
+        spell_name = 'Sicken'   # level 5
         sp = LinearDotSpell(spell_name, 126, 8, 2, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
         self.spell_dict[spell_name] = sp
 
-        spell_name = 'Tainted Breath'
+        spell_name = 'Tainted Breath'   # level 9
         sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) has been poisoned')
         self.spell_dict[spell_name] = sp
 
-        spell_name = 'Spirit Strike'
-        sp = LinearDotSpell(spell_name, 42, 10, 8, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
+        spell_name = 'Affliction'   # level 19
+        sp = LinearDotSpell(spell_name, 126, 30, 6, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
         self.spell_dict[spell_name] = sp
+
+        spell_name = 'Infectious Cloud'   # level 19, Targeted AOE
+        sp = LinearDotSpell(spell_name, 126, 20, 5, r'^(?P<target_name>[\w` ]+) starts to wretch', aoe=True)
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Envenomed Breath'   # level 24
+        sp = LinearDotSpell(spell_name, 42, 30, 27, r'^(?P<target_name>[\w` ]+) has been poisoned')
+        self.spell_dict[spell_name] = sp
+
+        spell_name = 'Scourge'   # level 34
+        sp = LinearDotSpell(spell_name, 126, 40, 24, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
+        self.spell_dict[spell_name] = sp
+
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
