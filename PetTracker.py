@@ -441,6 +441,8 @@ class PetTracker:
         pet_spell = PetSpell('Emissary of Thule', 'Necro', caster_level=59, pet_level_list=pet_level_list.copy())
         self.pet_dict['Emissary of Thule'] = pet_spell
 
+        # todo need the focused pet levels
+
         #
         # Enchanter pets
         #
@@ -476,7 +478,18 @@ class PetTracker:
         pet_spell = PetSpell('Companion Spirit', 'Shaman', caster_level=34, pet_level_list=pet_level_list.copy())
         self.pet_dict['Companion Spirit'] = pet_spell
 
-        # todo need shaman pets for 39, 44, 49, 55
+        pet_level_list.clear()
+        pet_level_list.append(PetLevel(rank=1, pet_level=24, max_melee=27, max_bashkick=17, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=2, pet_level=25, max_melee=28, max_bashkick=18, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=3, pet_level=26, max_melee=31, max_bashkick=18, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=4, pet_level=27, max_melee=33, max_bashkick=19, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=5, pet_level=28, max_melee=35, max_bashkick=19, max_backstab=0, lifetap=0))
+        pet_spell = PetSpell('Vigilant Spirit', 'Shaman', caster_level=39, pet_level_list=pet_level_list.copy())
+        self.pet_dict['Vigilant Spirit'] = pet_spell
+
+        # todo need shaman pets for 44, 49, 55
+
+        # todo need all mage pets
 
 #################################################################################################
 

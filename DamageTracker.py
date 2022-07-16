@@ -850,7 +850,7 @@ class DamageTracker:
         #
         # watch for casting messages
         #
-        casting_regexp = r'^You begin casting (?P<spell_name>[\w` ]+)\.'
+        casting_regexp = r'^You begin casting (?P<spell_name>[\w`\' ]+)\.'
         m = re.match(casting_regexp, trunc_line)
         if m:
 
@@ -1405,8 +1405,8 @@ class DamageTracker:
         sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
         self.spell_dict[spell_name] = sp
 
-        spell_name = 'Poison Rain'      # level 24, rain spell, 3x waves of 60 each
-        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin blisters')
+        spell_name = 'Poison Storm'      # level 24, rain spell, 3x waves of 60 each
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin blisters', aoe=True)
         self.spell_dict[spell_name] = sp
 
         spell_name = 'Shock of the Tainted'      # level 34
@@ -1417,6 +1417,9 @@ class DamageTracker:
         sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+) staggers as spirits of frost slam against them')
         self.spell_dict[spell_name] = sp
 
+        spell_name = 'Gale of Poison'      # level 39, rain spell, 3x waves of 122 each
+        sp = DirectDamageSpell(spell_name, r'^(?P<target_name>[\w` ]+)\'s skin blisters', aoe=True)
+        self.spell_dict[spell_name] = sp
 
 
 
@@ -1447,6 +1450,9 @@ class DamageTracker:
         sp = LinearDotSpell(spell_name, 126, 40, 24, r'^(?P<target_name>[\w` ]+) sweats and shivers, looking feverish')
         self.spell_dict[spell_name] = sp
 
+        spell_name = 'Venom of the Snake'   # level 39
+        sp = LinearDotSpell(spell_name, 42, 40, 59, r'^(?P<target_name>[\w` ]+) has been poisoned')
+        self.spell_dict[spell_name] = sp
 
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
