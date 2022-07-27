@@ -340,7 +340,7 @@ class Target:
     # implied target level, from max melee value
     def implied_level(self) -> float:
         if self.max_melee <= 60:
-            level = (self.max_melee / 2) - 1
+            level = (self.max_melee / 2)
         else:
             level = (self.max_melee + 60) / 4
         return level
