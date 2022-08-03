@@ -412,6 +412,7 @@ class PetTracker:
         pet_level_list.append(PetLevel(rank=3, pet_level=39, max_melee=51, max_bashkick=23, max_backstab=0, lifetap=40))
         pet_level_list.append(PetLevel(rank=4, pet_level=40, max_melee=52, max_bashkick=24, max_backstab=0, lifetap=41))
         pet_level_list.append(PetLevel(rank=5, pet_level=41, max_melee=55, max_bashkick=24, max_backstab=0, lifetap=42))
+        pet_level_list.append(PetLevel(rank=6, pet_level=42, max_melee=57, max_bashkick=25, max_backstab=0, lifetap=43))
         pet_spell = PetSpell('Invoke Death', 'Necro', caster_level=49, pet_level_list=pet_level_list.copy())
         self.pet_dict['Invoke Death'] = pet_spell
 
@@ -421,6 +422,7 @@ class PetTracker:
         pet_level_list.append(PetLevel(rank=3, pet_level=42, max_melee=52, max_bashkick=0, max_backstab=159, lifetap=42))
         pet_level_list.append(PetLevel(rank=4, pet_level=43, max_melee=55, max_bashkick=0, max_backstab=165, lifetap=43))
         pet_level_list.append(PetLevel(rank=5, pet_level=44, max_melee=56, max_bashkick=0, max_backstab=171, lifetap=44))
+        pet_level_list.append(PetLevel(rank=6, pet_level=45, max_melee=59, max_bashkick=0, max_backstab=177, lifetap=45))
         pet_spell = PetSpell('Minion of Shadows', 'Necro', caster_level=53, pet_level_list=pet_level_list.copy())
         self.pet_dict['Minion of Shadows'] = pet_spell
 
@@ -430,6 +432,7 @@ class PetTracker:
         pet_level_list.append(PetLevel(rank=3, pet_level=42, max_melee=55, max_bashkick=66, max_backstab=0, lifetap=43))
         pet_level_list.append(PetLevel(rank=4, pet_level=43, max_melee=56, max_bashkick=68, max_backstab=0, lifetap=44))
         pet_level_list.append(PetLevel(rank=5, pet_level=44, max_melee=59, max_bashkick=69, max_backstab=0, lifetap=45))
+        pet_level_list.append(PetLevel(rank=6, pet_level=45, max_melee=61, max_bashkick=71, max_backstab=0, lifetap=46))
         pet_spell = PetSpell('Servant of Bones', 'Necro', caster_level=56, pet_level_list=pet_level_list.copy())
         self.pet_dict['Servant of Bones'] = pet_spell
 
@@ -439,10 +442,9 @@ class PetTracker:
         pet_level_list.append(PetLevel(rank=3, pet_level=45, max_melee=56, max_bashkick=25, max_backstab=0, lifetap=46))
         pet_level_list.append(PetLevel(rank=4, pet_level=46, max_melee=59, max_bashkick=25, max_backstab=0, lifetap=47))
         pet_level_list.append(PetLevel(rank=5, pet_level=47, max_melee=61, max_bashkick=26, max_backstab=0, lifetap=48))
+        pet_level_list.append(PetLevel(rank=6, pet_level=48, max_melee=62, max_bashkick=26, max_backstab=0, lifetap=49))
         pet_spell = PetSpell('Emissary of Thule', 'Necro', caster_level=59, pet_level_list=pet_level_list.copy())
         self.pet_dict['Emissary of Thule'] = pet_spell
-
-        # todo need the focused pet levels
 
         #
         # Enchanter pets
