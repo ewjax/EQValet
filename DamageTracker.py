@@ -5,7 +5,7 @@ import pyperclip
 import re
 from datetime import datetime
 
-import myconfig
+import config
 
 from CaseInsensitiveDict import CaseInsensitiveDict
 from SmartBuffer import SmartBuffer
@@ -615,7 +615,7 @@ class DamageTracker:
         self.spell_pending = None
 
         # combat timeout
-        self.combat_timeout = myconfig.COMBAT_TIMEOUT_SEC
+        self.combat_timeout = config.COMBAT_TIMEOUT_SEC
         self.slain_datetime = None
 
         # set of player names
@@ -793,7 +793,7 @@ class DamageTracker:
             # get current time and check for timeout
             now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
             elapsed_seconds = (now - self.spell_pending.event_datetime)
-            if elapsed_seconds.total_seconds() > myconfig.SPELL_PENDING_TIMEOUT_SEC:
+            if elapsed_seconds.total_seconds() > config.SPELL_PENDING_TIMEOUT_SEC:
                 # ...then this spell pending is expired
                 await self.client.send('*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
                 self.spell_pending = None

@@ -4,7 +4,7 @@ import re
 import threading
 import time
 
-import myconfig
+import config
 
 
 #################################################################################################
@@ -18,13 +18,13 @@ class EverquestLogFile:
     #
     # ctor
     #
-    def __init__(self, char_name=myconfig.DEFAULT_CHAR_NAME):
+    def __init__(self, char_name=config.DEFAULT_CHAR_NAME):
 
         # instance data
-        self.base_directory = myconfig.BASE_DIRECTORY
-        self.logs_directory = myconfig.LOGS_DIRECTORY
+        self.base_directory = config.BASE_DIRECTORY
+        self.logs_directory = config.LOGS_DIRECTORY
         self.char_name = char_name
-        self.server_name = myconfig.SERVER_NAME
+        self.server_name = config.SERVER_NAME
         self.filename = self.build_filename(self.char_name)
         self.file = None
 
@@ -34,7 +34,7 @@ class EverquestLogFile:
         self.author = ''
 
         self.prevtime = time.time()
-        self.heartbeat = myconfig.HEARTBEAT
+        self.heartbeat = config.HEARTBEAT
 
         # timezone string for current computer
         self.current_tzname = time.tzname[time.daylight]

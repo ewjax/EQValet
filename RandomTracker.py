@@ -2,8 +2,8 @@ import re
 # import the datetime class from the datetime module
 from datetime import datetime
 
-# import the customized settings and file locations etc, found in myconfig.py
-import myconfig
+# import the global config data
+import config
 
 
 class PlayerRandomRoll:
@@ -218,7 +218,7 @@ class RandomTracker:
         self.all_random_events = list()
 
         # default time a RandomEvent runs, collecting PlayerRandomRolls
-        self.default_window = myconfig.DEFAULT_WINDOW
+        self.default_window = config.DEFAULT_WINDOW
 
     # check if a random is occurring
     async def process_line(self, line):

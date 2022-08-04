@@ -5,10 +5,11 @@ import time
 import discord
 from discord.ext import commands
 
+# import the global config data
+import config
+
 import DamageTracker
 import EverquestLogFile
-# import the customized settings and file locations etc, found in myconfig.py
-import myconfig
 import PetTracker
 import RandomTracker
 from SmartBuffer import SmartBuffer
@@ -29,11 +30,11 @@ class EQValetClient(commands.Bot):
     def __init__(self):
 
         # force global data to load from ini file
-        myconfig.load()
+        config.load()
 
         # call parent ctor
-        print(f'command prefix = [{myconfig.BOT_COMMAND_PREFIX}]')
-        commands.Bot.__init__(self, command_prefix=myconfig.BOT_COMMAND_PREFIX)
+        print(f'command prefix = [{config.BOT_COMMAND_PREFIX}]')
+        commands.Bot.__init__(self, command_prefix=config.BOT_COMMAND_PREFIX)
 
         # create the EQ log file parser
         self.elf = EverquestLogFile.EverquestLogFile()
@@ -69,19 +70,19 @@ class EQValetClient(commands.Bot):
     # sound the alert
     async def alert(self, msg):
 
-        special_channel = self.get_channel(myconfig.PERSONAL_SERVER_ALERTID)
+        special_channel = self.get_channel(config.PERSONAL_SERVER_ALERTID)
         await special_channel.send(msg)
 
     # notify of pop
     async def pop(self, msg):
 
-        special_channel = self.get_channel(myconfig.PERSONAL_SERVER_POPID)
+        special_channel = self.get_channel(config.PERSONAL_SERVER_POPID)
         await special_channel.send(msg)
 
     # send message to the special EQValet channel
     async def send(self, msg):
 
-        special_channel = self.get_channel(myconfig.PERSONAL_SERVER_VALETID)
+        special_channel = self.get_channel(config.PERSONAL_SERVER_VALETID)
         await special_channel.send(msg)
 
     # begin parsing
@@ -431,4 +432,4 @@ async def parse():
 
 
 # let's go!!
-client.run(myconfig.BOT_TOKEN)
+client.run(config.BOT_TOKEN)
