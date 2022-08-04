@@ -8,7 +8,7 @@ setup: requirements.txt
 	pip install -r requirements.txt
 
 exe:
-	pyinstaller --onefile --icon data/icons/sample.ico EQValet.py
+	pyinstaller --onefile --icon data/icons/diamond.ico EQValet.py
 
 #zip:
 #	cp DeathLoopVaccine.ini.example dist

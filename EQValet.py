@@ -28,7 +28,11 @@ class EQValetClient(commands.Bot):
     # ctor
     def __init__(self):
 
+        # force global data to load from ini file
+        myconfig.load()
+
         # call parent ctor
+        print(f'command prefix = [{myconfig.BOT_COMMAND_PREFIX}]')
         commands.Bot.__init__(self, command_prefix=myconfig.BOT_COMMAND_PREFIX)
 
         # create the EQ log file parser

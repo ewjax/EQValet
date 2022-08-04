@@ -1,0 +1,50 @@
+
+
+[Everquest]
+
+# configure location of the everquest log files
+BASE_DIRECTORY = c:\Everquest
+LOGS_DIRECTORY = \logs\
+
+# which server
+SERVER_NAME = P1999Green
+
+# Max number of seconds of logfile inactivity before a check is made to see if a new file is being written to
+HEARTBEAT = 15
+
+
+[RandomTracker]
+
+# default randomevent window
+DEFAULT_WINDOW = 30
+
+
+[DamageTracker]
+
+# timeout for spell casting pending wait timeout
+SPELL_PENDING_TIMEOUT_SEC = 10
+
+# timeout for combat timer
+COMBAT_TIMEOUT_SEC = 120
+
+
+[PetTracker]
+
+
+[Discord]
+
+# token corresponds to the bot from discord developer portal
+BOT_TOKEN = your_bot_token_here
+
+# change this if you need to have multiple bots with same commands present on a server
+BOT_COMMAND_PREFIX = .
+
+
+# some server ID's
+PERSONAL_SERVER_NAME = ewjax personal server
+PERSONAL_SERVER_POPID = pop_channel_id_here
+PERSONAL_SERVER_ALERTID = alert_channel_id_here
+PERSONAL_SERVER_VALETID = eqvalet_channel_id_here
+
+
+
