@@ -909,7 +909,8 @@ class DamageTracker:
         #
         # watch for melee misses by me
         #
-        my_miss_regexp = r'^You try to (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+), but miss!'
+        my_miss_regexp = r'^You try to (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash|slice)) ' \
+                         r'(?P<target_name>[\w` ]+), but miss!'
         m = re.match(my_miss_regexp, trunc_line)
         if m:
             # extract RE data
@@ -926,7 +927,8 @@ class DamageTracker:
         #
         # watch for melee messages by me
         #
-        my_hit_regexp = r'^You (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        my_hit_regexp = r'^You (?P<dmg_type>(hit|slash|pierce|crush|claw|bite|sting|maul|gore|punch|kick|backstab|bash|slice)) ' \
+                        r'(?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
         m = re.match(my_hit_regexp, trunc_line)
         if m:
 
@@ -949,7 +951,9 @@ class DamageTracker:
         #
         # watch for melee messages
         #
-        melee_regexp = r'^(?P<attacker_name>[\w` ]+) (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes)) (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
+        melee_regexp = r'^(?P<attacker_name>[\w` ]+) ' \
+                       r'(?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs|bashes|slices)) ' \
+                       r'(?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
         m = re.match(melee_regexp, trunc_line)
         if m:
 
