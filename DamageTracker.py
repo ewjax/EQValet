@@ -621,7 +621,7 @@ class DamageTracker:
         # set of player names
         self.player_names_set = set()
         self.player_names_count = 0
-        self.player_names_fname = 'EQValet-PlayerNames.dat'
+        self.player_names_fname = './data/EQValet-PlayerNames.dat'
         self.read_player_names()
 
         # set of pet names
