@@ -101,9 +101,10 @@ class EQValetClient(commands.Bot):
             if TEST_BOT:
 
                 # read a sample file for testing
-                filename = 'randoms.txt'
-                # filename = 'pets.txt'
-                # filename = 'fights.txt'
+                filename = './data/test/randoms.txt'
+                # filename = './data/test/pets.txt'
+                # filename = './data/test/pets_long.txt'
+                # filename = './data/test/fights.txt'
 
                 # start parsing, but in this case, start reading from the beginning of the file,
                 # rather than the end (default)
