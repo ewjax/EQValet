@@ -33,11 +33,12 @@ class EQValetClient(commands.Bot):
         config.load()
 
         # call parent ctor
-        print(f'command prefix = [{config.BOT_COMMAND_PREFIX}]')
-        commands.Bot.__init__(self, command_prefix=config.BOT_COMMAND_PREFIX)
+        prefix = config.config_data.get('Discord', 'BOT_COMMAND_PREFIX')
+        print(f'command prefix = [{prefix}]')
+        commands.Bot.__init__(self, command_prefix=prefix)
 
         # create the EQ log file parser
-        self.elf = EverquestLogFile.EverquestLogFile()
+        self.elf = EverquestLogFile.EverquestLogFile('')
 
         # use a RandomTracker class to deal with all things random numbers and rolls
         self.random_parse = True
@@ -70,19 +71,22 @@ class EQValetClient(commands.Bot):
     # sound the alert
     async def alert(self, msg):
 
-        special_channel = self.get_channel(config.PERSONAL_SERVER_ALERTID)
+        channel_id = config.config_data.getint('Discord', 'PERSONAL_SERVER_ALERTID')
+        special_channel = self.get_channel(channel_id)
         await special_channel.send(msg)
 
     # notify of pop
     async def pop(self, msg):
 
-        special_channel = self.get_channel(config.PERSONAL_SERVER_POPID)
+        channel_id = config.config_data.getint('Discord', 'PERSONAL_SERVER_POPID')
+        special_channel = self.get_channel(channel_id)
         await special_channel.send(msg)
 
     # send message to the special EQValet channel
     async def send(self, msg):
 
-        special_channel = self.get_channel(config.PERSONAL_SERVER_VALETID)
+        channel_id = config.config_data.getint('Discord', 'PERSONAL_SERVER_VALETID')
+        special_channel = self.get_channel(channel_id)
         await special_channel.send(msg)
 
     # begin parsing
@@ -432,4 +436,4 @@ async def parse():
 
 
 # let's go!!
-client.run(config.BOT_TOKEN)
+client.run(config.config_data['Discord']['BOT_TOKEN'])

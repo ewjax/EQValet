@@ -18,13 +18,17 @@ class EverquestLogFile:
     #
     # ctor
     #
-    def __init__(self, char_name=config.DEFAULT_CHAR_NAME):
+    def __init__(self, char_name):
 
         # instance data
-        self.base_directory = config.BASE_DIRECTORY
-        self.logs_directory = config.LOGS_DIRECTORY
+        # self.base_directory = config.BASE_DIRECTORY
+        self.base_directory = config.config_data.get('Everquest', 'BASE_DIRECTORY')
+
+        # self.logs_directory = config.LOGS_DIRECTORY
+        self.logs_directory = config.config_data.get('Everquest', 'LOGS_DIRECTORY')
+
         self.char_name = char_name
-        self.server_name = config.SERVER_NAME
+        self.server_name = config.config_data.get('Everquest', 'SERVER_NAME')
         self.filename = self.build_filename(self.char_name)
         self.file = None
 
@@ -34,7 +38,7 @@ class EverquestLogFile:
         self.author = ''
 
         self.prevtime = time.time()
-        self.heartbeat = config.HEARTBEAT
+        self.heartbeat = config.config_data.getint('Everquest', 'HEARTBEAT')
 
         # timezone string for current computer
         self.current_tzname = time.tzname[time.daylight]

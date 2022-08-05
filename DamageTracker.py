@@ -615,13 +615,13 @@ class DamageTracker:
         self.spell_pending = None
 
         # combat timeout
-        self.combat_timeout = config.COMBAT_TIMEOUT_SEC
+        self.combat_timeout = config.config_data.getint('DamageTracker', 'COMBAT_TIMEOUT_SEC')
         self.slain_datetime = None
 
         # set of player names
         self.player_names_set = set()
         self.player_names_count = 0
-        self.player_names_fname = 'players.dat'
+        self.player_names_fname = 'EQValet-PlayerNames.dat'
         self.read_player_names()
 
         # set of pet names
@@ -793,7 +793,7 @@ class DamageTracker:
             # get current time and check for timeout
             now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
             elapsed_seconds = (now - self.spell_pending.event_datetime)
-            if elapsed_seconds.total_seconds() > config.SPELL_PENDING_TIMEOUT_SEC:
+            if elapsed_seconds.total_seconds() > config.config_data.geting('DamageTracker', 'SPELL_PENDING_TIMEOUT_SEC'):
                 # ...then this spell pending is expired
                 await self.client.send('*Spell ({}) no longer pending: Timed out*'.format(self.spell_pending.spell_name))
                 self.spell_pending = None

@@ -218,7 +218,7 @@ class RandomTracker:
         self.all_random_events = list()
 
         # default time a RandomEvent runs, collecting PlayerRandomRolls
-        self.default_window = config.DEFAULT_WINDOW
+        self.default_window = config.config_data.getint('RandomTracker', 'DEFAULT_WINDOW')
 
     # check if a random is occurring
     async def process_line(self, line):
