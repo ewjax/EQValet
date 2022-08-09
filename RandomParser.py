@@ -58,8 +58,8 @@ class PlayerRandomRoll:
 
         Args:
             you_name: Name of this character
-            high_list: a list of PlayerRandomRoll objects, representing the high roll(s) so far in a RandomEvent
-            first_timestamp: datetime object for the timestamp of the first random roll in a RandomEvent
+            high_list: a list of PlayerRandomRoll objects, representing the high roll(s) so far in a RandomGroup
+            first_timestamp: datetime object for the timestamp of the first random roll in a RandomGroup
 
         Returns:
             str: The full report buffer
@@ -83,7 +83,7 @@ class PlayerRandomRoll:
             rv += f' {minutes:>02}:{seconds:>02} |'
 
         if high_list:
-            # if self.player_roll(r.player_name) is None:
+            # if self.player_roll(prr.player_name) is None:
             for prr in high_list:
                 if self.player_name == prr.player_name:
                     rv += ' *HIGH*'
@@ -99,7 +99,7 @@ class PlayerRandomRoll:
         return rv
 
 
-class RandomEvent:
+class RandomGroup:
     """
     Class for many random rolls, to find random winners etc
 
@@ -144,7 +144,7 @@ class RandomEvent:
         Class to generate the header of a report
 
         Args:
-            ndx: Which random out of the list of RandomEvents
+            ndx: Which random out of the list of RandomGroups
 
         Returns:
             Report buffer with header information
@@ -203,7 +203,7 @@ class RandomEvent:
             - winner report
 
         Args:
-            ndx: index of which RandomEvent is to be edited
+            ndx: index of which RandomGroup is to be edited
             you_name: Name of this player
 
         Returns:
@@ -224,7 +224,7 @@ class RandomEvent:
             - winner report
 
         Args:
-            ndx: index of which RandomEvent is to be edited
+            ndx: index of which RandomGroup is to be edited
             you_name: Name of this player
 
         Returns:
@@ -264,18 +264,18 @@ class RandomEvent:
         Overload function to allow object to print() to screen in sensible manner, for debugging with print()
 
         Returns:
-            string representation of this RandomEvent
+            string representation of this RandomGroup
         """
         rv = self.report_header()
         for r in self.rolls:
             rv += r.report()
         return rv
 
-    # does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomEvent
+    # does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomGroup
     # returns True if this list toggles from NotExpired to Expired
     def check_expiration(self, line: str) -> bool:
         """
-        Does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomEvent
+        Does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomGroup
 
         Args:
             line: line containing the EQ timestamp to use for expiration calculation
@@ -289,12 +289,12 @@ class RandomEvent:
         if not self.expired:
             # ...and there is at least 1 roll in the list...
             if len(self.rolls) > 0:
-                # ...and the time stamp of the passed line parameter is outside the RandomEvent window duration...
+                # ...and the time stamp of the passed line parameter is outside the RandomGroup window duration...
                 try:
                     check_time = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                     elapsed_seconds = check_time - self.start_time_stamp
                     if elapsed_seconds.total_seconds() > self.delta_seconds:
-                        # ...then this RandomEvent is expired
+                        # ...then this RandomGroup is expired
                         self.expired = True
                         self.sort_descending_randoms()
                         rv = True
@@ -307,14 +307,14 @@ class RandomEvent:
     #
     # add a roll to the list
     # return True if roll is added, False if not added
-    def add_roll(self, r: PlayerRandomRoll) -> bool:
+    def add_roll(self, prr: PlayerRandomRoll) -> bool:
         """
         Add a roll to the list, assuming
             - high and low values match (if high/low are significant)
-            - that the timestamp of this roll is within the RandomEvent window
+            - that the timestamp of this roll is within the RandomGroup window
 
         Args:
-            r: PlayerRandomRoll to be added
+            prr: PlayerRandomRoll to be added
 
         Returns:
             Return True if roll is added, False if not added
@@ -322,27 +322,27 @@ class RandomEvent:
         rv = False
 
         # check if the random low and high limits match
-        if ((not self.low_significant) or (r.low == self.low)) and \
-                ((not self.high_significant) or (r.high == self.high)):
+        if ((not self.low_significant) or (prr.low == self.low)) and \
+                ((not self.high_significant) or (prr.high == self.high)):
 
             # the assumption is these will be loaded in sequential, time-increasing order,
             # i.e. the first one is the starting time for the random window
             if len(self.rolls) == 0:
-                self.start_time_stamp = r.time_stamp
+                self.start_time_stamp = prr.time_stamp
 
             # check if the timestamp to be added is in range
-            elapsed_seconds = r.time_stamp - self.start_time_stamp
+            elapsed_seconds = prr.time_stamp - self.start_time_stamp
             if elapsed_seconds.total_seconds() <= self.delta_seconds:
 
                 # check that this person hasn't already randomed
-                if self.player_roll(r.player_name) is None:
-                    self.rolls.append(r)
+                if self.player_roll(prr.player_name) is None:
+                    self.rolls.append(prr)
 
                     # print out a running list of the winner(s)
                     high_list: list[PlayerRandomRoll] = self.high_roll_list()
-                    prr: PlayerRandomRoll
-                    for prr in high_list:
-                        starprint(f'({self.low}-{self.high}): {prr.player_name}/{prr.random_value}', '>')
+                    rr: PlayerRandomRoll
+                    for rr in high_list:
+                        starprint(f'({self.low}-{self.high}): {rr.player_name}/{rr.random_value}', '>')
 
                     rv = True
 
@@ -377,7 +377,7 @@ class RandomEvent:
         high_roll = self.rolls[0].random_value
 
         # since there could be ties, add all high rolls to a list
-        rv = list()
+        rv: list[PlayerRandomRoll] = list()
         elem: PlayerRandomRoll
         for elem in self.rolls:
             if elem.random_value == high_roll:
@@ -404,6 +404,7 @@ class RandomEvent:
             The PlayerRandomRoll for this particular player
         """
         rv = None
+        r: PlayerRandomRoll
         for r in self.rolls:
             if player == r.player_name:
                 rv = r
@@ -413,7 +414,7 @@ class RandomEvent:
 #
 # Class to do all the random tracking work
 #
-class RandomTracker:
+class RandomParser:
     """
     Class to do all the random tracking work
     """
@@ -422,14 +423,14 @@ class RandomTracker:
     # ctor
     def __init__(self):
         """
-        RandomTracker ctor
+        RandomParser ctor
         """
         # list of all random rolls, and all RandomEvents
         self.all_rolls = list()
-        self.all_random_events = list()
+        self.all_random_groups = list()
 
-        # default time a RandomEvent runs, collecting PlayerRandomRolls
-        self.default_window = config.config_data.getint('RandomTracker', 'DEFAULT_WINDOW')
+        # default time a RandomGroup runs, collecting PlayerRandomRolls
+        self.default_window = config.config_data.getint('RandomParser', 'DEFAULT_WINDOW')
 
         # default is to parse for randoms
         self.parse = True
@@ -438,19 +439,19 @@ class RandomTracker:
     # check if a random is occurring
     def process_line(self, line: str) -> None:
         """
-        This function does all the parsing work for the RandomTracker class
+        This function does all the parsing work for the RandomParser class
 
         Args:
             line: current line from the EQ logfile being parsed
         """
 
         # begin by checking if any of the RandomEvents is due to expire
-        rev: RandomEvent
-        for (ndx, rev) in enumerate(self.all_random_events):
-            if not rev.expired:
-                toggled = rev.check_expiration(line)
+        rg: RandomGroup
+        for (ndx, rg) in enumerate(self.all_random_groups):
+            if not rg.expired:
+                toggled = rg.check_expiration(line)
                 if toggled:
-                    print(f'{rev.report_summary(ndx, config.elf.char_name)}')
+                    print(f'{rg.report_summary(ndx, config.elf.char_name)}')
 
         #
         # cut off the leading date-time stamp info
@@ -477,7 +478,7 @@ class RandomTracker:
         target = r'^\.win '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'RandomTracker grouping window (seconds) = {self.default_window}')
+            starprint(f'RandomParser grouping window (seconds) = {self.default_window}')
 
         # only do everything else if parsing is true
         if self.parse:
@@ -505,11 +506,11 @@ class RandomTracker:
             target = r'^\.roll '
             m = re.match(target, trunc_line)
             if m:
-                ndx = len(self.all_random_events) - 1
+                ndx = len(self.all_random_groups) - 1
                 self.random_report(ndx)
 
             #
-            # regroup randomevent N with new window W
+            # regroup RandomGroup N with new window W
             #
             target = r'^\.win\.(?P<ndx>[0-9]+)\.(?P<new_win>[0-9]+) '
             m = re.match(target, trunc_line)
@@ -518,11 +519,11 @@ class RandomTracker:
                 new_win = int(m.group('new_win'))
 
                 # is ndx in range
-                if len(self.all_random_events) == 0:
-                    starprint(f'Error:  No RandomEvents to regroup!')
+                if len(self.all_random_groups) == 0:
+                    starprint(f'Error:  No RandomGroups to regroup!')
 
-                elif (ndx < 0) or (ndx >= len(self.all_random_events)):
-                    starprint(f'Error:  Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_events) - 1}')
+                elif (ndx < 0) or (ndx >= len(self.all_random_groups)):
+                    starprint(f'Error:  Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_groups) - 1}')
 
                 elif new_win <= 0:
                     starprint(f'Error:  Requested new_window value = {new_win}.  Value for new_window must be > 0')
@@ -564,119 +565,119 @@ class RandomTracker:
                     self.all_rolls.append(roll)
 
                     added = False
-                    # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
-                    for rev in self.all_random_events:
-                        if not rev.expired:
-                            if rev.add_roll(roll):
+                    # add it to the appropriate RandomGroup - walk the list and try to add the roll to any open randomevents
+                    for rg in self.all_random_groups:
+                        if not rg.expired:
+                            if rg.add_roll(roll):
                                 added = True
                                 break
 
-                    # if the roll wasn't added, create a new RandomEvent to hold this one
+                    # if the roll wasn't added, create a new RandomGroup to hold this one
                     if not added:
-                        rev = RandomEvent(low, high, self.default_window)
-                        rev.add_roll(roll)
-                        self.all_random_events.append(rev)
+                        rg = RandomGroup(low, high, self.default_window)
+                        rg.add_roll(roll)
+                        self.all_random_groups.append(rg)
 
     #
-    # regroup random events with a new, different window than what the random events currently have
+    # regroup random groups with a new, different window than what the random events currently have
     def regroup(self, ndx: int = -1, new_window: int = 0, low_significant: bool = True, high_significant: bool = True) -> None:
         """
         Regroup random events with a new, different window than what the random events currently have
 
         Args:
-            ndx: Which RandomEvent to regroup
+            ndx: Which RandomGroup to regroup
             new_window: New window
             low_significant: Boolean to indicate if low value is significant in the grouping process
             high_significant: Boolean to indicate if the high value is significant in the grouping process
         """
         # is ndx in range
-        if len(self.all_random_events) == 0:
-            starprint(f'Error:  No RandomEvents to regroup!')
+        if len(self.all_random_groups) == 0:
+            starprint(f'Error:  No RandomGroups to regroup!')
 
-        elif (ndx < 0) or (ndx >= len(self.all_random_events)):
-            starprint(f'Error:  Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_events) - 1}')
+        elif (ndx < 0) or (ndx >= len(self.all_random_groups)):
+            starprint(f'Error:  Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_groups) - 1}')
         elif new_window <= 0:
             starprint(f'Error:  Requested new_window value = {new_window}.  Value for new_window must be > 0')
 
         else:
-            # grab the requested random event, and restore it to time-ascending order
-            old_rev: RandomEvent = self.all_random_events.pop(ndx)
+            # grab the requested random group, and restore it to time-ascending order
+            old_rev: RandomGroup = self.all_random_groups.pop(ndx)
 
             low = old_rev.low
             high = old_rev.high
             rolls = old_rev.rolls
 
-            # is the new, larger window overlapping into the next random event(s)?
+            # is the new, larger window overlapping into the next random group(s)?
             if new_window >= old_rev.delta_seconds:
-                while ndx < len(self.all_random_events):
-                    next_rev = self.all_random_events[ndx]
+                while ndx < len(self.all_random_groups):
+                    next_rev = self.all_random_groups[ndx]
                     # get delta t
                     delta_seconds = next_rev.start_time_stamp - old_rev.start_time_stamp
                     delta = delta_seconds.total_seconds()
-                    # does next random event and is within new time window?
+                    # does next random group and is within new time window?
                     # if ((low == next_rev.low) and (high == next_rev.high) and (delta <= new_window)):
                     if (not low_significant or low == next_rev.low) and \
                             (not high_significant or high == next_rev.high) and \
                             (delta <= new_window):
-                        # add the next randomm event rolls to the list of rolls to be sorted / readded
+                        # add the next randomm group rolls to the list of rolls to be sorted / re-added
                         rolls += next_rev.rolls
-                        self.all_random_events.pop(ndx)
+                        self.all_random_groups.pop(ndx)
                     else:
                         ndx += 1
 
             # sort the list of all rolls in time-ascenting order
             rolls.sort(key=lambda x: x.time_stamp)
 
-            # get all the rolls from the old random event(s)
+            # get all the rolls from the old random group(s)
             for r in rolls:
 
                 added = False
-                # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
-                rev: RandomEvent
-                for rev in self.all_random_events:
-                    if not rev.expired:
-                        rev.low_significant = low_significant
-                        rev.high_significant = high_significant
-                        if rev.add_roll(r):
+                # add it to the appropriate RandomGroup - walk the list and try to add the roll to any open randomgroups
+                rg: RandomGroup
+                for rg in self.all_random_groups:
+                    if not rg.expired:
+                        rg.low_significant = low_significant
+                        rg.high_significant = high_significant
+                        if rg.add_roll(r):
                             added = True
                             break
 
-                # if the roll wasn't added, create a new RandomEvent to hold this one
+                # if the roll wasn't added, create a new RandomGroup to hold this one
                 if not added:
-                    rev = RandomEvent(r.low, r.high, new_window, low_significant, high_significant)
-                    rev.add_roll(r)
-                    self.all_random_events.append(rev)
+                    rg = RandomGroup(r.low, r.high, new_window, low_significant, high_significant)
+                    rg.add_roll(r)
+                    self.all_random_groups.append(rg)
 
             # sort the event list to restore it to time-ascending order
-            self.all_random_events.sort(key=lambda x: x.start_time_stamp)
+            self.all_random_groups.sort(key=lambda x: x.start_time_stamp)
 
             # if not expired yet, these are the random events just added, so close them, sort them, report them
-            for (n, ev) in enumerate(self.all_random_events):
-                if not ev.expired:
-                    ev.expired = True
-                    ev.sort_descending_randoms()
-                    print(f'{ev.report_summary(n, config.elf.char_name)}')
+            for (n, rg) in enumerate(self.all_random_groups):
+                if not rg.expired:
+                    rg.expired = True
+                    rg.sort_descending_randoms()
+                    print(f'{rg.report_summary(n, config.elf.char_name)}')
 
     #
-    # show a report for one specific randomevent
+    # show a report for one specific randomgroup
     def random_report(self, ndx: int) -> None:
         """
-        Show a report for all random rolls in one specific randomevent
+        Show a report for all random rolls in one specific randomgroup
 
         Args:
-            ndx: Index into the array of all randomevents
+            ndx: Index into the array of all randomgroups
         """
         
         # is ndx in range
-        if (ndx >= 0) and (ndx < len(self.all_random_events)):
+        if (ndx >= 0) and (ndx < len(self.all_random_groups)):
 
-            # get the RandomEvent at ndx
-            rev: RandomEvent = self.all_random_events[ndx]
-            reportbuffer = rev.report_detail(ndx, config.elf.char_name)
+            # get the RandomGroup at ndx
+            rg: RandomGroup = self.all_random_groups[ndx]
+            reportbuffer = rg.report_detail(ndx, config.elf.char_name)
             print(f'{reportbuffer}')
 
         else:
-            starprint(f'Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(config.random_tracker.all_random_events) - 1}')
+            starprint(f'Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_groups) - 1}')
 
     #
     # show a report of all randomevents
@@ -694,12 +695,12 @@ class RandomTracker:
         reportbuffer += f'\n'
 
         reportbuffer += f'Total Rolls = {len(self.all_rolls)}\n'
-        reportbuffer += f'Total Random Events = {len(config.random_tracker.all_random_events)}\n'
+        reportbuffer += f'Total Random Groupss = {len(self.all_random_groups)}\n'
 
         # add the list of random events
-        rev: RandomEvent
-        for (ndx, rev) in enumerate(self.all_random_events):
-            reportbuffer += f'{rev.report_summary(ndx, config.elf.char_name)}'
+        rg: RandomGroup
+        for (ndx, rg) in enumerate(self.all_random_groups):
+            reportbuffer += f'{rg.report_summary(ndx, config.elf.char_name)}'
 
         reportbuffer += f'{"":{fill1}^{width}}\n'
 
@@ -777,8 +778,8 @@ def main():
     print(rr)
     print()
 
-    print('use RandomEvent class')
-    rl = RandomEvent(0, 1000, 30)
+    print('use RandomGroup class')
+    rl = RandomGroup(0, 1000, 30)
     r = PlayerRandomRoll('FirstRoll', 33, 0, 1000, line1)
     print(rl.add_roll(r))
     r = PlayerRandomRoll('HighRoller', 47, 0, 1000, line2)

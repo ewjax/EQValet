@@ -9,10 +9,10 @@ from discord.ext import commands
 # import the global config data
 import config
 
-import DamageTracker
 import EverquestLogFile
-import PetTracker
-import RandomTracker
+import DamageParser
+import PetParser
+import RandomParser
 from util import starprint
 
 # allow for testing, by forcing the bot to read an old log file
@@ -40,14 +40,14 @@ class EQValetClient(commands.Bot):
         # create the EQ log file parser
         config.elf = EverquestLogFile.EverquestLogFile()
 
-        # use a RandomTracker class to deal with all things random numbers and rolls
-        config.random_tracker = RandomTracker.RandomTracker()
+        # use a RandomParser class to deal with all things random numbers and rolls
+        config.random_tracker = RandomParser.RandomParser()
 
-        # use a DamageTracker class to keep track of total damage dealt by spells and by pets
-        config.damage_tracker = DamageTracker.DamageTracker()
+        # use a DamageParser class to keep track of total damage dealt by spells and by pets
+        config.damage_tracker = DamageParser.DamageParser()
 
-        # use a PetTracker class to deal with all things pets
-        config.pet_tracker = PetTracker.PetTracker()
+        # use a PetParser class to deal with all things pets
+        config.pet_tracker = PetParser.PetParser()
 
     # process each line
     async def process_line(self, line):
@@ -240,10 +240,10 @@ async def ran_rolls(ctx):
     #
     # # add total rolls, and total random events
     # sb.add('Total Rolls = {}\n'.format(len(config.random_tracker.all_rolls)))
-    # sb.add('Total Random Events = {}\n'.format(len(config.random_tracker.all_random_events)))
+    # sb.add('Total Random Events = {}\n'.format(len(config.random_tracker.all_random_groups)))
     #
     # # add the list of random events
-    # for (ndx, rev) in enumerate(config.random_tracker.all_random_events):
+    # for (ndx, rev) in enumerate(config.random_tracker.all_random_groups):
     #     sb.add('{}'.format(rev.report_summary(ndx, config.elf.char_name)))
     #
     # # get the list of buffers and send each to discord
@@ -254,18 +254,18 @@ async def ran_rolls(ctx):
 
 
 # show command
-# show all rolls in a specified RandomEvent
+# show all rolls in a specified RandomGroup
 @client.command(aliases=['show'])
 async def ran_show(ctx, ndx=-1):
     # print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
     #
     # # if the ndx value isn't specified, default to showing the last randomevent
     # if ndx == -1:
-    #     ndx = len(config.random_tracker.all_random_events) - 1
+    #     ndx = len(config.random_tracker.all_random_groups) - 1
     #
     # # is ndx in range
-    # if (ndx >= 0) and (ndx < len(config.random_tracker.all_random_events)):
-    #     rev = config.random_tracker.all_random_events[ndx]
+    # if (ndx >= 0) and (ndx < len(config.random_tracker.all_random_groups)):
+    #     rev = config.random_tracker.all_random_groups[ndx]
     #
     #     # create a smart buffer to keep buffers under max size for discord messages (2000)
     #     sb = SmartBuffer()
@@ -274,8 +274,8 @@ async def ran_show(ctx, ndx=-1):
     #     sb.add(rev.report_header(ndx))
     #
     #     # add all the rolls
-    #     for r in rev.rolls:
-    #         sb.add(r.report(config.elf.char_name))
+    #     for prr in rev.rolls:
+    #         sb.add(prr.report(config.elf.char_name))
     #
     #     # add the winner
     #     sb.add(rev.report_winner(config.elf.char_name))
@@ -286,23 +286,23 @@ async def ran_show(ctx, ndx=-1):
     #         await client.send('{}'.format(b))
     #
     # else:
-    #     await client.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(config.random_tracker.all_random_events) - 1))
+    #     await client.send('Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(config.random_tracker.all_random_groups) - 1))
     #     await client.send('Unspecified ndx value = shows most recent random event')
     pass
 
 
 # regroup command
-# allows user to change the delta window on any given RandomEvent
+# allows user to change the delta window on any given RandomGroup
 @client.command(aliases=['regroup'])
 async def ran_regroup(ctx, ndx=-1, new_window=0, low_significant=True, high_significant=True):
     # print('Command received: [{}] from [{}]'.format(ctx.message.content, ctx.message.author))
     #
     # # is ndx in range
-    # if len(config.random_tracker.all_random_events) == 0:
+    # if len(config.random_tracker.all_random_groups) == 0:
     #     await client.send('Error:  No RandomEvents to regroup!')
     #
-    # elif (ndx < 0) or (ndx >= len(config.random_tracker.all_random_events)):
-    #     await client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(config.random_tracker.all_random_events) - 1))
+    # elif (ndx < 0) or (ndx >= len(config.random_tracker.all_random_groups)):
+    #     await client.send('Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(config.random_tracker.all_random_groups) - 1))
     # elif new_window <= 0:
     #     await client.send(
     #         'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
@@ -323,11 +323,11 @@ async def ran_window(ctx, new_window=0):
     #         'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
     #
     # elif new_window == 0:
-    #     await client.send('RandomEvent default window = {}'.format(config.random_tracker.default_window))
+    #     await client.send('RandomGroup default window = {}'.format(config.random_tracker.default_window))
     #
     # else:
     #     config.random_tracker.default_window = new_window
-    #     await client.send('RandomEvent default window = {}'.format(config.random_tracker.default_window))
+    #     await client.send('RandomGroup default window = {}'.format(config.random_tracker.default_window))
     pass
 
 
@@ -389,11 +389,11 @@ async def com_timeout(ctx, new_cto=0):
     #     await client.send('Error:  Requested new_cto value = {}.  Value for new_cto must be > 0'.format(new_cto))
     #
     # elif new_cto == 0:
-    #     await client.send('DamageTracker combat timeout (CTO) = {}'.format(config.damage_tracker.combat_timeout))
+    #     await client.send('DamageParser combat timeout (CTO) = {}'.format(config.damage_tracker.combat_timeout))
     #
     # else:
     #     config.damage_tracker.combat_timeout = new_cto
-    #     await client.send('DamageTracker Combat timeout (CTO) = {}'.format(config.damage_tracker.combat_timeout))
+    #     await client.send('DamageParser Combat timeout (CTO) = {}'.format(config.damage_tracker.combat_timeout))
     pass
 
 

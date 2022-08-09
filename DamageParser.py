@@ -799,7 +799,7 @@ class Target:
 #
 # class to do all the damage tracking work
 #
-class DamageTracker:
+class DamageParser:
     """
     Class to do all the damage tracking work
     """
@@ -824,7 +824,7 @@ class DamageTracker:
         self.spell_pending = None
 
         # combat timeout
-        self.combat_timeout = config.config_data.getint('DamageTracker', 'COMBAT_TIMEOUT_SEC')
+        self.combat_timeout = config.config_data.getint('DamageParser', 'COMBAT_TIMEOUT_SEC')
         self.slain_datetime = None
 
         # set of player names
@@ -981,7 +981,7 @@ class DamageTracker:
         target = r'^\.cto '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'DamageTracker Combat timeout (CTO) = {self.combat_timeout}')
+            starprint(f'DamageParser Combat timeout (CTO) = {self.combat_timeout}')
 
         #
         # only do the rest if user is parsing combat damage
@@ -1093,7 +1093,7 @@ class DamageTracker:
                 # get current time and check for timeout
                 now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                 elapsed_seconds = (now - self.spell_pending.event_datetime)
-                if elapsed_seconds.total_seconds() > config.config_data.getint('DamageTracker', 'SPELL_PENDING_TIMEOUT_SEC'):
+                if elapsed_seconds.total_seconds() > config.config_data.getint('DamageParser', 'SPELL_PENDING_TIMEOUT_SEC'):
                     # ...then this spell pending is expired
                     starprint(f'Spell ({self.spell_pending.spell_name}) no longer pending: Timed out')
                     self.spell_pending = None
@@ -1869,7 +1869,7 @@ def main():
     # line4 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 25 points of damage.'
     # line44 = '[Mon Sep 06 14:01:11 2021] Goliathette slashes a stingtooth piranha for 125 points of damage.'
     # line45 = '[Mon Sep 06 14:01:11 2021] Goliathette hits a stingtooth piranha for 99 points of damage.'
-    # melee_target = r'^(?P<attacker_name>[\w` ]+) \
+    # melee_target = prr'^(?P<attacker_name>[\w` ]+) \
     #                (?P<dmg_type>(hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|kicks|backstabs)) \
     #                (?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'
     #
@@ -1928,7 +1928,7 @@ def main():
     #
     #
     # line5 = '[Wed Dec 01 21:08:15 2021] a stingtooth piranha was hit by non-melee for 315 points of damage.'
-    # non_melee_target = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
+    # non_melee_target = prr'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) points of damage'
     #
     # m = re.match(non_melee_target, line5[27:], re.IGNORECASE)
     # if m:

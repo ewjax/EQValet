@@ -106,7 +106,7 @@ class Pet:
 #
 # class to do all the pet tracking work
 #
-class PetTracker:
+class PetParser:
     """
     Class to do all the pet tracking work
     """

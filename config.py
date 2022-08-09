@@ -1,5 +1,7 @@
 import configparser
 
+from util import starprint
+
 # global data
 
 # begin by reading in the config data
@@ -34,4 +36,4 @@ def load() -> None:
         print(f'[{section}]')
         for key in config_data[section]:
             val = config_data[section][key]
-            print(f'    {key} = {val}')
+            starprint(f'    {key} = {val}')
