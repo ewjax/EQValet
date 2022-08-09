@@ -5,6 +5,8 @@ from datetime import datetime
 # import the global config data
 import config
 
+from util import starprint
+
 
 class PlayerRandomRoll:
     """class for a single random roll by a particular player
@@ -16,10 +18,18 @@ class PlayerRandomRoll:
         and the timestamp of the roll
     """
 
+    #
     # ctor
-    def __init__(self, player_name, random_value, low, high, eq_timestamp):
-        """the eq_timestamp must at least include the leading [0:26] time stamp characters from the log file line,
-        or it can also just be the entire line
+    def __init__(self, player_name: str, random_value: int, low: int, high: int, eq_timestamp: str) -> None:
+        """
+        ctor
+
+        Args:
+            player_name: Name of the player
+            random_value: The value of this particular random roll
+            low: The low value of the random range
+            high: The high value of the random range
+            eq_timestamp: EQ timestamp, e.g. '[Thu Oct 28 15:24:13 2021]' (or the whole line)
         """
 
         self.player_name = player_name
@@ -30,34 +40,68 @@ class PlayerRandomRoll:
         # create a datetime object, using the very capable strptime() parsing function built into the datetime module
         self.time_stamp = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
 
+    #
+    #
     def __repr__(self):
-        """overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+        """
+        Overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
         """
         return (
             '({}, {}, {}, {}, {})'.format(self.player_name, self.random_value, self.low, self.high, self.time_stamp))
 
-    def report(self, boldname=''):
-        """to make bold text in a Discord message, surround it with double asterisks, i.e. **Example**
+    #
+    #
+    def report(self, you_name: str = '', high_list: list = None, first_timestamp: datetime = None) -> str:
+        """
+        To make bold text in a Discord message, surround it with double asterisks, i.e. **Example**
+        For terminal window, simply append on ' <-- You' indicator
+
+        Args:
+            you_name: Name of this character
+            high_list: a list of PlayerRandomRoll objects, representing the high roll(s) so far in a RandomEvent
+            first_timestamp: datetime object for the timestamp of the first random roll in a RandomEvent
+
+        Returns:
+            str: The full report buffer
         """
 
         rv = ''
-        if self.player_name.casefold() == boldname.casefold():
-            rv += '**'
+        if self.player_name.casefold() == you_name.casefold():
+            # discord indicates emphasis with 2x leading and trailing stars
+            # rv += '**'
+            # for a terminal window, we will simply append on an additional '<-- You' marker
+            # rv += '['
+            pass
 
-        rv += '--Player: {} | Random: {} | Range: [{}-{}] | Time: {}\n'.format(self.player_name,
-                                                                               self.random_value,
-                                                                               self.low,
-                                                                               self.high,
-                                                                               self.time_stamp)
+        rv += f'{self.player_name:>15} | Value: {self.random_value:>5} | Range: [{self.low:>5}-{self.high:>5}] | {self.time_stamp} |'
 
-        if self.player_name.casefold() == boldname.casefold():
-            rv += '**'
+        # if the first timestamp parameter is passed
+        if first_timestamp:
+            elapsed_seconds = self.time_stamp - first_timestamp
+            minutes = int(elapsed_seconds.total_seconds() // 60)
+            seconds = int(elapsed_seconds.total_seconds() % 60)
+            rv += f' {minutes:>02}:{seconds:>02} |'
+
+        if high_list:
+            # if self.player_roll(r.player_name) is None:
+            for prr in high_list:
+                if self.player_name == prr.player_name:
+                    rv += ' *HIGH*'
+
+        if self.player_name.casefold() == you_name.casefold():
+            # discord indicates emphasis with 2x leading and trailing stars
+            # rv += '**'
+            # for a terminal window, we will simply append on an additional '<-- You' marker
+            rv += ' <--You'
+
+        rv += '\n'
 
         return rv
 
 
 class RandomEvent:
-    """class for many random rolls, to find random winners etc
+    """
+    Class for many random rolls, to find random winners etc
 
     every roll in the list must:
       - have same range (low, high) (if low_significant and high_significant parameters are True)
@@ -67,23 +111,55 @@ class RandomEvent:
       - players can only random once.  any subsequent random will not be added to the RandomList
     """
 
+    #
     # ctor
-    def __init__(self, low, high, delta_seconds, low_significant=True, high_significant=True):
+    def __init__(self, low: int, high: int, delta_seconds: int, low_significant: bool = True, high_significant: bool = True) -> None:
+        """
+        Class for a particular set of random rolls (PlayerRandomRoll objects)
 
+        Args:
+            low: The low value of the random range
+            high: The high value of the random range
+            delta_seconds: How many seconds to aggregate PlayerRandomRoll's together
+            low_significant: Yes/No whether the low value is significant in the grouping logic
+            high_significant: Yes/No whether the high value is significant in the grouping logic
+        """
         self.low = int(low)
         self.low_significant = low_significant
         self.high = int(high)
         self.high_significant = high_significant
         self.delta_seconds = int(delta_seconds)
 
+        # list of player random rolls
         self.rolls = list()
         self.start_time_stamp = None
 
         # flag to indicate whether this list is open for adding rolls
         self.expired = False
 
-    def report_header(self, ndx=-1):
-        rv = '[Index {}]: ==============================================================\n'.format(ndx)
+    #
+    #
+    def report_header(self, ndx: int = -1) -> str:
+        """
+        Class to generate the header of a report
+
+        Args:
+            ndx: Which random out of the list of RandomEvents
+
+        Returns:
+            Report buffer with header information
+        """
+
+        # example header
+        # Index[24]..........................................................................................
+        # Range: [150 - 999] | Rolls: 1 | Start Time: 2022 - 01 - 1500: 14:35 | Delta(seconds): 60
+
+        width = config.REPORT_WIDTH
+        fill = '.'
+
+        rv = '\n'
+        leader = f'Index [{ndx}]'
+        rv += f'{leader:{fill}<{width}}\n'
 
         ll = '?'
         if self.low_significant:
@@ -91,25 +167,105 @@ class RandomEvent:
         hh = '?'
         if self.high_significant:
             hh = str(self.high)
-        rv += 'Range: [{}-{}] | Rolls: {} | Start Time: {} | Delta (seconds): {}\n'.format(ll, hh,
-                                                                                           len(self.rolls),
-                                                                                           self.start_time_stamp,
-                                                                                           self.delta_seconds)
+        rv += f'Range: [{ll}-{hh}] | Rolls: {len(self.rolls)} | Start Time: {self.start_time_stamp} | Delta (seconds): {self.delta_seconds}\n'
         return rv
 
-    def report_winner(self, boldname=''):
-        rv = 'Winner(s):\n'
-        for r in self.winner():
-            rv += r.report(boldname)
+    #
+    #
+    def report_winner(self, you_name: str = '') -> str:
+        """
+        Add the random winner(s) to the report
+
+        Args:
+            you_name: Name of this player
+
+        Returns:
+            Report buffer containing winner(s) info
+        """
+
+        # example of the winner report
+        # Winner(s):
+        # Ceit | Roll: 627 | Range: [0 - 999] | 2022 - 01 - 1500: 14:38 * HIGH *
+        
+        rv = f'Winner(s):\n'
+        prr: PlayerRandomRoll
+        high_list: list[PlayerRandomRoll] = self.high_roll_list()
+        for prr in high_list:
+            rv += f'{prr.report(you_name, high_list)}'
         return rv
 
-    def report_summary(self, ndx=-1, boldname=''):
+    #
+    #
+    def report_summary(self, ndx: int = -1, you_name: str = '') -> str:
+        """
+        Provide a report summary, consisting of
+            - header report
+            - winner report
+
+        Args:
+            ndx: index of which RandomEvent is to be edited
+            you_name: Name of this player
+
+        Returns:
+            Report buffer containing the summary report
+        """
+
         rv = self.report_header(ndx)
-        rv += self.report_winner(boldname)
+        rv += self.report_winner(you_name)
         return rv
 
+    #
+    #
+    def report_detail(self, ndx: int, you_name: str = '') -> str:
+        """
+        Provide a detailed report, consisting of
+            - header report
+            - one line for each PLayerRandomRoll
+            - winner report
+
+        Args:
+            ndx: index of which RandomEvent is to be edited
+            you_name: Name of this player
+
+        Returns:
+            Report buffer containing the detail report
+        """
+
+        rv = ''
+
+        # add the header report
+        rv += self.report_header(ndx)
+
+        # add all the individual PlayerRandomRolls
+        prr: PlayerRandomRoll
+        high_list: list[PlayerRandomRoll] = self.high_roll_list()
+
+        # the prev line sorted the list in descending random order, to find the winner list
+        # re-sort the list back into ascending timestamp order
+        self.sort_ascending_timestamps()
+
+        # get timestamp of first roll
+        first_timestamp = self.rolls[0].time_stamp
+
+        # add each individual PlayerRandomRoll report
+        for prr in self.rolls:
+            rv += prr.report(you_name, high_list, first_timestamp)
+
+        # add the winner report
+        rv += self.report_winner(you_name)
+
+        # return complete report
+        return rv
+
+    #
     # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Overload function to allow object to print() to screen in sensible manner, for debugging with print()
+
+        Returns:
+            string representation of this RandomEvent
+        """
         rv = self.report_header()
         for r in self.rolls:
             rv += r.report()
@@ -117,8 +273,16 @@ class RandomEvent:
 
     # does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomEvent
     # returns True if this list toggles from NotExpired to Expired
-    def check_expiration(self, line):
+    def check_expiration(self, line: str) -> bool:
+        """
+        Does this list need to expire?  check timestamp of the passed line vs the delta window of this RandomEvent
 
+        Args:
+            line: line containing the EQ timestamp to use for expiration calculation
+
+        Returns:
+            Returns True if this list toggles from NotExpired to Expired
+        """
         rv = False
 
         # currently not expired...
@@ -143,9 +307,18 @@ class RandomEvent:
     #
     # add a roll to the list
     # return True if roll is added, False if not added
-    #
-    def add_roll(self, r):
+    def add_roll(self, r: PlayerRandomRoll) -> bool:
+        """
+        Add a roll to the list, assuming
+            - high and low values match (if high/low are significant)
+            - that the timestamp of this roll is within the RandomEvent window
 
+        Args:
+            r: PlayerRandomRoll to be added
+
+        Returns:
+            Return True if roll is added, False if not added
+        """
         rv = False
 
         # check if the random low and high limits match
@@ -164,27 +337,48 @@ class RandomEvent:
                 # check that this person hasn't already randomed
                 if self.player_roll(r.player_name) is None:
                     self.rolls.append(r)
+
+                    # print out a running list of the winner(s)
+                    high_list: list[PlayerRandomRoll] = self.high_roll_list()
+                    prr: PlayerRandomRoll
+                    for prr in high_list:
+                        starprint(f'({self.low}-{self.high}): {prr.player_name}/{prr.random_value}', '>')
+
                     rv = True
 
         # true if added, false otherwise
         return rv
 
+    #
     # sort the rolls in descending order, so high roll(s) is at start of list
-    def sort_descending_randoms(self):
+    def sort_descending_randoms(self) -> None:
+        """
+        Sort the rolls in descending order, so high roll(s) is at start of list
+        """
         self.rolls.sort(key=lambda x: x.random_value, reverse=True)
 
+    #
     # sort the rolls in ascending time order
-    def sort_ascending_timestamps(self):
+    def sort_ascending_timestamps(self) -> None:
+        """
+        Sort the rolls in ascending time order
+        """
         self.rolls.sort(key=lambda x: x.time_stamp)
 
+    #
     # return high roll(s) in a list()
-    def winner(self):
+    def high_roll_list(self) -> list[PlayerRandomRoll]:
+        """
+        Returns:
+            Return high roll(s) in a list()
+        """
         # get high roll to start of list and save the value
         self.sort_descending_randoms()
         high_roll = self.rolls[0].random_value
 
         # since there could be ties, add all high rolls to a list
         rv = list()
+        elem: PlayerRandomRoll
         for elem in self.rolls:
             if elem.random_value == high_roll:
                 rv.append(elem)
@@ -196,7 +390,19 @@ class RandomEvent:
     # not particularly efficient since it just brute force visits every member in the list,
     # but the number of rollers is really never that high,
     # so in this case, simplicity wins over a very slight inefficiency
-    def player_roll(self, player):
+    def player_roll(self, player: str) -> PlayerRandomRoll:
+        """
+        Walk the list and return the roll for a particular player.
+        Not particularly efficient since it just brute force visits every member in the list,
+        but the number of rollers is really never that high, so in this case, simplicity
+        wins over a very slight inefficiency
+
+        Args:
+            player: Name of the player
+
+        Returns:
+            The PlayerRandomRoll for this particular player
+        """
         rv = None
         for r in self.rolls:
             if player == r.player_name:
@@ -204,15 +410,20 @@ class RandomEvent:
         return rv
 
 
+#
+# Class to do all the random tracking work
+#
 class RandomTracker:
-    """class to do all the random tracking work"""
+    """
+    Class to do all the random tracking work
+    """
 
+    #
     # ctor
-    def __init__(self, client):
-
-        # pointer to the discord client for comms
-        self.client = client
-
+    def __init__(self):
+        """
+        RandomTracker ctor
+        """
         # list of all random rolls, and all RandomEvents
         self.all_rolls = list()
         self.all_random_events = list()
@@ -220,73 +431,172 @@ class RandomTracker:
         # default time a RandomEvent runs, collecting PlayerRandomRolls
         self.default_window = config.config_data.getint('RandomTracker', 'DEFAULT_WINDOW')
 
+        # default is to parse for randoms
+        self.parse = True
+
+    #
     # check if a random is occurring
-    async def process_line(self, line):
+    def process_line(self, line: str) -> None:
+        """
+        This function does all the parsing work for the RandomTracker class
+
+        Args:
+            line: current line from the EQ logfile being parsed
+        """
 
         # begin by checking if any of the RandomEvents is due to expire
+        rev: RandomEvent
         for (ndx, rev) in enumerate(self.all_random_events):
             if not rev.expired:
                 toggled = rev.check_expiration(line)
                 if toggled:
-                    await self.client.send('{}'.format(rev.report_summary(ndx, self.client.elf.char_name)))
+                    print(f'{rev.report_summary(ndx, config.elf.char_name)}')
 
+        #
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
-        target1 = '\*\*A Magic Die is rolled by (?P<playername>[\w ]+)\.'
-        target2 = '\*\*It could have been any number from (?P<low>[0-9]+) to (?P<high>[0-9]+), but this time it turned up a (?P<value>[0-9]+)\.'
 
-        # return value m is either None of an object with information about the RE search
-        m = re.match(target1, trunc_line)
+        #
+        # check for toggling the parse on/off
+        #
+        target = r'^\.rt '
+        m = re.match(target, trunc_line)
         if m:
+            if self.parse:
+                self.parse = False
+                onoff = 'Off'
+            else:
+                self.parse = True
+                onoff = 'On'
 
-            # fetch the player name
-            player = m.group('playername')
+            starprint(f'Random Parsing: {onoff}')
 
-            # get next line
-            line = self.client.elf.readline()
-            print(line, end='')
-            trunc_line = line[27:]
+        #
+        # report the current value of window
+        #
+        target = r'^\.win '
+        m = re.match(target, trunc_line)
+        if m:
+            starprint(f'RandomTracker grouping window (seconds) = {self.default_window}')
 
-            # fetch the low, high, and value numbers
-            m = re.match(target2, trunc_line)
+        # only do everything else if parsing is true
+        if self.parse:
+
+            #
+            # show a summary of all randomevents
+            #
+            target = r'^\.rolls '
+            m = re.match(target, trunc_line)
             if m:
-                low = m.group('low')
-                high = m.group('high')
-                value = m.group('value')
+                self.all_randoms_report()
 
-                # create the roll object
-                roll = PlayerRandomRoll(player, value, low, high, line)
+            #
+            # show a detailed report of one particular randomevent
+            #
+            target = r'^\.roll\.(?P<ndx>[0-9]+) '
+            m = re.match(target, trunc_line)
+            if m:
+                ndx = int(m.group('ndx'))
+                self.random_report(ndx)
 
-                # add it to the list of all rolls
-                self.all_rolls.append(roll)
+            #
+            # show the last randomevent
+            #
+            target = r'^\.roll '
+            m = re.match(target, trunc_line)
+            if m:
+                ndx = len(self.all_random_events) - 1
+                self.random_report(ndx)
 
-                added = False
-                # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
-                for rev in self.all_random_events:
-                    if not rev.expired:
-                        if rev.add_roll(roll):
-                            added = True
-                            break
+            #
+            # regroup randomevent N with new window W
+            #
+            target = r'^\.win\.(?P<ndx>[0-9]+)\.(?P<new_win>[0-9]+) '
+            m = re.match(target, trunc_line)
+            if m:
+                ndx = int(m.group('ndx'))
+                new_win = int(m.group('new_win'))
 
-                # if the roll wasn't added, create a new RandomEvent to hold this one
-                if not added:
-                    rev = RandomEvent(low, high, self.default_window)
-                    rev.add_roll(roll)
-                    self.all_random_events.append(rev)
+                # is ndx in range
+                if len(self.all_random_events) == 0:
+                    starprint(f'Error:  No RandomEvents to regroup!')
 
+                elif (ndx < 0) or (ndx >= len(self.all_random_events)):
+                    starprint(f'Error:  Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_events) - 1}')
+
+                elif new_win <= 0:
+                    starprint(f'Error:  Requested new_window value = {new_win}.  Value for new_window must be > 0')
+
+                else:
+                    self.regroup(ndx, new_win)
+
+            #
+            # check for a random roll
+            #
+            target1 = '\\*\\*A Magic Die is rolled by (?P<playername>[\\w ]+)\\.'
+            target2 = '\\*\\*It could have been any number from (?P<low>[0-9]+) to (?P<high>[0-9]+), ' \
+                      'but this time it turned up a (?P<value>[0-9]+)\\.'
+
+            # return value m is either None of an object with information about the RE search
+            m = re.match(target1, trunc_line)
+            if m:
+
+                # fetch the player name
+                player = m.group('playername')
+
+                # get next line
+                line = config.elf.readline()
+                # print(line, end='')
+                trunc_line = line[27:]
+
+                # fetch the low, high, and value numbers
+                m = re.match(target2, trunc_line)
+                if m:
+                    low = m.group('low')
+                    high = m.group('high')
+                    value = m.group('value')
+
+                    # create the roll object
+                    roll = PlayerRandomRoll(player, value, low, high, line)
+                    starprint(f'Random: {roll.report("")}')
+
+                    # add it to the list of all rolls
+                    self.all_rolls.append(roll)
+
+                    added = False
+                    # add it to the appropriate RandomEvent - walk the list and try to add the roll to any open randomevents
+                    for rev in self.all_random_events:
+                        if not rev.expired:
+                            if rev.add_roll(roll):
+                                added = True
+                                break
+
+                    # if the roll wasn't added, create a new RandomEvent to hold this one
+                    if not added:
+                        rev = RandomEvent(low, high, self.default_window)
+                        rev.add_roll(roll)
+                        self.all_random_events.append(rev)
+
+    #
     # regroup random events with a new, different window than what the random events currently have
-    async def regroup(self, ndx=-1, new_window=0, low_significant=True, high_significant=True):
+    def regroup(self, ndx: int = -1, new_window: int = 0, low_significant: bool = True, high_significant: bool = True) -> None:
+        """
+        Regroup random events with a new, different window than what the random events currently have
 
+        Args:
+            ndx: Which RandomEvent to regroup
+            new_window: New window
+            low_significant: Boolean to indicate if low value is significant in the grouping process
+            high_significant: Boolean to indicate if the high value is significant in the grouping process
+        """
         # is ndx in range
         if len(self.all_random_events) == 0:
-            await self.client.send('Error:  No RandomEvents to regroup!')
+            starprint(f'Error:  No RandomEvents to regroup!')
 
         elif (ndx < 0) or (ndx >= len(self.all_random_events)):
-            await self.client.send(
-                'Error:  Requested ndx value = {}.  Value for ndx must be between 0 and {}'.format(ndx, len(self.all_random_events) - 1))
+            starprint(f'Error:  Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(self.all_random_events) - 1}')
         elif new_window <= 0:
-            await self.client.send(
-                'Error:  Requested new_window value = {}.  Value for new_window must be > 0'.format(new_window))
+            starprint(f'Error:  Requested new_window value = {new_window}.  Value for new_window must be > 0')
 
         else:
             # grab the requested random event, and restore it to time-ascending order
@@ -345,7 +655,55 @@ class RandomTracker:
                 if not ev.expired:
                     ev.expired = True
                     ev.sort_descending_randoms()
-                    await self.client.send('{}'.format(ev.report_summary(n, self.client.elf.char_name)))
+                    print(f'{ev.report_summary(n, config.elf.char_name)}')
+
+    #
+    # show a report for one specific randomevent
+    def random_report(self, ndx: int) -> None:
+        """
+        Show a report for all random rolls in one specific randomevent
+
+        Args:
+            ndx: Index into the array of all randomevents
+        """
+        
+        # is ndx in range
+        if (ndx >= 0) and (ndx < len(self.all_random_events)):
+
+            # get the RandomEvent at ndx
+            rev: RandomEvent = self.all_random_events[ndx]
+            reportbuffer = rev.report_detail(ndx, config.elf.char_name)
+            print(f'{reportbuffer}')
+
+        else:
+            starprint(f'Requested ndx value = {ndx}.  Value for ndx must be between 0 and {len(config.random_tracker.all_random_events) - 1}')
+
+    #
+    # show a report of all randomevents
+    def all_randoms_report(self) -> None:
+        """
+        Show a report of all randomevents
+        """
+
+        width = config.REPORT_WIDTH
+        fill1 = '-'
+        fill2 = '='
+
+        reportbuffer = f'{"":{fill2}^{width}}\n'
+        reportbuffer += f'{"Summary of all randoms":^{width}}'
+        reportbuffer += f'\n'
+
+        reportbuffer += f'Total Rolls = {len(self.all_rolls)}\n'
+        reportbuffer += f'Total Random Events = {len(config.random_tracker.all_random_events)}\n'
+
+        # add the list of random events
+        rev: RandomEvent
+        for (ndx, rev) in enumerate(self.all_random_events):
+            reportbuffer += f'{rev.report_summary(ndx, config.elf.char_name)}'
+
+        reportbuffer += f'{"":{fill1}^{width}}\n'
+
+        print(f'{reportbuffer}')
 
 
 def main():
@@ -444,7 +802,7 @@ def main():
     print()
 
     print('roll winner')
-    print(rl.winner())
+    print(rl.high_roll_list())
     print()
 
     print('DoubleRoller roll')

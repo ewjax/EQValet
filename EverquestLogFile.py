@@ -18,13 +18,10 @@ class EverquestLogFile:
     #
     # ctor
     #
-    def __init__(self, char_name):
+    def __init__(self, char_name: str = '') -> None:
 
         # instance data
-        # self.base_directory = config.BASE_DIRECTORY
         self.base_directory = config.config_data.get('Everquest', 'BASE_DIRECTORY')
-
-        # self.logs_directory = config.LOGS_DIRECTORY
         self.logs_directory = config.config_data.get('Everquest', 'LOGS_DIRECTORY')
 
         self.char_name = char_name
@@ -75,7 +72,7 @@ class EverquestLogFile:
         # note that backslashes in regular expressions are double-double-backslashes
         # this expression replaces double \\ with quadruple \\\\, as well as the filename mask asterisk to a
         # named regular expression
-        charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\w ]+)_')
+        charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\\w ]+)_')
         m = re.match(charname_regexp, latest_file)
         char_name = m.group('charname')
 

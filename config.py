@@ -1,13 +1,26 @@
 import configparser
 
-
 # global data
 
 # begin by reading in the config data
 config_data = configparser.ConfigParser()
 
+# the EverquestLogFile object
+elf = None
+
+# various trackers
+random_tracker = None
+damage_tracker = None
+pet_tracker = None
+
+# report width
+REPORT_WIDTH = 100
+
 
 def load() -> None:
+    """
+    Utility function to load contents from .ini file into a configparser.ConfigParser object
+    """
     global config_data
 
     ini_filename = 'EQValet.ini'
