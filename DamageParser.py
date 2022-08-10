@@ -7,7 +7,6 @@ from datetime import datetime
 
 import config
 from util import starprint
-
 from CaseInsensitiveDict import CaseInsensitiveDict
 
 
@@ -226,7 +225,7 @@ class DotSpell(DamageEvent):
             spell_name: Name of the spell
             max_duration_sec: Maximum duration (seconds)
             landed_message: Message when spell successfully lands on target
-            faded_message: is an opportunity to provide a custom message. Passing 'None' will cause the default faded message to be set to 'Your XXX spell has worn off'
+            faded_message: Custom faded message. Passing 'None' will cause the default faded message to be set to 'Your XXX spell has worn off'
             aoe: is this spell AOE
         """
         DamageEvent.__init__(self)
@@ -1112,7 +1111,7 @@ class DamageParser:
                     target_name = m.group('target_name')
 
                     # set the attacker name to the player name
-                    attacker_name = config.elf.char_name
+                    attacker_name = config.the_valet.elf.char_name
 
                     # any damage event indicates we are in combat
                     the_target = self.get_target(target_name)
@@ -1146,7 +1145,7 @@ class DamageParser:
             #
             for targ in self.active_target_dict.values():
                 if targ.in_combat:
-                    attacker_name = config.elf.char_name
+                    attacker_name = config.the_valet.elf.char_name
                     de_list = targ.incoming_damage_events_dict.get(attacker_name)
                     # for each event in the player's DE list
                     if de_list:
@@ -1186,11 +1185,11 @@ class DamageParser:
 
                 # set the attacker name
                 # will usually be player name, unless, this message is from a pet lifetap
-                attacker_name = config.elf.char_name
+                attacker_name = config.the_valet.elf.char_name
                 if damage < 100:
-                    if config.pet_tracker.current_pet:
-                        if config.pet_tracker.current_pet.lifetap_pending:
-                            attacker_name = config.pet_tracker.pet_name()
+                    if config.the_valet.pet_parser.current_pet:
+                        if config.the_valet.pet_parser.current_pet.lifetap_pending:
+                            attacker_name = config.the_valet.pet_parser.pet_name()
 
                 # any damage event indicates we are in combat
                 the_target = self.get_target(target_name)
@@ -1233,7 +1232,7 @@ class DamageParser:
             if m:
 
                 # extract RE data
-                attacker_name = config.elf.char_name
+                attacker_name = config.the_valet.elf.char_name
                 dmg_type = m.group('dmg_type')
                 target_name = m.group('target_name')
                 damage = int(m.group('damage'))
@@ -1319,14 +1318,14 @@ class DamageParser:
                 # [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
 
                 # get next line - many dashes
-                nextline = config.elf.readline()
+                nextline = config.the_valet.elf.readline()
                 # print(nextline, end='')
 
                 # read all the name(s) in the /who report
                 while processing_names:
 
                     # get next line
-                    nextline = config.elf.readline()
+                    nextline = config.the_valet.elf.readline()
                     # print(nextline, end='')
                     trunc_line = nextline[27:]
 

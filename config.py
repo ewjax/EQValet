@@ -7,13 +7,8 @@ from util import starprint
 # begin by reading in the config data
 config_data = configparser.ConfigParser()
 
-# the EverquestLogFile object
-elf = None
-
-# various trackers
-random_tracker = None
-damage_tracker = None
-pet_tracker = None
+# global instance of the EQValet class
+the_valet = None
 
 # report width
 REPORT_WIDTH = 100
@@ -33,7 +28,7 @@ def load() -> None:
     # print out the contents
     print(f'{ini_filename} loaded')
     for section in config_data.sections():
-        print(f'[{section}]')
+        starprint(f'[{section}]')
         for key in config_data[section]:
             val = config_data[section][key]
             starprint(f'    {key} = {val}')

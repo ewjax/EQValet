@@ -158,7 +158,7 @@ class RandomGroup:
         fill = '.'
 
         rv = '\n'
-        leader = f'Index [{ndx}]'
+        leader = f'Group Index: [{ndx}]'
         rv += f'{leader:{fill}<{width}}\n'
 
         ll = '?'
@@ -451,7 +451,7 @@ class RandomParser:
             if not rg.expired:
                 toggled = rg.check_expiration(line)
                 if toggled:
-                    print(f'{rg.report_summary(ndx, config.elf.char_name)}')
+                    print(f'{rg.report_summary(ndx, config.the_valet.elf.char_name)}')
 
         #
         # cut off the leading date-time stamp info
@@ -478,7 +478,17 @@ class RandomParser:
         target = r'^\.win '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'RandomParser grouping window (seconds) = {self.default_window}')
+            starprint(f'RandomParser default grouping window: {self.default_window} seconds')
+
+        #
+        # change default grouping window
+        #
+        target = r'^\.win\.(?P<new_win>[0-9]+) '
+        m = re.match(target, trunc_line)
+        if m:
+            ndx = int(m.group('new_win'))
+            self.default_window = ndx
+            starprint(f'RandomParser new default grouping window: {self.default_window} seconds')
 
         # only do everything else if parsing is true
         if self.parse:
@@ -529,6 +539,7 @@ class RandomParser:
                     starprint(f'Error:  Requested new_window value = {new_win}.  Value for new_window must be > 0')
 
                 else:
+                    starprint(f'Changing group [{ndx}] to new grouping window of [{new_win}], and rearranging groups as needed')
                     self.regroup(ndx, new_win)
 
             #
@@ -546,7 +557,7 @@ class RandomParser:
                 player = m.group('playername')
 
                 # get next line
-                line = config.elf.readline()
+                line = config.the_valet.elf.readline()
                 # print(line, end='')
                 trunc_line = line[27:]
 
@@ -656,7 +667,7 @@ class RandomParser:
                 if not rg.expired:
                     rg.expired = True
                     rg.sort_descending_randoms()
-                    print(f'{rg.report_summary(n, config.elf.char_name)}')
+                    print(f'{rg.report_summary(n, config.the_valet.elf.char_name)}')
 
     #
     # show a report for one specific randomgroup
@@ -673,7 +684,7 @@ class RandomParser:
 
             # get the RandomGroup at ndx
             rg: RandomGroup = self.all_random_groups[ndx]
-            reportbuffer = rg.report_detail(ndx, config.elf.char_name)
+            reportbuffer = rg.report_detail(ndx, config.the_valet.elf.char_name)
             print(f'{reportbuffer}')
 
         else:
@@ -700,7 +711,7 @@ class RandomParser:
         # add the list of random events
         rg: RandomGroup
         for (ndx, rg) in enumerate(self.all_random_groups):
-            reportbuffer += f'{rg.report_summary(ndx, config.elf.char_name)}'
+            reportbuffer += f'{rg.report_summary(ndx, config.the_valet.elf.char_name)}'
 
         reportbuffer += f'{"":{fill1}^{width}}\n'
 
