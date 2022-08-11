@@ -38,7 +38,8 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
     # process each line
     def process_line(self, line):
-        # print(line, end='')
+        # call parent to edit every line, the default behavior
+        # super().process_line(line)
 
         #
         # check for general commands
