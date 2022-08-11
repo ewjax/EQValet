@@ -11,7 +11,6 @@ from util import starprint
 # TEST_ELF = False
 TEST_ELF = True
 
-
 class EverquestLogFile(threading.Thread):
     """
     class to encapsulate Everquest log file operations.
@@ -30,10 +29,11 @@ class EverquestLogFile(threading.Thread):
         """
         ctor
 
-        :param base_directory: Base installation directory for Everquest
-        :param logs_directory: Logs directory, typically '\\logs\\'
-        :param server_name: Name of the server, i.e. 'P1999Green'
-        :param heartbeat: Number of seconds of logfile inactivity before a check is made to re-determine most recent logfile
+        Args:
+            base_directory: Base installation directory for Everquest
+            logs_directory: Logs directory, typically '\\logs\\'
+            server_name: Name of the server, i.e. 'P1999Green'
+            heartbeat: Number of seconds of logfile inactivity before a check is made to re-determine most recent logfile
         """
         # parent ctor
         # the daemon=True parameter causes this child thread object to terminate
@@ -59,8 +59,11 @@ class EverquestLogFile(threading.Thread):
         build the file name.
         call this anytime that the filename attributes change
 
-        :param charname: Everquest character log to be parsed
-        :return: complete filename
+        Args:
+            charname: Everquest character log to be parsed
+
+        Returns:
+            str: complete filename
         """
         rv = self.base_directory + self.logs_directory + 'eqlog_' + charname + '_' + self.server_name + '.txt'
         return rv
@@ -79,9 +82,8 @@ class EverquestLogFile(threading.Thread):
 
     def is_parsing(self) -> bool:
         """
-        is the file being actively parsed
-
-        :return: boolean True/False
+        Returns:
+            object: Is the file being actively parsed
         """
         return self._parsing.is_set()
 
@@ -89,8 +91,11 @@ class EverquestLogFile(threading.Thread):
         """
         open the file with most recent mod time (i.e. latest).
 
-        :param seek_end:  True if parsing is to begin at the end of the file, False if at the beginning
-        :return: True if a new file was opened, False otherwise
+        Args:
+            seek_end: True if parsing is to begin at the end of the file, False if at the beginning
+
+        Returns:
+            object: True if a new file was opened, False otherwise
         """
         # get a list of all log files, and sort on mod time, latest at top
         mask = self.base_directory + self.logs_directory + 'eqlog_*_' + self.server_name + '.txt'
@@ -137,10 +142,13 @@ class EverquestLogFile(threading.Thread):
         open the file.
         seek file position to end of file if passed parameter 'seek_end' is true
 
-        :param charname: character name whose log file is to be opened
-        :param filename: full log filename
-        :param seek_end:  True if parsing is to begin at the end of the file, False if at the beginning
-        :return: True if a new file was opened, False otherwise
+        Args:
+            charname: character name whose log file is to be opened
+            filename: full log filename
+            seek_end: True if parsing is to begin at the end of the file, False if at the beginning
+
+        Returns:
+            bool: True if a new file was opened, False otherwise
         """
         try:
             self.file = open(filename, 'r', errors='ignore')
@@ -166,7 +174,9 @@ class EverquestLogFile(threading.Thread):
     def readline(self) -> str or None:
         """
         get the next line
-        :return: a string containing the next line, or None if no new lines to be read
+
+        Returns:
+            str or None: a string containing the next line, or None if no new lines to be read
         """
         if self.is_parsing():
             return self.file.readline()
@@ -177,7 +187,8 @@ class EverquestLogFile(threading.Thread):
         """
         call this method to kick off the parsing thread
 
-        :return: True if file is opened successfully for parsing
+        Returns:
+            bool: True if file is opened successfully for parsing
         """
         rv = False
 
@@ -270,7 +281,8 @@ class EverquestLogFile(threading.Thread):
 
         Default behavior is to simply print() the line
 
-        :param line: line from logfile to be processed
+        Args:
+            line: line from logfile to be processed
         """
         print(line.rstrip())
 
