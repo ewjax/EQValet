@@ -11,6 +11,7 @@ from util import starprint
 TEST_ELF = False
 # TEST_ELF = True
 
+
 class EverquestLogFile(threading.Thread):
     """
     class to encapsulate Everquest log file operations.

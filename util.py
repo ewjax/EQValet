@@ -53,10 +53,10 @@ def starprint(line: str, alignment: str = '<', fill: str = ' ') -> None:
     """
     utility function to print with leading and trailing ** indicators
 
-    :param line: line to be printed
-    :param alignment: (left, centered, right) are denoted by one of (<, ^, >)
-    :param fill: Character to fill with
-
+    Args:
+        line: line to be printed
+        alignment: (left, centered, right) are denoted by one of (<, ^, >)
+        fill: Character to fill with
     """
     width = config.REPORT_WIDTH
     print(f'** {line.rstrip():{fill}{alignment}{width}} **')
