@@ -451,7 +451,7 @@ class RandomParser:
             if not rg.expired:
                 toggled = rg.check_expiration(line)
                 if toggled:
-                    print(f'{rg.report_summary(ndx, config.the_valet.elf.char_name)}')
+                    print(f'{rg.report_summary(ndx, config.the_valet.char_name)}')
 
         #
         # cut off the leading date-time stamp info
@@ -557,7 +557,7 @@ class RandomParser:
                 player = m.group('playername')
 
                 # get next line
-                line = config.the_valet.elf.readline()
+                line = config.the_valet.readline()
                 # print(line, end='')
                 trunc_line = line[27:]
 
@@ -667,7 +667,7 @@ class RandomParser:
                 if not rg.expired:
                     rg.expired = True
                     rg.sort_descending_randoms()
-                    print(f'{rg.report_summary(n, config.the_valet.elf.char_name)}')
+                    print(f'{rg.report_summary(n, config.the_valet.char_name)}')
 
     #
     # show a report for one specific randomgroup
@@ -684,7 +684,7 @@ class RandomParser:
 
             # get the RandomGroup at ndx
             rg: RandomGroup = self.all_random_groups[ndx]
-            reportbuffer = rg.report_detail(ndx, config.the_valet.elf.char_name)
+            reportbuffer = rg.report_detail(ndx, config.the_valet.char_name)
             print(f'{reportbuffer}')
 
         else:
@@ -711,7 +711,7 @@ class RandomParser:
         # add the list of random events
         rg: RandomGroup
         for (ndx, rg) in enumerate(self.all_random_groups):
-            reportbuffer += f'{rg.report_summary(ndx, config.the_valet.elf.char_name)}'
+            reportbuffer += f'{rg.report_summary(ndx, config.the_valet.char_name)}'
 
         reportbuffer += f'{"":{fill1}^{width}}\n'
 

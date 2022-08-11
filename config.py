@@ -26,7 +26,7 @@ def load() -> None:
         raise ValueError(f'Unable to open ini file [{ini_filename}]')
 
     # print out the contents
-    print(f'{ini_filename} loaded')
+    starprint(f'{ini_filename} loaded')
     for section in config_data.sections():
         starprint(f'[{section}]')
         for key in config_data[section]:

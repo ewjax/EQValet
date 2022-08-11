@@ -1111,7 +1111,7 @@ class DamageParser:
                     target_name = m.group('target_name')
 
                     # set the attacker name to the player name
-                    attacker_name = config.the_valet.elf.char_name
+                    attacker_name = config.the_valet.char_name
 
                     # any damage event indicates we are in combat
                     the_target = self.get_target(target_name)
@@ -1145,7 +1145,7 @@ class DamageParser:
             #
             for targ in self.active_target_dict.values():
                 if targ.in_combat:
-                    attacker_name = config.the_valet.elf.char_name
+                    attacker_name = config.the_valet.char_name
                     de_list = targ.incoming_damage_events_dict.get(attacker_name)
                     # for each event in the player's DE list
                     if de_list:
@@ -1185,7 +1185,7 @@ class DamageParser:
 
                 # set the attacker name
                 # will usually be player name, unless, this message is from a pet lifetap
-                attacker_name = config.the_valet.elf.char_name
+                attacker_name = config.the_valet.char_name
                 if damage < 100:
                     if config.the_valet.pet_parser.current_pet:
                         if config.the_valet.pet_parser.current_pet.lifetap_pending:
@@ -1232,7 +1232,7 @@ class DamageParser:
             if m:
 
                 # extract RE data
-                attacker_name = config.the_valet.elf.char_name
+                attacker_name = config.the_valet.char_name
                 dmg_type = m.group('dmg_type')
                 target_name = m.group('target_name')
                 damage = int(m.group('damage'))
@@ -1318,14 +1318,14 @@ class DamageParser:
                 # [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
 
                 # get next line - many dashes
-                nextline = config.the_valet.elf.readline()
+                nextline = config.the_valet.readline()
                 # print(nextline, end='')
 
                 # read all the name(s) in the /who report
                 while processing_names:
 
                     # get next line
-                    nextline = config.the_valet.elf.readline()
+                    nextline = config.the_valet.readline()
                     # print(nextline, end='')
                     trunc_line = nextline[27:]
 
