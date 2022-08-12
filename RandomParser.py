@@ -451,6 +451,8 @@ class RandomParser:
             if not rg.expired:
                 toggled = rg.check_expiration(line)
                 if toggled:
+                    # bell sound
+                    print('\a')
                     print(f'{rg.report_summary(ndx, config.the_valet.char_name)}')
 
         #
@@ -706,7 +708,7 @@ class RandomParser:
         reportbuffer += f'\n'
 
         reportbuffer += f'Total Rolls = {len(self.all_rolls)}\n'
-        reportbuffer += f'Total Random Groupss = {len(self.all_random_groups)}\n'
+        reportbuffer += f'Total Random Groups = {len(self.all_random_groups)}\n'
 
         # add the list of random events
         rg: RandomGroup

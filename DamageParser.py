@@ -674,6 +674,9 @@ class Target:
         if self.combat_duration_seconds() > 0:
             dps_outgoing = grand_total_outgoing / self.combat_duration_seconds()
 
+        # bell sound
+        print('\a')
+
         # now create the output report
         width = config.REPORT_WIDTH
         fill1 = '.'
