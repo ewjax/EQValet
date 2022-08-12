@@ -1,0 +1,35 @@
+
+
+[Everquest]
+
+# configure location of the everquest log files
+BASE_DIRECTORY = c:\Everquest
+LOGS_DIRECTORY = \logs\
+
+# which server
+SERVER_NAME = P1999Green
+
+# Max number of seconds of logfile inactivity before a check is made to see if a new file is being written to
+HEARTBEAT = 15
+
+
+[RandomParser]
+
+# default randomevent window
+DEFAULT_WINDOW = 60
+
+
+[DamageParser]
+
+# timeout for spell casting pending wait timeout
+SPELL_PENDING_TIMEOUT_SEC = 10
+
+# timeout for combat timer
+COMBAT_TIMEOUT_SEC = 120
+
+
+[PetParser]
+
+
+
+

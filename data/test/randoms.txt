@@ -11,6 +11,12 @@
 [Tue Jul 13 00:30:07 2021] **It could have been any number from 0 to 1000, but this time it turned up a 588.
 [Tue Jul 13 00:30:08 2021] **A Magic Die is rolled by Azae.
 [Tue Jul 13 00:30:08 2021] **It could have been any number from 0 to 1000, but this time it turned up a 848.
+[Tue Jul 13 00:30:08 2021] **A Magic Die is rolled by Xytl.
+[Tue Jul 13 00:30:08 2021] **It could have been any number from 0 to 1000, but this time it turned up a 848.
+[Tue Jul 13 00:30:08 2021] **A Magic Die is rolled by Azleep.
+[Tue Jul 13 00:30:08 2021] **It could have been any number from 0 to 1000, but this time it turned up a 848.
+[Tue Jul 13 00:30:08 2021] **A Magic Die is rolled by Goruck.
+[Tue Jul 13 00:30:08 2021] **It could have been any number from 0 to 1000, but this time it turned up a 848.
 [Tue Jul 13 00:30:08 2021] **A Magic Die is rolled by Narkor.
 [Tue Jul 13 00:30:08 2021] **It could have been any number from 0 to 1000, but this time it turned up a 319.
 [Tue Jul 13 00:30:08 2021] **A Magic Die is rolled by Savasan.
@@ -1081,6 +1087,14 @@
 [Tue Sep 07 17:51:31 2021] Lothik tells the guild, 'I already have 5 kids quarantining in my class.'
 [Tue Sep 07 17:51:36 2021] **A Magic Die is rolled by Buskin.
 [Tue Sep 07 17:51:36 2021] **It could have been any number from 0 to 321, but this time it turned up a 318.
+
+[Tue Sep 07 17:51:36 2021] **A Magic Die is rolled by Azleep.
+[Tue Sep 07 17:51:36 2021] **It could have been any number from 0 to 321, but this time it turned up a 318.
+[Tue Sep 07 17:51:36 2021] **A Magic Die is rolled by Xytl.
+[Tue Sep 07 17:51:36 2021] **It could have been any number from 0 to 321, but this time it turned up a 318.
+[Tue Sep 07 17:51:36 2021] **A Magic Die is rolled by Goruck.
+[Tue Sep 07 17:51:36 2021] **It could have been any number from 0 to 321, but this time it turned up a 318.
+
 [Tue Sep 07 17:51:36 2021] **A Magic Die is rolled by Telwin.
 [Tue Sep 07 17:51:36 2021] **It could have been any number from 0 to 321, but this time it turned up a 178.
 [Tue Sep 07 17:51:40 2021] Lothik tells the guild, 'we have been in school for 7 days.'

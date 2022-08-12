@@ -1,7 +1,6 @@
 # specific files
-myconfig.py
-players.pickle
-players.dat
+EQValet.ini
+EQValet-PlayerNames.dat
 
 # directories for this project
 pics/

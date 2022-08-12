@@ -1,5 +1,8 @@
 import re
 
+import config
+from util import starprint
+
 
 #################################################################################################
 
@@ -7,7 +10,8 @@ import re
 # A summoned pet can have a range of levels and abilities.  This class represents one individual set.
 #
 class PetLevel:
-    """A summoned pet can have a range of levels and abilities.  This class represents one individual set.
+    """
+    A summoned pet can have a range of levels and abilities.  This class represents one individual set.
     """
 
     def __init__(self, rank: int, pet_level: int, max_melee: int, max_bashkick: int, max_backstab: int, lifetap: int) -> None:
@@ -33,13 +37,14 @@ class PetLevel:
 
 #
 # class for a Pet spell.  
-# Has information about this particular pet spell, as well as an array of PetLevel info records,
+# Has information about this particular pet spell, as well as a list of PetLevel info records,
 # for each possible pet level
 #
 class PetSpell:
-    """class for a Pet spell.
-    Has information about this particular pet spell, as well as an array of PetLevel info records,
-    for each possible pet level
+    """
+    Class for a Pet spell.
+    Has information about this particular pet spell, i.e. spell name, caster class, caster level,
+    and a list of PetLevel info records
     """
 
     # ctor
@@ -63,7 +68,9 @@ class PetSpell:
 # class for an actual pet in game
 #
 class Pet:
-    """class for an actual pet in game"""
+    """
+    Class for an actual pet in game, its name, level, max melee, etc
+    """
 
     # ctor
     def __init__(self, pet_spell: PetSpell) -> None:
@@ -90,7 +97,7 @@ class Pet:
                                                                              len(self.pet_spell.pet_level_list),
                                                                              self.pet_rank)
         if self.pet_spell:
-            rv += ' ({})'.format(self.pet_spell.spell_name)
+            rv += f' ({self.pet_spell.spell_name})'
         return rv
 
 
@@ -99,29 +106,35 @@ class Pet:
 #
 # class to do all the pet tracking work
 #
-class PetTracker:
-    """class to do all the pet tracking work"""
+class PetParser:
+    """
+    Class to do all the pet tracking work
+    """
 
     # ctor
-    def __init__(self, client):
+    def __init__(self):
 
-        # pointer to the discord client for comms
-        self.client = client
+        # default is to parse for pet info
+        self.parse = True
 
         # pointer to current pet
         self.current_pet = None
 
         # list of all pets
         # not really used for now, but keeping it in case this idea is needed later
-        # perhaps for some function that needs to know about all pets, et c
+        # perhaps for some function that needs to know about all pets, etc
         self.all_pets = []
 
-        # a dictionary of pets, keys = Pet Spell Names, values = associated PetSpell objects
+        # a dictionary of pet spells, keys = Pet Spell Names, values = associated PetSpell objects
         self.pet_dict = {}
         self.load_pet_dict()
 
     # get pet name
-    def pet_name(self):
+    def pet_name(self) -> str:
+        """
+        Returns:
+            pet name
+        """
         rv = 'No Pet'
         if self.current_pet:
             if self.current_pet.pet_name:
@@ -131,215 +144,250 @@ class PetTracker:
     #
     # check for pet related items
     #
-    async def process_line(self, line):
+    def process_line(self, line: str) -> None:
+        """
+        The parse logic for this particular parser.
 
+        :param line: complete line to be parsed, i.e. timestamp and content
+        """
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
-        #
-        # check for a few ways in which the pet can be lost
-        #
-        if self.current_pet:
-
-            # zoning?
-            target = '^LOADING, PLEASE WAIT'
-            m1 = re.match(target, trunc_line)
-
-            # pet reclaimed?
-            target = '^{} disperses'.format(self.current_pet.pet_name)
-            m2 = re.match(target, trunc_line, re.IGNORECASE)
-
-            # pet died?
-            target = '^{} says, \'Sorry to have failed you, oh Great One'.format(self.current_pet.pet_name)
-            m3 = re.match(target, trunc_line, re.IGNORECASE)
-
-            # somehow pet is gone
-            target = r'^You don\'t have a pet to command!'
-            m4 = re.match(target, trunc_line)
-
-            # check for any of the pet died messages
-            if m1 or m2 or m3 or m4:
-                await self.client.send('Pet {} died/lost'.format(self.current_pet.pet_name))
-                self.current_pet = None
-
-        #
-        # search for cast message, see if any of the pet spells we know about are being cast
-        #
-        target = r'^You begin casting (?P<spell_name>[\w`\' ]+)\.'
-
-        # return value m is either None of an object with information about the RE search
+        # check for toggling the parse on/off
+        target = r'^\.pt '
         m = re.match(target, trunc_line)
         if m:
+            if self.parse:
+                self.parse = False
+                onoff = 'Off'
+            else:
+                self.parse = True
+                onoff = 'On'
 
-            # fetch the spell name
-            spell_name = m.group('spell_name')
+            starprint(f'Pet Parsing: {onoff}')
 
-            # does the spell name match one of the pets we know about?
-            if spell_name in self.pet_dict:
-                pet_spell = self.pet_dict[spell_name]
-                self.current_pet = Pet(pet_spell)
-                await self.client.send('*Pet being created from spell ({}), name TBD*'.format(spell_name))
+        if self.parse:
 
-        #
-        # if the flag is set that we have a pet and don't know the name yet, search for pet name
-        #
-        if self.current_pet and self.current_pet.name_pending:
-            target = r'^(?P<pet_name>[\w ]+) says \'At your service Master.'
+            #
+            # check for user commands
+            #
+            target = r'^\.pet '
+            m = re.match(target, trunc_line)
+            if m:
+                if self.current_pet:
+                    starprint(str(self.current_pet))
+                else:
+                    starprint('No pet')
+
+            #
+            # check for a few ways in which the pet can be lost
+            #
+            if self.current_pet:
+
+                # zoning?
+                target = '^LOADING, PLEASE WAIT'
+                m1 = re.match(target, trunc_line)
+
+                # pet reclaimed?
+                target = '^{} disperses'.format(self.current_pet.pet_name)
+                m2 = re.match(target, trunc_line, re.IGNORECASE)
+
+                # pet died?
+                target = '^{} says, \'Sorry to have failed you, oh Great One'.format(self.current_pet.pet_name)
+                m3 = re.match(target, trunc_line, re.IGNORECASE)
+
+                # somehow pet is gone
+                target = r'^You don\'t have a pet to command!'
+                m4 = re.match(target, trunc_line)
+
+                # check for any of the pet died messages
+                if m1 or m2 or m3 or m4:
+                    starprint(f'Pet {self.current_pet.pet_name} died/lost')
+                    self.current_pet = None
+
+            #
+            # search for cast message, see if any of the pet spells we know about are being cast
+            #
+            target = r'^You begin casting (?P<spell_name>[\w`\' ]+)\.'
 
             # return value m is either None of an object with information about the RE search
             m = re.match(target, trunc_line)
             if m:
-                # fetch the pet name
-                pet_name = m.group('pet_name')
-                self.current_pet.pet_name = pet_name
-                self.current_pet.name_pending = False
 
-                self.all_pets.append(self.current_pet)
-                await self.client.send(self.current_pet.created_report())
-
-        #
-        # if the flag is set that we have a lifetap message and don't have the amount yet,
-        # search for the non-melee message
-        #
-        if self.current_pet and self.current_pet.lifetap_pending:
-
-            target = r'^(?P<target_name>[\w` ]+) was hit by non-melee for (?P<damage>[\d]+) points of damage'
-            m = re.match(target, trunc_line)
-            if m:
-
-                # fetch the damage, and reset the pending flag
-                dmg = int(m.group('damage'))
-                self.current_pet.lifetap_pending = False
-
-                # find the pet rank
-                for petstat in self.current_pet.pet_spell.pet_level_list:
-                    if (petstat.lifetap == dmg) and (self.current_pet.pet_rank != petstat.rank):
-                        self.current_pet.pet_rank = petstat.rank
-                        self.current_pet.pet_level = petstat.pet_level
-
-                        # announce the pet rank
-                        await self.client.send(self.current_pet)
-                        await self.client.send('*Identified via lifetap signature*')
-
-        #
-        # if we have a pet, do several scans....
-        #
-        if self.current_pet:
-
-            # 
-            # look for lifetap 'beams a smile' message coming from our pet
-            #
-            target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
-            m = re.match(target, trunc_line, re.IGNORECASE)
-            if m:
-                self.current_pet.lifetap_pending = True
-
-            #
-            # look for max melee value
-            #
-            target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|slices) ' \
-                     r'(?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(self.current_pet.pet_name)
-            # return value m is either None of an object with information about the RE search
-            m = re.match(target, trunc_line, re.IGNORECASE)
-            if m:
-                # fetch the damage
-                damage = int(m.group('damage'))
-
-                # is this new max?
-                if damage > self.current_pet.max_melee:
-                    self.current_pet.max_melee = damage
-
-                    # find the new rank
-                    for petstat in self.current_pet.pet_spell.pet_level_list:
-                        if petstat.max_melee == damage:
-                            self.current_pet.pet_rank = petstat.rank
-                            self.current_pet.pet_level = petstat.pet_level
-
-                    # if charmed pet, determine implied level here
-                    if self.current_pet.pet_spell.spell_name == 'CharmPet':
-                        if damage <= 60:
-                            self.current_pet.pet_level = damage / 2
-                        else:
-                            self.current_pet.pet_level = (damage + 60) / 4
-
-                    # announce the pet rank
-                    await self.client.send(self.current_pet)
-                    await self.client.send('*Identified via max melee damage*')
-
-        #
-        # do we need to reset our pet name to the parser?
-        #
-        reset_pet = False
-
-        # reset pet method 1:  use /pet leader
-        # watch for pet leader commands, and check that our pet name matches
-        # this is useful if somehow our pet name is goofed up
-        target = r'^(?P<pet_name>[\w` ]+) says \'My leader is (?P<char_name>[\w` ]+)'
-        m = re.match(target, trunc_line)
-        pet_name = ''
-        if m:
-            pet_name = m.group('pet_name')
-            char_name = m.group('char_name')
-
-            # if a pet just declared our character as the leader...
-            if char_name == self.client.elf.char_name:
-                reset_pet = True
-
-        # reset pet method 2:  direct the pet to attack itself
-        # search for the special case where the pet is attacking itself - this
-        # how we will communicate to EQValet from within the game regarding the
-        # presence of a pet that EQValet currently doesn't know about (most likely
-        # a charmed pet).  To generate this message, from within EQ issue these commands:
-        #   /pet target
-        #   /pet attack
-        target = r'^(?P<pet_name>[\w` ]+) tells you, \'Attacking (?P<target_name>[\w` ]+) Master'
-
-        # return value m is either None of an object with information about the RE search
-        m = re.match(target, trunc_line)
-        if m:
-            pet_name = m.group('pet_name')
-            target_name = m.group('target_name')
-
-            # is the pet attacking itself?
-            if pet_name == target_name:
-                reset_pet = True
-
-        # have we encountered a situation where a pet reset is needed?
-        if reset_pet:
-            # announce the pet name
-            await self.client.send('Pet name = {}'.format(pet_name))
-
-            # no pet known to EQValet?
-            if self.current_pet is None:
-
-                # then we probably have a charmed pet
-                spell_name = 'CharmPet'
+                # fetch the spell name
+                spell_name = m.group('spell_name')
 
                 # does the spell name match one of the pets we know about?
                 if spell_name in self.pet_dict:
                     pet_spell = self.pet_dict[spell_name]
                     self.current_pet = Pet(pet_spell)
+                    starprint(f'Pet being created from spell ({spell_name}), name TBD')
+
+            #
+            # if the flag is set that we have a pet and don't know the name yet, search for pet name
+            #
+            if self.current_pet and self.current_pet.name_pending:
+                target = r'^(?P<pet_name>[\w ]+) says \'At your service Master.'
+
+                # return value m is either None of an object with information about the RE search
+                m = re.match(target, trunc_line)
+                if m:
+                    # fetch the pet name
+                    pet_name = m.group('pet_name')
                     self.current_pet.pet_name = pet_name
                     self.current_pet.name_pending = False
 
                     self.all_pets.append(self.current_pet)
-                    await self.client.send(self.current_pet.created_report())
+                    starprint(self.current_pet.created_report())
 
-            # ok somehow EQValet thinks we have a pet, but the name is goofed up,
-            # so just reset the max_melee and pet_rank fields and let them get determined again
-            else:
-                self.current_pet.pet_name = pet_name
-                self.current_pet.name_pending = False
-                self.current_pet.pet_rank = 0
-                self.current_pet.pet_level = 0
-                self.current_pet.max_melee = 0
-                await self.client.send(self.current_pet)
+            #
+            # if the flag is set that we have a lifetap message and don't have the amount yet,
+            # search for the non-melee message
+            #
+            if self.current_pet and self.current_pet.lifetap_pending:
+
+                target = r'^(?P<target_name>[\w` ]+) was hit by non-melee for (?P<damage>[\d]+) points of damage'
+                m = re.match(target, trunc_line)
+                if m:
+
+                    # fetch the damage, and reset the pending flag
+                    dmg = int(m.group('damage'))
+                    self.current_pet.lifetap_pending = False
+
+                    # find the pet rank
+                    for petstat in self.current_pet.pet_spell.pet_level_list:
+                        if (petstat.lifetap == dmg) and (self.current_pet.pet_rank != petstat.rank):
+                            self.current_pet.pet_rank = petstat.rank
+                            self.current_pet.pet_level = petstat.pet_level
+
+                            # announce the pet rank
+                            starprint(self.current_pet)
+                            starprint('  (Identified via lifetap signature)')
+
+            #
+            # if we have a pet, do several scans....
+            #
+            if self.current_pet:
+
+                #
+                # look for lifetap 'beams a smile' message coming from our pet
+                #
+                target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
+                m = re.match(target, trunc_line, re.IGNORECASE)
+                if m:
+                    self.current_pet.lifetap_pending = True
+
+                #
+                # look for max melee value
+                #
+                target = r'^{} (hits|slashes|pierces|crushes|claws|bites|stings|mauls|gores|punches|slices) ' \
+                         r'(?P<target_name>[\w` ]+) for (?P<damage>[\d]+) point(s)? of damage'.format(self.current_pet.pet_name)
+                # return value m is either None of an object with information about the RE search
+                m = re.match(target, trunc_line, re.IGNORECASE)
+                if m:
+                    # fetch the damage
+                    damage = int(m.group('damage'))
+
+                    # is this new max?
+                    if damage > self.current_pet.max_melee:
+                        self.current_pet.max_melee = damage
+
+                        # find the new rank
+                        for petstat in self.current_pet.pet_spell.pet_level_list:
+                            if petstat.max_melee == damage:
+                                self.current_pet.pet_rank = petstat.rank
+                                self.current_pet.pet_level = petstat.pet_level
+
+                        # if charmed pet, determine implied level here
+                        if self.current_pet.pet_spell.spell_name == 'CharmPet':
+                            if damage <= 60:
+                                self.current_pet.pet_level = damage / 2
+                            else:
+                                self.current_pet.pet_level = (damage + 60) / 4
+
+                        # announce the pet rank
+                        starprint(str(self.current_pet))
+                        starprint('  (Identified via max melee damage)')
+
+            #
+            # do we need to reset our pet name to the parser?
+            #
+            reset_pet = False
+
+            # reset pet method 1:  use /pet leader
+            # watch for pet leader commands, and check that our pet name matches
+            # this is useful if somehow our pet name is goofed up
+            target = r'^(?P<pet_name>[\w` ]+) says \'My leader is (?P<char_name>[\w` ]+)'
+            m = re.match(target, trunc_line)
+            pet_name = ''
+            if m:
+                pet_name = m.group('pet_name')
+                char_name = m.group('char_name')
+
+                # if a pet just declared our character as the leader...
+                if char_name == config.the_valet.char_name:
+                    reset_pet = True
+
+            # reset pet method 2:  direct the pet to attack itself
+            # search for the special case where the pet is attacking itself - this
+            # how we will communicate to EQValet from within the game regarding the
+            # presence of a pet that EQValet currently doesn't know about (most likely
+            # a charmed pet).  To generate this message, from within EQ issue these commands:
+            #   /pet target
+            #   /pet attack
+            target = r'^(?P<pet_name>[\w` ]+) tells you, \'Attacking (?P<target_name>[\w` ]+) Master'
+
+            # return value m is either None of an object with information about the RE search
+            m = re.match(target, trunc_line)
+            if m:
+                pet_name = m.group('pet_name')
+                target_name = m.group('target_name')
+
+                # is the pet attacking itself?
+                if pet_name == target_name:
+                    reset_pet = True
+
+            # have we encountered a situation where a pet reset is needed?
+            if reset_pet:
+                # announce the pet name
+                starprint(f'Pet name = {pet_name}')
+
+                # no pet known to EQValet?
+                if self.current_pet is None:
+
+                    # then we probably have a charmed pet
+                    spell_name = 'CharmPet'
+
+                    # does the spell name match one of the pets we know about?
+                    if spell_name in self.pet_dict:
+                        pet_spell = self.pet_dict[spell_name]
+                        self.current_pet = Pet(pet_spell)
+                        self.current_pet.pet_name = pet_name
+                        self.current_pet.name_pending = False
+
+                        self.all_pets.append(self.current_pet)
+                        starprint(self.current_pet.created_report())
+
+                # ok somehow EQValet thinks we have a pet, but the name is goofed up,
+                # so just reset the max_melee and pet_rank fields and let them get determined again
+                else:
+                    self.current_pet.pet_name = pet_name
+                    self.current_pet.name_pending = False
+                    self.current_pet.pet_rank = 0
+                    self.current_pet.pet_level = 0
+                    self.current_pet.max_melee = 0
+
+                    starprint(str(self.current_pet))
 
     #
-    # create the dictionary of pet spells, with all pet spell info for each
     #
-    def load_pet_dict(self):
+    def load_pet_dict(self) -> None:
+        """
+        Create the dictionary of pet spells, with all pet spell info for each
 
+        Returns:
+            None: 
+        """
         #
         # Necro pets
         #
@@ -607,6 +655,7 @@ class PetTracker:
         # todo need shaman pets for 49, 55
 
         # todo need all mage pets
+
 
 #################################################################################################
 
