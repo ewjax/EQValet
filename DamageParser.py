@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 
 import config
+import util
 from util import starprint
 from CaseInsensitiveDict import CaseInsensitiveDict
 
@@ -678,7 +679,7 @@ class Target:
         print('\a')
 
         # now create the output report
-        width = config.REPORT_WIDTH
+        width = util.REPORT_WIDTH
         fill1 = '.'
         fill2 = '='
         reportbuffer = f'\n'
@@ -783,14 +784,14 @@ class Target:
         dps = 0.0
         if self.combat_duration_seconds() > 0:
             dps = grand_total_incoming / self.combat_duration_seconds()
-        clipboard_report = '{}, {} hp in {:.0f} s (@{:.1f} dps)'.format(self.target_name, grand_total_incoming, self.combat_duration_seconds(), dps)
+        clipboard_report = f'{self.target_name}, {grand_total_incoming} hp in {self.combat_duration_seconds():.0f}sec (@{dps:.1f} dps)'
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
         for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
             fraction = 0
             if grand_total_incoming != 0:
                 fraction = round(attacker_total / grand_total_incoming * 100.0)
-            clipboard_report += ' | {} {} [{}%]'.format(attacker, attacker_total, fraction)
+            clipboard_report += f' | {attacker} {attacker_total} [{fraction}%]'
 
         # send this to clipboard
         pyperclip.copy(clipboard_report)

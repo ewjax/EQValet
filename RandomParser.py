@@ -5,6 +5,7 @@ from datetime import datetime
 # import the global config data
 import config
 
+import util
 from util import starprint
 
 
@@ -44,7 +45,7 @@ class PlayerRandomRoll:
     #
     def __repr__(self):
         """
-        Overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+        Overload function to allow object to print() to screen in sensible manner, for debugging with print()
         """
         return (
             '({}, {}, {}, {}, {})'.format(self.player_name, self.random_value, self.low, self.high, self.time_stamp))
@@ -154,7 +155,7 @@ class RandomGroup:
         # Index[24]..........................................................................................
         # Range: [150 - 999] | Rolls: 1 | Start Time: 2022 - 01 - 1500: 14:35 | Delta(seconds): 60
 
-        width = config.REPORT_WIDTH
+        width = util.REPORT_WIDTH
         fill = '.'
 
         rv = '\n'
@@ -258,7 +259,7 @@ class RandomGroup:
         return rv
 
     #
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
         """
         Overload function to allow object to print() to screen in sensible manner, for debugging with print()
@@ -699,7 +700,7 @@ class RandomParser:
         Show a report of all randomevents
         """
 
-        width = config.REPORT_WIDTH
+        width = util.REPORT_WIDTH
         fill1 = '-'
         fill2 = '='
 

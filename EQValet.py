@@ -1,4 +1,5 @@
 import re
+import asyncio
 
 # import the global config data
 import config
@@ -37,7 +38,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         self.pet_parser = PetParser.PetParser()
 
     # process each line
-    def process_line(self, line):
+    async def process_line(self, line):
         # call parent to edit every line, the default behavior
         # super().process_line(line)
 
@@ -124,7 +125,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 #################################################################################################
 
 
-def main():
+async def main():
     # print a startup message
     starprint('')
     starprint('-------------------------------------------------')
@@ -138,10 +139,11 @@ def main():
 
     starprint('EQValet running')
 
-    # note that as soon as the main thread ends, so will the child threads
+    # while True followed by pass seems to block asyncio coroutines, so give the asyncio task a chance to break out
     while True:
-        pass
+        # sleep for 100 msec
+        await asyncio.sleep(0.1)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

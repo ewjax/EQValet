@@ -1,7 +1,6 @@
 import configparser
 
 from util import starprint
-
 # global data
 
 # begin by reading in the config data
@@ -9,9 +8,6 @@ config_data = configparser.ConfigParser()
 
 # global instance of the EQValet class
 the_valet = None
-
-# report width
-REPORT_WIDTH = 100
 
 
 def load() -> None:
