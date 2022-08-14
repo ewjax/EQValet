@@ -94,9 +94,10 @@ class EverquestLogFile:
         files = glob.glob(mask)
         files.sort(key=os.path.getmtime, reverse=True)
 
-        # if no files are found to parse, bail out with an exception
+        # if no files are found to parse, bail out
         if len(files) == 0:
-            raise ValueError(f'Unable to open any log files in directory [{self.base_directory}]')
+            starprint(f'ERROR: Unable to open any log files in directory [{self.base_directory}]')
+            return False
 
         latest_file = files[0]
 

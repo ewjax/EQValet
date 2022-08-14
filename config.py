@@ -36,64 +36,81 @@ def verify_settings() -> None:
     confirm all needed sections and key values are present in the ini file
     """
     global config_data
+    modified = False
 
     # EQValet section
     section = 'EQValet'
     if not config_data.has_section(section):
         config_data.add_section(section)
+        modified = True
 
     if not config_data.has_option(section, 'bell'):
         config_data.set(section, 'bell', 'True')
+        modified = True
 
     # Everquest section
     section = 'Everquest'
     if not config_data.has_section(section):
         config_data.add_section(section)
+        modified = True
 
     if not config_data.has_option(section, 'base_directory'):
         config_data.set(section, 'base_directory', 'c:\\everquest')
+        modified = True
 
     if not config_data.has_option(section, 'logs_directory'):
         config_data.set(section, 'logs_directory', '\\logs\\')
+        modified = True
 
     if not config_data.has_option(section, 'heartbeat'):
         config_data.set(section, 'heartbeat', '15')
+        modified = True
 
     # RandomParser section
     section = 'RandomParser'
     if not config_data.has_section(section):
         config_data.add_section(section)
+        modified = True
 
     if not config_data.has_option(section, 'parse'):
         config_data.set(section, 'parse', 'True')
+        modified = True
 
     if not config_data.has_option(section, 'grouping_window'):
         config_data.set(section, 'grouping_window', '60')
+        modified = True
 
     # DamageParser section
     section = 'DamageParser'
     if not config_data.has_section(section):
         config_data.add_section(section)
+        modified = True
 
     if not config_data.has_option(section, 'parse'):
         config_data.set(section, 'parse', 'True')
+        modified = True
 
     if not config_data.has_option(section, 'spell_pending_timeout_sec'):
         config_data.set(section, 'spell_pending_timeout_sec', '10')
+        modified = True
 
     if not config_data.has_option(section, 'combat_timeout_sec'):
         config_data.set(section, 'combat_timeout_sec', '120')
+        modified = True
 
     # PetParser section
     section = 'PetParser'
     if not config_data.has_section(section):
         config_data.add_section(section)
+        modified = True
 
     if not config_data.has_option(section, 'parse'):
         config_data.set(section, 'parse', 'True')
+        modified = True
 
     # save the data
-    save()
+    if modified:
+        save()
 
 
 def save() -> None:
@@ -104,6 +121,7 @@ def save() -> None:
     with open(ini_filename, 'wt') as inifile:
         config_data.write(inifile)
 
+    # print out the contents
     show()
 
 

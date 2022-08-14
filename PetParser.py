@@ -120,6 +120,7 @@ class PetParser:
     """
     Class to do all the pet tracking work
     """
+    current_pet: Pet or None
 
     # ctor
     def __init__(self):
@@ -219,8 +220,14 @@ class PetParser:
                 target = r'^You don\'t have a pet to command!'
                 m4 = re.match(target, trunc_line)
 
+                # charm break
+                m5 = False
+                if self.current_pet.pet_spell.spell_name == 'CharmPet':
+                    target = r'^Your charm spell has worn off'
+                    m5 = re.match(target, trunc_line)
+
                 # check for any of the pet died messages
-                if m1 or m2 or m3 or m4:
+                if m1 or m2 or m3 or m4 or m5:
                     starprint(f'Pet {self.current_pet.pet_name} died/lost')
                     self.current_pet = None
 
