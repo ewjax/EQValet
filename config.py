@@ -18,31 +18,105 @@ def load() -> None:
     global config_data
 
     file_list = config_data.read(ini_filename)
-    if len(file_list) == 0:
-        raise ValueError(f'Unable to open ini file [{ini_filename}]')
+    try:
+        if len(file_list) == 0:
+            raise ValueError(f'Unable to open ini file [{ini_filename}]')
+    except ValueError as verr:
+        starprint(f'{str(verr)}, creating default {ini_filename}')
+
+    # confirm all needed sections and key values are present in the ini file
+    verify_settings()
 
     # print out the contents
-    starprint(f'{ini_filename} loaded')
-    for section in config_data.sections():
-        starprint(f'[{section}]')
-        for key in config_data[section]:
-            val = config_data[section][key]
-            starprint(f'    {key} = {val}')
+    show()
+
+
+def verify_settings() -> None:
+    """
+    confirm all needed sections and key values are present in the ini file
+    """
+    global config_data
+
+    # EQValet section
+    section = 'EQValet'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+
+    if not config_data.has_option(section, 'bell'):
+        config_data.set(section, 'bell', 'True')
+
+    # Everquest section
+    section = 'Everquest'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+
+    if not config_data.has_option(section, 'base_directory'):
+        config_data.set(section, 'base_directory', 'c:\\everquest')
+
+    if not config_data.has_option(section, 'logs_directory'):
+        config_data.set(section, 'logs_directory', '\\logs\\')
+
+    if not config_data.has_option(section, 'heartbeat'):
+        config_data.set(section, 'heartbeat', '15')
+
+    # RandomParser section
+    section = 'RandomParser'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+
+    if not config_data.has_option(section, 'parse'):
+        config_data.set(section, 'parse', 'True')
+
+    if not config_data.has_option(section, 'grouping_window'):
+        config_data.set(section, 'grouping_window', '60')
+
+    # DamageParser section
+    section = 'DamageParser'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+
+    if not config_data.has_option(section, 'parse'):
+        config_data.set(section, 'parse', 'True')
+
+    if not config_data.has_option(section, 'spell_pending_timeout_sec'):
+        config_data.set(section, 'spell_pending_timeout_sec', '10')
+
+    if not config_data.has_option(section, 'combat_timeout_sec'):
+        config_data.set(section, 'combat_timeout_sec', '120')
+
+    # PetParser section
+    section = 'PetParser'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+
+    if not config_data.has_option(section, 'parse'):
+        config_data.set(section, 'parse', 'True')
+
+    # save the data
+    save()
 
 
 def save() -> None:
     """
     Utility function to save contents to .ini file from the configparser.ConfigParser object
     """
-
     global config_data
     with open(ini_filename, 'wt') as inifile:
         config_data.write(inifile)
 
-    # print out the contents
+    show()
+
+
+def show() -> None:
+    """
+    print out the contents
+    """
+    global config_data
+
     starprint(f'{ini_filename} saved')
     for section in config_data.sections():
         starprint(f'[{section}]')
         for key in config_data[section]:
             val = config_data[section][key]
             starprint(f'    {key} = {val}')
+

@@ -2,7 +2,7 @@
 bell = True
 
 [Everquest]
-base_directory = c:\users\ewjax\Documents\Gaming\Everquest-Project1999
+base_directory = c:\everquest
 logs_directory = \logs\
 heartbeat = 15
 
