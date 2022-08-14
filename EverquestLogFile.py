@@ -1,18 +1,18 @@
 import glob
 import os
 import re
-import threading
+import asyncio
 import time
 
 from util import starprint
 
 
 # allow for testing, by forcing the bot to read an old log file
-#TEST_ELF = False
+# TEST_ELF = False
 TEST_ELF = True
 
 
-class EverquestLogFile(threading.Thread):
+class EverquestLogFile:
     """
     class to encapsulate Everquest log file operations.
     This class is intended as a base class for any
@@ -22,71 +22,62 @@ class EverquestLogFile(threading.Thread):
     overloading the process_line() method
     """
 
-    # type-hint reference to base class data member _started, to quiet PEP warning
-    # about unreferenced attribute
-    _started: threading.Event
-
-    def __init__(self, base_directory: str, logs_directory: str, server_name: str, heartbeat: int) -> None:
+    def __init__(self, base_directory: str, logs_directory: str, heartbeat: int) -> None:
         """
         ctor
 
         Args:
             base_directory: Base installation directory for Everquest
             logs_directory: Logs directory, typically '\\logs\\'
-            server_name: Name of the server, i.e. 'P1999Green'
             heartbeat: Number of seconds of logfile inactivity before a check is made to re-determine most recent logfile
         """
-        # parent ctor
-        # the daemon=True parameter causes this child thread object to terminate
-        # when the parent thread terminates
-        super().__init__(daemon=True)
-
         # instance data
         self.base_directory = base_directory
         self.logs_directory = logs_directory
         self.char_name = 'Unknown'
-        self.server_name = server_name
-        self.filename = self.build_filename(self.char_name)
+        self.server_name = 'Unknown'
+        self.filename = self.build_filename(self.char_name, self.server_name)
         self.file = None
 
-        self._parsing = threading.Event()
-        self._parsing.clear()
+        # are we parsing
+        self._parsing = False
 
         self.prevtime = time.time()
         self.heartbeat = heartbeat
 
-    def build_filename(self, charname: str) -> str:
+    def build_filename(self, charname: str, servername: str) -> str:
         """
         build the file name.
         call this anytime that the filename attributes change
 
         Args:
             charname: Everquest character log to be parsed
+            servername: Name of the server, i.e. 'P1999Green'
 
         Returns:
             str: complete filename
         """
-        rv = self.base_directory + self.logs_directory + 'eqlog_' + charname + '_' + self.server_name + '.txt'
+        rv = self.base_directory + self.logs_directory + 'eqlog_' + charname + '_' + servername + '.txt'
         return rv
 
     def set_parsing(self) -> None:
         """
         called when parsing is active
         """
-        self._parsing.set()
+        self._parsing = True
 
     def clear_parsing(self) -> None:
         """
         called when parsing is no longer active
         """
-        self._parsing.clear()
+        self._parsing = False
 
     def is_parsing(self) -> bool:
         """
         Returns:
             object: Is the file being actively parsed
         """
-        return self._parsing.is_set()
+        return self._parsing
 
     def open_latest(self, seek_end=True) -> bool:
         """
@@ -99,7 +90,7 @@ class EverquestLogFile(threading.Thread):
             object: True if a new file was opened, False otherwise
         """
         # get a list of all log files, and sort on mod time, latest at top
-        mask = self.base_directory + self.logs_directory + 'eqlog_*_' + self.server_name + '.txt'
+        mask = self.base_directory + self.logs_directory + 'eqlog_*_*' + '.txt'
         files = glob.glob(mask)
         files.sort(key=os.path.getmtime, reverse=True)
 
@@ -114,9 +105,10 @@ class EverquestLogFile(threading.Thread):
         # note that backslashes in regular expressions are double-double-backslashes
         # this expression replaces double \\ with quadruple \\\\, as well as the filename mask asterisk to a
         # named regular expression
-        charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\\w ]+)_')
-        m = re.match(charname_regexp, latest_file)
+        names_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_*', 'eqlog_(?P<charname>[\\w ]+)_(?P<servername>[\\w]+)')
+        m = re.match(names_regexp, latest_file)
         char_name = m.group('charname')
+        server_name = m.group('servername')
 
         rv = False
 
@@ -130,21 +122,22 @@ class EverquestLogFile(threading.Thread):
         elif self.is_parsing() and (self.filename != latest_file):
             # stop parsing old and open the new file
             self.close()
-            rv = self.open(char_name, latest_file, seek_end)
+            rv = self.open(char_name, server_name, latest_file, seek_end)
 
         # if we aren't parsing any file, then open latest
         elif not self.is_parsing():
-            rv = self.open(char_name, latest_file, seek_end)
+            rv = self.open(char_name, server_name, latest_file, seek_end)
 
         return rv
 
-    def open(self, charname: str, filename: str, seek_end=True) -> bool:
+    def open(self, charname: str, servername: str, filename: str, seek_end=True) -> bool:
         """
         open the file.
         seek file position to end of file if passed parameter 'seek_end' is true
 
         Args:
             charname: character name whose log file is to be opened
+            servername: Name of the server, i.e. 'P1999Green'
             filename: full log filename
             seek_end: True if parsing is to begin at the end of the file, False if at the beginning
 
@@ -157,6 +150,7 @@ class EverquestLogFile(threading.Thread):
                 self.file.seek(0, os.SEEK_END)
 
             self.char_name = charname
+            self.server_name = servername
             self.filename = filename
             self.set_parsing()
             return True
@@ -210,7 +204,7 @@ class EverquestLogFile(threading.Thread):
 
                 # start parsing, but in this case, start reading from the beginning of the file,
                 # rather than the end (default)
-                rv = self.open('Testing', filename, seek_end=False)
+                rv = self.open('Testing', 'Testing', filename, seek_end=False)
 
             # open the latest file
             else:
@@ -219,14 +213,11 @@ class EverquestLogFile(threading.Thread):
 
             # if the log file was successfully opened, then initiate parsing
             if rv:
-
                 # status message
                 starprint('Now parsing character log for: [{}]'.format(self.char_name))
 
-                # if the thread is not already running,
-                # create the background thread and kick it off
-                if not self._started.is_set():
-                    self.start()
+                # create the asyncio coroutine and kick it off
+                asyncio.create_task(self.run())
 
             else:
                 starprint('ERROR: Could not open character log file for: [{}]'.format(self.char_name))
@@ -234,48 +225,49 @@ class EverquestLogFile(threading.Thread):
 
         return rv
 
-    def stop(self) -> None:
+    def stop_parsing(self) -> None:
         """
         call this function when ready to stop (opposite of go() function)
         """
         self.close()
 
-    def run(self) -> None:
+    async def run(self) -> None:
         """
-        override the thread.run() method
-        this method will execute in its own thread
+        this method will execute in its own asynco coroutine
+        Note that it calls self.process_line() for each line, so child classes can overload that function
+        to perform their particular parsing logic
         """
-        # run forever
-        while True:
 
-            # process the log file lines here
-            if self.is_parsing():
+        # do this while the parsing flag is set, and exit if/when stop_parsing() is called
+        while self.is_parsing():
 
-                # read a line
-                line = self.readline()
-                now = time.time()
-                if line:
+            # read a line
+            line = self.readline()
+            now = time.time()
+            if line:
+                self.prevtime = now
+
+                # process this line
+                await self.process_line(line)
+
+            else:
+                # check the heartbeat.  Has our logfile gone silent?
+                elapsed_seconds = (now - self.prevtime)
+
+                if elapsed_seconds > self.heartbeat:
+                    starprint(f'[{self.char_name}] heartbeat over limit, elapsed seconds = {elapsed_seconds:.2f}')
                     self.prevtime = now
 
-                    # process this line
-                    self.process_line(line)
+                    # attempt to open latest log file - returns True if a new logfile is opened
+                    if self.open_latest():
+                        starprint('Now parsing character log for: [{}]'.format(self.char_name))
 
-                else:
-                    # check the heartbeat.  Has our logfile gone silent?
-                    elapsed_seconds = (now - self.prevtime)
+                # if we didn't read a line, pause just for a 100 msec blink
+                await asyncio.sleep(0.1)
 
-                    if elapsed_seconds > self.heartbeat:
-                        starprint('[{}] heartbeat over limit, elapsed seconds = {:.2f}'.format(self.char_name, elapsed_seconds))
-                        self.prevtime = now
+        starprint(f'Stopped parsing character log for: [{self.char_name}]')
 
-                        # attempt to open latest log file - returns True if a new logfile is opened
-                        if self.open_latest():
-                            starprint('Now parsing character log for: [{}]'.format(self.char_name))
-
-                    # if we didn't read a line, pause just for a 100 msec blink
-                    time.sleep(0.1)
-
-    def process_line(self, line: str) -> None:
+    async def process_line(self, line: str) -> None:
         """
         virtual method, to be overridden in derived classes to do whatever specialized
         parsing is required for that application.
@@ -291,30 +283,43 @@ class EverquestLogFile(threading.Thread):
 #
 # test driver
 #
-def main():
-    print('creating and starting elf, then sleeping for 20')
+async def main():
 
     base_directory = 'c:\\users\\ewjax\\Documents\\Gaming\\Everquest-Project1999'
     logs_directory = '\\logs\\'
-    server_name = 'P1999Green'
+    # server_name = 'P1999Green'
     heartbeat = 15
 
-    elf = EverquestLogFile(base_directory, logs_directory, server_name, heartbeat)
+    elf = EverquestLogFile(base_directory, logs_directory, heartbeat)
+
+    print('creating and starting elf, then sleeping for 20')
     elf.go()
-    time.sleep(20)
+
+    count = 20
+    for n in range(count):
+        print(f'------------------- tick {n} ---------------------')
+        await asyncio.sleep(1)
 
     # test the ability to stop and restart the parsing
     print('stopping elf, then sleeping for 5')
-    elf.stop()
-    time.sleep(5)
+    elf.stop_parsing()
+
+    count = 5
+    for n in range(count):
+        print(f'------------------- tick {n} ---------------------')
+        await asyncio.sleep(1)
 
     print('restarting elf, then sleeping for 30')
     elf.go()
-    time.sleep(30)
+
+    count = 30
+    for n in range(count):
+        print(f'------------------- tick {n} ---------------------')
+        await asyncio.sleep(1)
 
     print('done done')
-    elf.stop()
+    elf.stop_parsing()
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

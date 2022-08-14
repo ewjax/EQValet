@@ -1,4 +1,5 @@
 import re
+import asyncio
 
 # import the global config data
 import config
@@ -21,11 +22,10 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         config.load()
 
         # parent ctor
-        base_dir = config.config_data.get('Everquest', 'BASE_DIRECTORY')
-        logs_dir = config.config_data.get('Everquest', 'LOGS_DIRECTORY')
-        server_name = config.config_data.get('Everquest', 'SERVER_NAME')
-        heartbeat = config.config_data.getint('Everquest', 'HEARTBEAT')
-        super().__init__(base_dir, logs_dir, server_name, heartbeat)
+        base_dir = config.config_data.get('Everquest', 'base_directory')
+        logs_dir = config.config_data.get('Everquest', 'logs_directory')
+        heartbeat = config.config_data.getint('Everquest', 'heartbeat')
+        super().__init__(base_dir, logs_dir, heartbeat)
 
         # use a RandomParser class to deal with all things random numbers and rolls
         self.random_parser = RandomParser.RandomParser()
@@ -37,7 +37,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         self.pet_parser = PetParser.PetParser()
 
     # process each line
-    def process_line(self, line):
+    async def process_line(self, line):
         # call parent to edit every line, the default behavior
         # super().process_line(line)
 
@@ -47,9 +47,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
-        #
         # todo - just testing the ability to enter a waypoint, with positive and negative value
-        #
         target = r'^\.wp\.(?P<eqx>[0-9-]+)\.(?P<eqy>[0-9-]+) '
         m = re.match(target, trunc_line)
         if m:
@@ -74,6 +72,27 @@ class EQValet(EverquestLogFile.EverquestLogFile):
             else:
                 starprint(f'Not currently parsing')
 
+        # check for .bt command
+        target = r'^\.bt'
+        m = re.match(target, trunc_line)
+        if m:
+            # the relevant section and key from the ini configfile
+            section = 'EQValet'
+            key = 'bell'
+            bell = config.config_data.getboolean(section, key)
+
+            if bell:
+                config.config_data[section][key] = 'False'
+                onoff = 'Off'
+            else:
+                config.config_data[section][key] = 'True'
+                onoff = 'On'
+
+            # save the updated ini file
+            config.save()
+
+            starprint(f'Bell tone notification: {onoff}')
+
         # check for a random
         self.random_parser.process_line(line)
 
@@ -94,6 +113,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('')
         starprint('General')
         starprint('  .help          : This message')
+        starprint('  .bt            : Toggle bell tone on/off.  Summary results can optionally be accompanied with a notification bell tone')
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
         starprint('Pets')
@@ -124,7 +144,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 #################################################################################################
 
 
-def main():
+async def main():
     # print a startup message
     starprint('')
     starprint('-------------------------------------------------')
@@ -138,10 +158,11 @@ def main():
 
     starprint('EQValet running')
 
-    # note that as soon as the main thread ends, so will the child threads
+    # while True followed by pass seems to block asyncio coroutines, so give the asyncio task a chance to break out
     while True:
-        pass
+        # sleep for 100 msec
+        await asyncio.sleep(0.1)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

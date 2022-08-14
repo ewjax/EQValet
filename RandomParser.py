@@ -5,6 +5,7 @@ from datetime import datetime
 # import the global config data
 import config
 
+import util
 from util import starprint
 
 
@@ -44,7 +45,7 @@ class PlayerRandomRoll:
     #
     def __repr__(self):
         """
-        Overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+        Overload function to allow object to print() to screen in sensible manner, for debugging with print()
         """
         return (
             '({}, {}, {}, {}, {})'.format(self.player_name, self.random_value, self.low, self.high, self.time_stamp))
@@ -154,7 +155,7 @@ class RandomGroup:
         # Index[24]..........................................................................................
         # Range: [150 - 999] | Rolls: 1 | Start Time: 2022 - 01 - 1500: 14:35 | Delta(seconds): 60
 
-        width = config.REPORT_WIDTH
+        width = util.REPORT_WIDTH
         fill = '.'
 
         rv = '\n'
@@ -258,7 +259,7 @@ class RandomGroup:
         return rv
 
     #
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
         """
         Overload function to allow object to print() to screen in sensible manner, for debugging with print()
@@ -429,12 +430,6 @@ class RandomParser:
         self.all_rolls = list()
         self.all_random_groups = list()
 
-        # default time a RandomGroup runs, collecting PlayerRandomRolls
-        self.default_window = config.config_data.getint('RandomParser', 'DEFAULT_WINDOW')
-
-        # default is to parse for randoms
-        self.parse = True
-
     #
     # check if a random is occurring
     def process_line(self, line: str) -> None:
@@ -452,7 +447,8 @@ class RandomParser:
                 toggled = rg.check_expiration(line)
                 if toggled:
                     # bell sound
-                    print('\a')
+                    if config.config_data.getboolean('EQValet', 'bell'):
+                        print('\a')
                     print(f'{rg.report_summary(ndx, config.the_valet.char_name)}')
 
         #
@@ -465,12 +461,21 @@ class RandomParser:
         target = r'^\.rt '
         m = re.match(target, trunc_line)
         if m:
-            if self.parse:
-                self.parse = False
+
+            # the relevant section and key value from the ini configfile
+            section = 'RandomParser'
+            key = 'parse'
+            setting = config.config_data.getboolean(section, key)
+
+            if setting:
+                config.config_data[section][key] = 'False'
                 onoff = 'Off'
             else:
-                self.parse = True
+                config.config_data[section][key] = 'True'
                 onoff = 'On'
+
+            # save the updated ini file
+            config.save()
 
             starprint(f'Random Parsing: {onoff}')
 
@@ -480,20 +485,27 @@ class RandomParser:
         target = r'^\.win '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'RandomParser default grouping window: {self.default_window} seconds')
+            win = config.config_data.getint('RandomParser', 'default_window')
+            starprint(f'RandomParser default grouping window: {win} seconds')
 
         #
-        # change default grouping window
+        # change grouping window
         #
         target = r'^\.win\.(?P<new_win>[0-9]+) '
         m = re.match(target, trunc_line)
         if m:
-            ndx = int(m.group('new_win'))
-            self.default_window = ndx
-            starprint(f'RandomParser new default grouping window: {self.default_window} seconds')
+            new_win = int(m.group('new_win'))
+            config.config_data['RandomParser']['grouping_window'] = new_win
 
+            # save the updated ini file
+            config.save()
+
+            starprint(f'RandomParser new grouping window: {new_win} seconds')
+
+        #
         # only do everything else if parsing is true
-        if self.parse:
+        #
+        if config.config_data.getboolean('RandomParser', 'parse'):
 
             #
             # show a summary of all randomevents
@@ -587,7 +599,8 @@ class RandomParser:
 
                     # if the roll wasn't added, create a new RandomGroup to hold this one
                     if not added:
-                        rg = RandomGroup(low, high, self.default_window)
+                        win = config.config_data['RandomParser']['grouping_window']
+                        rg = RandomGroup(low, high, win)
                         rg.add_roll(roll)
                         self.all_random_groups.append(rg)
 
@@ -699,7 +712,7 @@ class RandomParser:
         Show a report of all randomevents
         """
 
-        width = config.REPORT_WIDTH
+        width = util.REPORT_WIDTH
         fill1 = '-'
         fill2 = '='
 

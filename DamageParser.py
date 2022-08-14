@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 
 import config
+import util
 from util import starprint
 from CaseInsensitiveDict import CaseInsensitiveDict
 
@@ -675,10 +676,11 @@ class Target:
             dps_outgoing = grand_total_outgoing / self.combat_duration_seconds()
 
         # bell sound
-        print('\a')
+        if config.config_data.getboolean('EQValet', 'bell'):
+            print('\a')
 
         # now create the output report
-        width = config.REPORT_WIDTH
+        width = util.REPORT_WIDTH
         fill1 = '.'
         fill2 = '='
         reportbuffer = f'\n'
@@ -783,14 +785,14 @@ class Target:
         dps = 0.0
         if self.combat_duration_seconds() > 0:
             dps = grand_total_incoming / self.combat_duration_seconds()
-        clipboard_report = '{}, {} hp in {:.0f} s (@{:.1f} dps)'.format(self.target_name, grand_total_incoming, self.combat_duration_seconds(), dps)
+        clipboard_report = f'{self.target_name}, {grand_total_incoming} hp in {self.combat_duration_seconds():.0f}sec (@{dps:.1f} dps)'
 
         # walk the list of attackers, sort the attacker dictionary on total damage done...
         for (attacker, attacker_total) in sorted(incoming_summary_dict.items(), key=lambda val: val[1], reverse=True):
             fraction = 0
             if grand_total_incoming != 0:
                 fraction = round(attacker_total / grand_total_incoming * 100.0)
-            clipboard_report += ' | {} {} [{}%]'.format(attacker, attacker_total, fraction)
+            clipboard_report += f' | {attacker} {attacker_total} [{fraction}%]'
 
         # send this to clipboard
         pyperclip.copy(clipboard_report)
@@ -809,9 +811,6 @@ class DamageParser:
     # ctor
     def __init__(self):
 
-        # default is to parse
-        self.parse = True
-
         # the target that is being attacked
         # dictionary of {k:v} = {target_name, Target object}
         self.active_target_dict = CaseInsensitiveDict()
@@ -825,8 +824,6 @@ class DamageParser:
         # this is a pointer to the actual spell that is pending
         self.spell_pending = None
 
-        # combat timeout
-        self.combat_timeout = config.config_data.getint('DamageParser', 'COMBAT_TIMEOUT_SEC')
         self.slain_datetime = None
 
         # set of player names
@@ -968,12 +965,21 @@ class DamageParser:
         target = r'^\.ct '
         m = re.match(target, trunc_line)
         if m:
-            if self.parse:
-                self.parse = False
+
+            # the relevant section and key value from the ini configfile
+            section = 'DamageParser'
+            key = 'parse'
+            setting = config.config_data.getboolean(section, key)
+
+            if setting:
+                config.config_data[section][key] = 'False'
                 onoff = 'Off'
             else:
-                self.parse = True
+                config.config_data[section][key] = 'True'
                 onoff = 'On'
+
+            # save the updated ini file
+            config.save()
 
             starprint(f'Combat Parsing: {onoff}')
 
@@ -983,12 +989,13 @@ class DamageParser:
         target = r'^\.cto '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'DamageParser Combat timeout (CTO) = {self.combat_timeout}')
+            cto = config.config_data.getint('DamageParser', 'combat_timeout_sec')
+            starprint(f'DamageParser Combat timeout (CTO) = {cto}')
 
         #
         # only do the rest if user is parsing combat damage
         #
-        if self.parse:
+        if config.config_data.getboolean('DamageParser', 'parse'):
 
             #
             # watch for .who|.w user commands
@@ -1073,7 +1080,7 @@ class DamageParser:
                 # which would break the for loop
                 for target_name in copy.deepcopy(self.active_target_dict):
                     the_target = self.get_target(target_name)
-                    if the_target.combat_timeout_seconds(line) > self.combat_timeout:
+                    if the_target.combat_timeout_seconds(line) > config.config_data.getint('DamageParser', 'combat_timeout_sec'):
                         # ...then the combat timer has time out
                         starprint(f'Combat vs {target_name}: Timed out')
                         self.end_combat(target_name, line)
@@ -1095,7 +1102,7 @@ class DamageParser:
                 # get current time and check for timeout
                 now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                 elapsed_seconds = (now - self.spell_pending.event_datetime)
-                if elapsed_seconds.total_seconds() > config.config_data.getint('DamageParser', 'SPELL_PENDING_TIMEOUT_SEC'):
+                if elapsed_seconds.total_seconds() > config.config_data.getint('DamageParser', 'spell_pending_timeout_sec'):
                     # ...then this spell pending is expired
                     starprint(f'Spell ({self.spell_pending.spell_name}) no longer pending: Timed out')
                     self.spell_pending = None
