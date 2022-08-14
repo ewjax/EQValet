@@ -824,8 +824,6 @@ class DamageParser:
         # this is a pointer to the actual spell that is pending
         self.spell_pending = None
 
-        # combat timeout
-        self.combat_timeout = config.config_data.getint('DamageParser', 'combat_timeout_sec')
         self.slain_datetime = None
 
         # set of player names
@@ -958,9 +956,6 @@ class DamageParser:
             line: complete line from the EQ logfile
         """
 
-        # the relevant section from the ini configfile
-        section = 'DamageParser'
-
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
@@ -971,7 +966,8 @@ class DamageParser:
         m = re.match(target, trunc_line)
         if m:
 
-            # the relevant key value for this section in the ini configfile
+            # the relevant section and key value from the ini configfile
+            section = 'DamageParser'
             key = 'parse'
             setting = config.config_data.getboolean(section, key)
 
@@ -993,15 +989,13 @@ class DamageParser:
         target = r'^\.cto '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'DamageParser Combat timeout (CTO) = {self.combat_timeout}')
+            cto = config.config_data.getint('DamageParser', 'combat_timeout_sec')
+            starprint(f'DamageParser Combat timeout (CTO) = {cto}')
 
         #
         # only do the rest if user is parsing combat damage
         #
-
-        # the relevant key value for this section in the ini configfile
-        key = 'parse'
-        if config.config_data.getboolean(section, key):
+        if config.config_data.getboolean('DamageParser', 'parse'):
 
             #
             # watch for .who|.w user commands
@@ -1086,7 +1080,7 @@ class DamageParser:
                 # which would break the for loop
                 for target_name in copy.deepcopy(self.active_target_dict):
                     the_target = self.get_target(target_name)
-                    if the_target.combat_timeout_seconds(line) > self.combat_timeout:
+                    if the_target.combat_timeout_seconds(line) > config.config_data.getint('DamageParser', 'combat_timeout_sec'):
                         # ...then the combat timer has time out
                         starprint(f'Combat vs {target_name}: Timed out')
                         self.end_combat(target_name, line)

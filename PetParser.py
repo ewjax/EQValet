@@ -158,9 +158,6 @@ class PetParser:
         :param line: complete line to be parsed, i.e. timestamp and content
         """
 
-        # the relevant section from the ini configfile
-        section = 'PetParser'
-
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
@@ -168,8 +165,8 @@ class PetParser:
         target = r'^\.pt '
         m = re.match(target, trunc_line)
         if m:
-
-            # the relevant key value for this section in the ini configfile
+            # the relevant section and key value from the ini configfile
+            section = 'PetParser'
             key = 'parse'
             setting = config.config_data.getboolean(section, key)
 
@@ -185,9 +182,10 @@ class PetParser:
 
             starprint(f'Pet Parsing: {onoff}')
 
-        # the relevant key value for this section in the ini configfile
-        key = 'parse'
-        if config.config_data.getboolean(section, key):
+        #
+        # only do the rest if pet parsing is turned on
+        #
+        if config.config_data.getboolean('PetParser', 'parse'):
 
             #
             # check for user commands

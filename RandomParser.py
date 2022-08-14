@@ -430,9 +430,6 @@ class RandomParser:
         self.all_rolls = list()
         self.all_random_groups = list()
 
-        # default time a RandomGroup runs, collecting PlayerRandomRolls
-        self.default_window = config.config_data.getint('RandomParser', 'default_window')
-
     #
     # check if a random is occurring
     def process_line(self, line: str) -> None:
@@ -442,9 +439,6 @@ class RandomParser:
         Args:
             line: current line from the EQ logfile being parsed
         """
-
-        # the relevant section from the ini configfile
-        section = 'RandomParser'
 
         # begin by checking if any of the RandomEvents is due to expire
         rg: RandomGroup
@@ -468,7 +462,8 @@ class RandomParser:
         m = re.match(target, trunc_line)
         if m:
 
-            # the relevant key value for this section in the ini configfile
+            # the relevant section and key value from the ini configfile
+            section = 'RandomParser'
             key = 'parse'
             setting = config.config_data.getboolean(section, key)
 
@@ -490,23 +485,27 @@ class RandomParser:
         target = r'^\.win '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'RandomParser default grouping window: {self.default_window} seconds')
+            win = config.config_data.getint('RandomParser', 'default_window')
+            starprint(f'RandomParser default grouping window: {win} seconds')
 
         #
-        # change default grouping window
+        # change grouping window
         #
         target = r'^\.win\.(?P<new_win>[0-9]+) '
         m = re.match(target, trunc_line)
         if m:
-            ndx = int(m.group('new_win'))
-            self.default_window = ndx
-            starprint(f'RandomParser new default grouping window: {self.default_window} seconds')
+            new_win = int(m.group('new_win'))
+            config.config_data['RandomParser']['grouping_window'] = new_win
 
+            # save the updated ini file
+            config.save()
+
+            starprint(f'RandomParser new grouping window: {new_win} seconds')
+
+        #
         # only do everything else if parsing is true
-
-        # the relevant key value for this section in the ini configfile
-        key = 'parse'
-        if config.config_data.getboolean(section, key):
+        #
+        if config.config_data.getboolean('RandomParser', 'parse'):
 
             #
             # show a summary of all randomevents
@@ -600,7 +599,8 @@ class RandomParser:
 
                     # if the roll wasn't added, create a new RandomGroup to hold this one
                     if not added:
-                        rg = RandomGroup(low, high, self.default_window)
+                        win = config.config_data['RandomParser']['grouping_window']
+                        rg = RandomGroup(low, high, win)
                         rg.add_roll(roll)
                         self.all_random_groups.append(rg)
 

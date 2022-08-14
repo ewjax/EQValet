@@ -41,18 +41,13 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # call parent to edit every line, the default behavior
         # super().process_line(line)
 
-        # the relevant section from the ini configfile
-        section = 'EQValet'
-
         #
         # check for general commands
         #
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
-        #
         # todo - just testing the ability to enter a waypoint, with positive and negative value
-        #
         target = r'^\.wp\.(?P<eqx>[0-9-]+)\.(?P<eqy>[0-9-]+) '
         m = re.match(target, trunc_line)
         if m:
@@ -81,8 +76,8 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         target = r'^\.bt'
         m = re.match(target, trunc_line)
         if m:
-
-            # the relevant key value for this section in the ini configfile
+            # the relevant section and key from the ini configfile
+            section = 'EQValet'
             key = 'bell'
             bell = config.config_data.getboolean(section, key)
 
