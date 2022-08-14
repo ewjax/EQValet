@@ -22,22 +22,21 @@ class EverquestLogFile:
     overloading the process_line() method
     """
 
-    def __init__(self, base_directory: str, logs_directory: str, server_name: str, heartbeat: int) -> None:
+    def __init__(self, base_directory: str, logs_directory: str, heartbeat: int) -> None:
         """
         ctor
 
         Args:
             base_directory: Base installation directory for Everquest
             logs_directory: Logs directory, typically '\\logs\\'
-            server_name: Name of the server, i.e. 'P1999Green'
             heartbeat: Number of seconds of logfile inactivity before a check is made to re-determine most recent logfile
         """
         # instance data
         self.base_directory = base_directory
         self.logs_directory = logs_directory
         self.char_name = 'Unknown'
-        self.server_name = server_name
-        self.filename = self.build_filename(self.char_name)
+        self.server_name = 'Unknown'
+        self.filename = self.build_filename(self.char_name, self.server_name)
         self.file = None
 
         # are we parsing
@@ -46,18 +45,19 @@ class EverquestLogFile:
         self.prevtime = time.time()
         self.heartbeat = heartbeat
 
-    def build_filename(self, charname: str) -> str:
+    def build_filename(self, charname: str, servername: str) -> str:
         """
         build the file name.
         call this anytime that the filename attributes change
 
         Args:
             charname: Everquest character log to be parsed
+            servername: Name of the server, i.e. 'P1999Green'
 
         Returns:
             str: complete filename
         """
-        rv = self.base_directory + self.logs_directory + 'eqlog_' + charname + '_' + self.server_name + '.txt'
+        rv = self.base_directory + self.logs_directory + 'eqlog_' + charname + '_' + servername + '.txt'
         return rv
 
     def set_parsing(self) -> None:
@@ -90,7 +90,7 @@ class EverquestLogFile:
             object: True if a new file was opened, False otherwise
         """
         # get a list of all log files, and sort on mod time, latest at top
-        mask = self.base_directory + self.logs_directory + 'eqlog_*_' + self.server_name + '.txt'
+        mask = self.base_directory + self.logs_directory + 'eqlog_*_*' + '.txt'
         files = glob.glob(mask)
         files.sort(key=os.path.getmtime, reverse=True)
 
@@ -105,9 +105,10 @@ class EverquestLogFile:
         # note that backslashes in regular expressions are double-double-backslashes
         # this expression replaces double \\ with quadruple \\\\, as well as the filename mask asterisk to a
         # named regular expression
-        charname_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_', 'eqlog_(?P<charname>[\\w ]+)_')
-        m = re.match(charname_regexp, latest_file)
+        names_regexp = mask.replace('\\', '\\\\').replace('eqlog_*_*', 'eqlog_(?P<charname>[\\w ]+)_(?P<servername>[\\w]+)')
+        m = re.match(names_regexp, latest_file)
         char_name = m.group('charname')
+        server_name = m.group('servername')
 
         rv = False
 
@@ -121,21 +122,22 @@ class EverquestLogFile:
         elif self.is_parsing() and (self.filename != latest_file):
             # stop parsing old and open the new file
             self.close()
-            rv = self.open(char_name, latest_file, seek_end)
+            rv = self.open(char_name, server_name, latest_file, seek_end)
 
         # if we aren't parsing any file, then open latest
         elif not self.is_parsing():
-            rv = self.open(char_name, latest_file, seek_end)
+            rv = self.open(char_name, server_name, latest_file, seek_end)
 
         return rv
 
-    def open(self, charname: str, filename: str, seek_end=True) -> bool:
+    def open(self, charname: str, servername: str, filename: str, seek_end=True) -> bool:
         """
         open the file.
         seek file position to end of file if passed parameter 'seek_end' is true
 
         Args:
             charname: character name whose log file is to be opened
+            servername: Name of the server, i.e. 'P1999Green'
             filename: full log filename
             seek_end: True if parsing is to begin at the end of the file, False if at the beginning
 
@@ -148,6 +150,7 @@ class EverquestLogFile:
                 self.file.seek(0, os.SEEK_END)
 
             self.char_name = charname
+            self.server_name = servername
             self.filename = filename
             self.set_parsing()
             return True
@@ -201,7 +204,7 @@ class EverquestLogFile:
 
                 # start parsing, but in this case, start reading from the beginning of the file,
                 # rather than the end (default)
-                rv = self.open('Testing', filename, seek_end=False)
+                rv = self.open('Testing', 'Testing', filename, seek_end=False)
 
             # open the latest file
             else:
@@ -284,10 +287,10 @@ async def main():
 
     base_directory = 'c:\\users\\ewjax\\Documents\\Gaming\\Everquest-Project1999'
     logs_directory = '\\logs\\'
-    server_name = 'P1999Green'
+    # server_name = 'P1999Green'
     heartbeat = 15
 
-    elf = EverquestLogFile(base_directory, logs_directory, server_name, heartbeat)
+    elf = EverquestLogFile(base_directory, logs_directory, heartbeat)
 
     print('creating and starting elf, then sleeping for 20')
     elf.go()

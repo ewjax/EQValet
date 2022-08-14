@@ -431,10 +431,7 @@ class RandomParser:
         self.all_random_groups = list()
 
         # default time a RandomGroup runs, collecting PlayerRandomRolls
-        self.default_window = config.config_data.getint('RandomParser', 'DEFAULT_WINDOW')
-
-        # default is to parse for randoms
-        self.parse = True
+        self.default_window = config.config_data.getint('RandomParser', 'default_window')
 
     #
     # check if a random is occurring
@@ -446,6 +443,9 @@ class RandomParser:
             line: current line from the EQ logfile being parsed
         """
 
+        # the relevant section from the ini configfile
+        section = 'RandomParser'
+
         # begin by checking if any of the RandomEvents is due to expire
         rg: RandomGroup
         for (ndx, rg) in enumerate(self.all_random_groups):
@@ -453,7 +453,8 @@ class RandomParser:
                 toggled = rg.check_expiration(line)
                 if toggled:
                     # bell sound
-                    print('\a')
+                    if config.config_data.getboolean('EQValet', 'bell'):
+                        print('\a')
                     print(f'{rg.report_summary(ndx, config.the_valet.char_name)}')
 
         #
@@ -466,12 +467,20 @@ class RandomParser:
         target = r'^\.rt '
         m = re.match(target, trunc_line)
         if m:
-            if self.parse:
-                self.parse = False
+
+            # the relevant key value for this section in the ini configfile
+            key = 'parse'
+            setting = config.config_data.getboolean(section, key)
+
+            if setting:
+                config.config_data[section][key] = 'False'
                 onoff = 'Off'
             else:
-                self.parse = True
+                config.config_data[section][key] = 'True'
                 onoff = 'On'
+
+            # save the updated ini file
+            config.save()
 
             starprint(f'Random Parsing: {onoff}')
 
@@ -494,7 +503,10 @@ class RandomParser:
             starprint(f'RandomParser new default grouping window: {self.default_window} seconds')
 
         # only do everything else if parsing is true
-        if self.parse:
+
+        # the relevant key value for this section in the ini configfile
+        key = 'parse'
+        if config.config_data.getboolean(section, key):
 
             #
             # show a summary of all randomevents

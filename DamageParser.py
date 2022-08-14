@@ -676,7 +676,8 @@ class Target:
             dps_outgoing = grand_total_outgoing / self.combat_duration_seconds()
 
         # bell sound
-        print('\a')
+        if config.config_data.getboolean('EQValet', 'bell'):
+            print('\a')
 
         # now create the output report
         width = util.REPORT_WIDTH
@@ -810,9 +811,6 @@ class DamageParser:
     # ctor
     def __init__(self):
 
-        # default is to parse
-        self.parse = True
-
         # the target that is being attacked
         # dictionary of {k:v} = {target_name, Target object}
         self.active_target_dict = CaseInsensitiveDict()
@@ -827,7 +825,7 @@ class DamageParser:
         self.spell_pending = None
 
         # combat timeout
-        self.combat_timeout = config.config_data.getint('DamageParser', 'COMBAT_TIMEOUT_SEC')
+        self.combat_timeout = config.config_data.getint('DamageParser', 'combat_timeout_sec')
         self.slain_datetime = None
 
         # set of player names
@@ -960,6 +958,9 @@ class DamageParser:
             line: complete line from the EQ logfile
         """
 
+        # the relevant section from the ini configfile
+        section = 'DamageParser'
+
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
@@ -969,12 +970,20 @@ class DamageParser:
         target = r'^\.ct '
         m = re.match(target, trunc_line)
         if m:
-            if self.parse:
-                self.parse = False
+
+            # the relevant key value for this section in the ini configfile
+            key = 'parse'
+            setting = config.config_data.getboolean(section, key)
+
+            if setting:
+                config.config_data[section][key] = 'False'
                 onoff = 'Off'
             else:
-                self.parse = True
+                config.config_data[section][key] = 'True'
                 onoff = 'On'
+
+            # save the updated ini file
+            config.save()
 
             starprint(f'Combat Parsing: {onoff}')
 
@@ -989,7 +998,10 @@ class DamageParser:
         #
         # only do the rest if user is parsing combat damage
         #
-        if self.parse:
+
+        # the relevant key value for this section in the ini configfile
+        key = 'parse'
+        if config.config_data.getboolean(section, key):
 
             #
             # watch for .who|.w user commands
@@ -1096,7 +1108,7 @@ class DamageParser:
                 # get current time and check for timeout
                 now = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                 elapsed_seconds = (now - self.spell_pending.event_datetime)
-                if elapsed_seconds.total_seconds() > config.config_data.getint('DamageParser', 'SPELL_PENDING_TIMEOUT_SEC'):
+                if elapsed_seconds.total_seconds() > config.config_data.getint('DamageParser', 'spell_pending_timeout_sec'):
                     # ...then this spell pending is expired
                     starprint(f'Spell ({self.spell_pending.spell_name}) no longer pending: Timed out')
                     self.spell_pending = None

@@ -93,9 +93,19 @@ class Pet:
         return rv
 
     def __repr__(self):
-        rv = 'Pet: **{}**, Level: {}, Max Melee: {}, Rank (1-{}): {}'.format(self.pet_name, self.pet_level, self.max_melee,
-                                                                             len(self.pet_spell.pet_level_list),
-                                                                             self.pet_rank)
+
+        # return value
+        rv = ''
+
+        # bell sound
+        if config.config_data.getboolean('EQValet', 'bell'):
+            rv += f'\a'
+
+        rv += f'Pet: **{self.pet_name}**, ' \
+              f'Level: {self.pet_level}, ' \
+              f'Max Melee: {self.max_melee}, ' \
+              f'Rank (1-{len(self.pet_spell.pet_level_list)}): {self.pet_rank}'
+
         if self.pet_spell:
             rv += f' ({self.pet_spell.spell_name})'
         return rv
@@ -113,9 +123,6 @@ class PetParser:
 
     # ctor
     def __init__(self):
-
-        # default is to parse for pet info
-        self.parse = True
 
         # pointer to current pet
         self.current_pet = None
@@ -150,6 +157,10 @@ class PetParser:
 
         :param line: complete line to be parsed, i.e. timestamp and content
         """
+
+        # the relevant section from the ini configfile
+        section = 'PetParser'
+
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
@@ -157,16 +168,26 @@ class PetParser:
         target = r'^\.pt '
         m = re.match(target, trunc_line)
         if m:
-            if self.parse:
-                self.parse = False
+
+            # the relevant key value for this section in the ini configfile
+            key = 'parse'
+            setting = config.config_data.getboolean(section, key)
+
+            if setting:
+                config.config_data[section][key] = 'False'
                 onoff = 'Off'
             else:
-                self.parse = True
+                config.config_data[section][key] = 'True'
                 onoff = 'On'
+
+            # save the updated ini file
+            config.save()
 
             starprint(f'Pet Parsing: {onoff}')
 
-        if self.parse:
+        # the relevant key value for this section in the ini configfile
+        key = 'parse'
+        if config.config_data.getboolean(section, key):
 
             #
             # check for user commands

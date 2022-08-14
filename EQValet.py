@@ -22,11 +22,10 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         config.load()
 
         # parent ctor
-        base_dir = config.config_data.get('Everquest', 'BASE_DIRECTORY')
-        logs_dir = config.config_data.get('Everquest', 'LOGS_DIRECTORY')
-        server_name = config.config_data.get('Everquest', 'SERVER_NAME')
-        heartbeat = config.config_data.getint('Everquest', 'HEARTBEAT')
-        super().__init__(base_dir, logs_dir, server_name, heartbeat)
+        base_dir = config.config_data.get('Everquest', 'base_directory')
+        logs_dir = config.config_data.get('Everquest', 'logs_directory')
+        heartbeat = config.config_data.getint('Everquest', 'heartbeat')
+        super().__init__(base_dir, logs_dir, heartbeat)
 
         # use a RandomParser class to deal with all things random numbers and rolls
         self.random_parser = RandomParser.RandomParser()
@@ -41,6 +40,9 @@ class EQValet(EverquestLogFile.EverquestLogFile):
     async def process_line(self, line):
         # call parent to edit every line, the default behavior
         # super().process_line(line)
+
+        # the relevant section from the ini configfile
+        section = 'EQValet'
 
         #
         # check for general commands
@@ -75,6 +77,27 @@ class EQValet(EverquestLogFile.EverquestLogFile):
             else:
                 starprint(f'Not currently parsing')
 
+        # check for .bt command
+        target = r'^\.bt'
+        m = re.match(target, trunc_line)
+        if m:
+
+            # the relevant key value for this section in the ini configfile
+            key = 'bell'
+            bell = config.config_data.getboolean(section, key)
+
+            if bell:
+                config.config_data[section][key] = 'False'
+                onoff = 'Off'
+            else:
+                config.config_data[section][key] = 'True'
+                onoff = 'On'
+
+            # save the updated ini file
+            config.save()
+
+            starprint(f'Bell tone notification: {onoff}')
+
         # check for a random
         self.random_parser.process_line(line)
 
@@ -95,6 +118,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('')
         starprint('General')
         starprint('  .help          : This message')
+        starprint('  .bt            : Toggle bell tone on/off.  Summary results can optionally be accompanied with a notification bell tone')
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
         starprint('Pets')
