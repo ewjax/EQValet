@@ -27,7 +27,7 @@ def main():
 
     #
     # self.player_names_count = len(self.player_names_set)
-    # print('Read {} player names from [{}]'.format(self.player_names_count, self.player_names_fname))
+    # print('Read {} player names from [{}]'.format(self.player_names_count, self.player_names_filename))
     #
     # the_set = set()
     #

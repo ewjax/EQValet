@@ -13,18 +13,18 @@ ini_filename = 'EQValet.ini'
 
 def load() -> None:
     """
-    Utility function to load contents from .ini file into a configparser.ConfigParser object
+    Utility function to load contents from .ini logfile into a configparser.ConfigParser object
     """
     global config_data
 
     file_list = config_data.read(ini_filename)
     try:
         if len(file_list) == 0:
-            raise ValueError(f'Unable to open ini file [{ini_filename}]')
+            raise ValueError(f'Unable to open ini logfile [{ini_filename}]')
     except ValueError as verr:
         starprint(f'{str(verr)}, creating default {ini_filename}')
 
-    # confirm all needed sections and key values are present in the ini file
+    # confirm all needed sections and key values are present in the ini logfile
     verify_settings()
 
     # print out the contents
@@ -33,7 +33,7 @@ def load() -> None:
 
 def verify_settings() -> None:
     """
-    confirm all needed sections and key values are present in the ini file
+    confirm all needed sections and key values are present in the ini logfile
     """
     global config_data
     modified = False
@@ -111,18 +111,19 @@ def verify_settings() -> None:
     # save the data
     if modified:
         save()
+        show()
 
 
 def save() -> None:
     """
-    Utility function to save contents to .ini file from the configparser.ConfigParser object
+    Utility function to save contents to .ini logfile from the configparser.ConfigParser object
     """
     global config_data
     with open(ini_filename, 'wt') as inifile:
         config_data.write(inifile)
 
-    # print out the contents
-    show()
+    # # print out the contents
+    # show()
 
 
 def show() -> None:
@@ -131,10 +132,10 @@ def show() -> None:
     """
     global config_data
 
-    starprint(f'{ini_filename} saved')
+    starprint(f'{ini_filename} contents:', alignment='^', fill='-')
     for section in config_data.sections():
         starprint(f'[{section}]')
         for key in config_data[section]:
             val = config_data[section][key]
             starprint(f'    {key} = {val}')
-
+    starprint(f'.', alignment='^', fill='.')

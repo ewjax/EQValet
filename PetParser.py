@@ -178,7 +178,7 @@ class PetParser:
                 config.config_data[section][key] = 'True'
                 onoff = 'On'
 
-            # save the updated ini file
+            # save the updated ini logfile
             config.save()
 
             starprint(f'Pet Parsing: {onoff}')

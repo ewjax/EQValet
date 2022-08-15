@@ -1,6 +1,5 @@
 # import the datetime class from the datetime module
 import copy
-import pickle
 import pyperclip
 import re
 from datetime import datetime
@@ -115,7 +114,7 @@ class DiscreteDamageEvent(DamageEvent):
     """
 
     # ctor
-    # for the time parameter, pass at least, or all, of the actual log file line containing the timestamp
+    # for the time parameter, pass at least, or all, of the actual log logfile line containing the timestamp
     # [Thu Oct 28 15:24:13 2021] A frost giant captain is engulfed in darkness.
     def __init__(self, attacker_name: str, target_name: str, eq_timestamp: str, dmg_type: str, dmg_amount: int, aoe: bool = False):
         """
@@ -824,67 +823,12 @@ class DamageParser:
         # this is a pointer to the actual spell that is pending
         self.spell_pending = None
 
+        # slain message
         self.slain_datetime = None
-
-        # set of player names
-        self.player_names_set = set()
-        self.player_names_count = 0
-        self.player_names_fname = './data/EQValet-PlayerNames.dat'
-        self.read_player_names()
 
         # set of pet names
         self.pet_names_set = set()
         self.read_pet_names()
-
-    #
-    #
-    def read_player_names(self) -> bool:
-        """
-        Read player names from the database file being maintained
-
-        Returns:
-            Boolean indicating read success/failure
-        """
-        # throws and exception if file doesn't exist
-        try:
-            f = open(self.player_names_fname, 'rb')
-            self.player_names_set = pickle.load(f)
-            f.close()
-
-            self.player_names_count = len(self.player_names_set)
-            print('Read {} player names from [{}]'.format(self.player_names_count, self.player_names_fname))
-
-            return True
-        except OSError as err:
-            print("OS error: {0}".format(err))
-            print('Unable to open filename: [{}]'.format(self.player_names_fname))
-            return False
-
-    #
-    #
-    def write_player_names(self) -> bool:
-        """
-        Write player names to the database file being maintained
-
-        Returns:
-            Boolean indicating write success/failure
-        """
-        try:
-            f = open(self.player_names_fname, 'wb')
-            pickle.dump(self.player_names_set, f)
-            f.close()
-
-            old_count = self.player_names_count
-            new_count = len(self.player_names_set)
-            self.player_names_count = new_count
-
-            starprint(f'{new_count - old_count} new, {new_count} total player names written to [{self.player_names_fname}]')
-            return True
-
-        except OSError as err:
-            print("OS error: {0}".format(err))
-            print('Unable to open filename: [{}]'.format(self.player_names_fname))
-            return False
 
     #
     #
@@ -933,7 +877,7 @@ class DamageParser:
 
         Args:
             target_name: combat target name
-            line: log file line
+            line: log logfile line
         """
 
         # remove this target from the active Target dictionary, and add it to the inactive target list
@@ -978,7 +922,7 @@ class DamageParser:
                 config.config_data[section][key] = 'True'
                 onoff = 'On'
 
-            # save the updated ini file
+            # save the updated ini logfile
             config.save()
 
             starprint(f'Combat Parsing: {onoff}')
@@ -998,39 +942,6 @@ class DamageParser:
         if config.config_data.getboolean('DamageParser', 'parse'):
 
             #
-            # watch for .who|.w user commands
-            #
-            target = r'^(\.who )|(\.w )'
-            m = re.match(target, trunc_line)
-            if m:
-                namebuffer = f'Sorted list of all player names stored in /who database: {self.player_names_fname}\n'
-                current_firstchar = None
-
-                # walk the sorted list of names
-                for name in sorted(self.player_names_set):
-
-                    # check first character of current name
-                    testchar = name[0]
-
-                    # new first character detected
-                    if testchar != current_firstchar:
-                        # print current with the old first character
-                        print(namebuffer)
-
-                        # now reset the data and get it ready for this character
-                        current_firstchar = testchar
-                        namebuffer = f'\n[{current_firstchar}] Names:\n'
-                        namebuffer += f'{name}, '
-
-                    # same first char
-                    else:
-                        # just append this name to the namebuffer
-                        namebuffer += f'{name}, '
-
-                # print the last namebuffer
-                print(namebuffer)
-
-            #
             # watch for conditions indicating combat is finished
             #
             if len(self.active_target_dict) > 0:
@@ -1042,7 +953,7 @@ class DamageParser:
                     # extract RE data
                     target_name = m.group('target_name')
                     # ensure slain target was not a player and was not a pet
-                    if (target_name not in self.player_names_set) and (target_name not in self.pet_names_set):
+                    if (target_name not in config.the_valet.player_names_set) and (target_name not in self.pet_names_set):
                         # save for exp message comparison
                         self.slain_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                         self.end_combat(target_name, line)
@@ -1053,7 +964,7 @@ class DamageParser:
                 if m:
                     # extract RE data
                     target_name = m.group('target_name')
-                    if target_name not in self.player_names_set:
+                    if target_name not in config.the_valet.player_names_set:
                         # save for exp message comparison
                         self.slain_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                         self.end_combat(target_name, line)
@@ -1274,7 +1185,7 @@ class DamageParser:
                 damage = int(m.group('damage'))
 
                 # the case where the Mob is attacking YOU, or a Player, or any pet
-                if (target_name == 'YOU') or (target_name in self.player_names_set) or (target_name in self.pet_names_set):
+                if (target_name == 'YOU') or (target_name in config.the_valet.player_names_set) or (target_name in self.pet_names_set):
 
                     # any damage event indicates we are in combat
                     the_target = self.get_target(attacker_name)
@@ -1301,81 +1212,6 @@ class DamageParser:
                     # add the DamageEvent
                     dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
                     the_target.add_incoming_damage_event(dde)
-
-            #
-            # watch for /who messages
-            #
-            who_regexp = r'^Players (in|on) EverQuest'
-            m = re.match(who_regexp, trunc_line)
-            if m:
-                starprint('/who detected, checking for new names to add to database')
-                processing_names = True
-                player_names_set_modified = False
-
-                # # debugging output
-                # [Sun Dec 19 20:33:44 2021] Players on EverQuest:
-                # [Sun Dec 19 20:33:44 2021] ---------------------------
-                # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Aijalon
-                # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yihao
-                # [Sun Dec 19 20:33:44 2021] [54 Disciple] Weth (Iksar) <Safe Space>
-                # [Sun Dec 19 20:33:44 2021] [54 Disciple] Rcva (Iksar) <Kingdom>
-                # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yula  <Force of Will>
-                # [Sun Dec 19 20:33:44 2021] [57 Master] Twywu (Iksar) <Safe Space>
-                # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Tenedorf  <Safe Space>
-                # [Sun Dec 19 20:33:44 2021] [60 Grave Lord] Gratton (Troll) <Force of Will>
-                # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Bloodreign
-                # [Sun Dec 19 20:33:44 2021] [60 Phantasmist] Azleep (Elemental) <Force of Will>
-                # [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
-
-                # get next line - many dashes
-                nextline = config.the_valet.readline()
-                # print(nextline, end='')
-
-                # read all the name(s) in the /who report
-                while processing_names:
-
-                    # get next line
-                    nextline = config.the_valet.readline()
-                    # print(nextline, end='')
-                    trunc_line = nextline[27:]
-
-                    # as a safety net, just presume this is not the next name on the report
-                    processing_names = False
-
-                    # oddly, sometimes the name lists is preceeded by a completely blank line,
-                    # usually when a /who all command has been issued
-                    # this regex allows for a blank line
-                    name_regexp = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w]+)|^$)'
-                    m = re.match(name_regexp, trunc_line)
-                    if m:
-                        # since we did successfully find a name, extend the processing for another line
-                        processing_names = True
-
-                        # process the name.  will return None if got here via the empty ^$ line that /who all puts out
-                        record = ''
-                        player_name = m.group('player_name')
-                        if player_name:
-                            record += player_name
-                            if player_name not in self.player_names_set:
-                                self.player_names_set.add(player_name)
-                                player_names_set_modified = True
-
-                        player_level = m.group('player_level')
-                        if player_level:
-                            record += ' '
-                            record += player_level
-
-                        player_class = m.group('player_class')
-                        if player_class:
-                            record += ' '
-                            record += player_class
-
-                        # if record != '':
-                        #     print(record)
-
-                # done processing /who list
-                if player_names_set_modified:
-                    self.write_player_names()
 
     #
     #

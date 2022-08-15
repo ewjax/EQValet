@@ -18,7 +18,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
     # ctor
     def __init__(self) -> None:
 
-        # force global data to load from ini file
+        # force global data to load from ini logfile
         config.load()
 
         # parent ctor
@@ -36,14 +36,12 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # use a PetParser class to deal with all things pets
         self.pet_parser = PetParser.PetParser()
 
+    #
     # process each line
-    async def process_line(self, line):
+    async def process_line(self, line: str, printline: bool = False) -> None:
         # call parent to edit every line, the default behavior
-        # super().process_line(line)
+        await super().process_line(line, printline)
 
-        #
-        # check for general commands
-        #
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
@@ -61,13 +59,20 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         if m:
             EQValet.help_message()
 
+        # check for .ini command
+        target = r'^\.ini'
+        m = re.match(target, trunc_line)
+        if m:
+            # show the ini file
+            config.show()
+
         # check for .status command
         target = r'^\.status'
         m = re.match(target, trunc_line)
         if m:
             if self.is_parsing():
                 starprint(f'Parsing character log for:    [{self.char_name}]')
-                starprint(f'Log filename:                 [{self.filename}]')
+                starprint(f'Log filename:                 [{self.logfile_name}]')
                 starprint(f'Heartbeat timeout (seconds):  [{self.heartbeat}]')
             else:
                 starprint(f'Not currently parsing')
@@ -88,7 +93,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
                 config.config_data[section][key] = 'True'
                 onoff = 'On'
 
-            # save the updated ini file
+            # save the updated ini logfile
             config.save()
 
             starprint(f'Bell tone notification: {onoff}')
@@ -102,8 +107,13 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # check for pet-related content
         self.pet_parser.process_line(line)
 
+    #
+    #
     @staticmethod
-    def help_message():
+    def help_message() -> None:
+        """
+        Print out a Help message
+        """
         starprint('')
         starprint('', '^', '*')
         starprint('')

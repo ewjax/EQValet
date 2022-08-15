@@ -474,7 +474,7 @@ class RandomParser:
                 config.config_data[section][key] = 'True'
                 onoff = 'On'
 
-            # save the updated ini file
+            # save the updated ini logfile
             config.save()
 
             starprint(f'Random Parsing: {onoff}')
@@ -485,7 +485,7 @@ class RandomParser:
         target = r'^\.win '
         m = re.match(target, trunc_line)
         if m:
-            win = config.config_data.getint('RandomParser', 'default_window')
+            win = config.config_data.getint('RandomParser', 'grouping_window')
             starprint(f'RandomParser default grouping window: {win} seconds')
 
         #
@@ -495,9 +495,9 @@ class RandomParser:
         m = re.match(target, trunc_line)
         if m:
             new_win = int(m.group('new_win'))
-            config.config_data['RandomParser']['grouping_window'] = new_win
+            config.config_data['RandomParser']['grouping_window'] = f'{new_win}'
 
-            # save the updated ini file
+            # save the updated ini logfile
             config.save()
 
             starprint(f'RandomParser new grouping window: {new_win} seconds')
