@@ -1,6 +1,6 @@
 # specific files
 EQValet.ini
-EQValet-PlayerNames.dat
+data/EQValet-PlayerNames_*.dat
 
 # directories for this project
 pics/

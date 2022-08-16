@@ -160,6 +160,9 @@ class RandomGroup:
 
         rv = '\n'
         leader = f'Group Index: [{ndx}]'
+        if not self.expired:
+            leader += f' (OPEN) '
+
         rv += f'{leader:{fill}<{width}}\n'
 
         ll = '?'
