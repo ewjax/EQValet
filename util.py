@@ -1,3 +1,5 @@
+import psutil
+
 
 MAXBUFFLENGTH = 1950
 
@@ -63,3 +65,18 @@ def starprint(line: str, alignment: str = '<', fill: str = ' ') -> None:
     """
     width = REPORT_WIDTH
     print(f'** {line.rstrip():{fill}{alignment}{width}} **')
+
+
+def get_eqgame_pid_list() -> list[int]:
+    """
+    get list of process ID's for eqgame.exe, using psutil module
+    returns a list of process ID's (in case multiple versions of eqgame.exe are somehow running)
+
+    :return: list of process ID integers
+    """
+
+    pid_list = list()
+    for p in psutil.process_iter(['name']):
+        if p.info['name'] == 'eqgame.exe':
+            pid_list.append(p.pid)
+    return pid_list

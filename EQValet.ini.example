@@ -18,3 +18,7 @@ combat_timeout_sec = 120
 [PetParser]
 parse = True
 
+[DeathLoopParser]
+parse = True
+deaths = 4
+seconds = 120
