@@ -34,20 +34,21 @@ exe: libs
 
 exe.clean: libs.clean
 	rm -rfd build
-	rm -rfd dist
+	#rm -rfd dist
+	rm dist/$(PACKAGE).exe
 
 
 # install make targets ###########################
 #DIRS=dist/data dist/xxx
 DIRS=dist/data
 install: exe
-	cp $(PACKAGE).ini* ./dist
+	#cp $(PACKAGE).ini* ./dist
 	$(shell mkdir $(DIRS))
-	cp ./data/*.dat ./dist/data/
+	#cp ./data/*.dat ./dist/data/
 
 install.clean: exe.clean
-	rm -rfd dist/$(PACKAGE).ini
-	rm -rfd dist/data
+	#rm -rfd dist/$(PACKAGE).ini
+	#rm -rfd dist/data
 
 
 # zip make targets ###########################

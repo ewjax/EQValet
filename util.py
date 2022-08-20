@@ -1,5 +1,5 @@
 import psutil
-
+from win32gui import FindWindow, GetWindowRect
 
 MAXBUFFLENGTH = 1950
 
@@ -80,3 +80,13 @@ def get_eqgame_pid_list() -> list[int]:
         if p.info['name'] == 'eqgame.exe':
             pid_list.append(p.pid)
     return pid_list
+
+
+def get_window_rect():
+
+    # FindWindow takes the Window Class name (can be None if unknown), and the window's display text.
+    window_handle = FindWindow(None, 'EQValet')
+    window_rect = GetWindowRect(window_handle)
+
+    print(window_rect)
+    # (0, 0, 800, 600)

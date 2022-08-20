@@ -9,6 +9,7 @@ import DamageParser
 import PetParser
 import RandomParser
 import DeathLoopParser
+import util
 from util import starprint
 
 
@@ -39,6 +40,8 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
         # use a DeathLoopParser class to deal with all things Deathloop
         self.deathloop_parser = DeathLoopParser.DeathLoopParser()
+
+        util.get_window_rect()
 
     #
     # process each line

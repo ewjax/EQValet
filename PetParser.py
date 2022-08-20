@@ -287,7 +287,7 @@ class PetParser:
                             self.current_pet.pet_level = petstat.pet_level
 
                             # announce the pet rank
-                            starprint(self.current_pet)
+                            starprint(str(self.current_pet))
                             starprint('  (Identified via lifetap signature)')
 
             #
@@ -678,7 +678,16 @@ class PetParser:
         pet_spell = PetSpell('Guardian Spirit', 'Shaman', caster_level=44, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
-        # todo need shaman pets for 49, 55
+        pet_level_list.clear()
+        pet_level_list.append(PetLevel(rank=1, pet_level=32, max_melee=43, max_bashkick=21, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=2, pet_level=33, max_melee=45, max_bashkick=22, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=3, pet_level=34, max_melee=47, max_bashkick=22, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=4, pet_level=35, max_melee=49, max_bashkick=23, max_backstab=0, lifetap=0))
+        pet_level_list.append(PetLevel(rank=5, pet_level=36, max_melee=51, max_bashkick=23, max_backstab=0, lifetap=0))
+        pet_spell = PetSpell('Frenzied Spirit', 'Shaman', caster_level=49, pet_level_list=pet_level_list.copy())
+        self.pet_dict[pet_spell.spell_name] = pet_spell
+
+        # todo need shaman pets for 55
 
         # todo need all mage pets
 
