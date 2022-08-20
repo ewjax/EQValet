@@ -108,6 +108,24 @@ def verify_settings() -> None:
         config_data.set(section, 'parse', 'True')
         modified = True
 
+    # DeathLoopParser section
+    section = 'DeathLoopParser'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+        modified = True
+
+    if not config_data.has_option(section, 'parse'):
+        config_data.set(section, 'parse', 'True')
+        modified = True
+
+    if not config_data.has_option(section, 'deaths'):
+        config_data.set(section, 'deaths', '4')
+        modified = True
+
+    if not config_data.has_option(section, 'seconds'):
+        config_data.set(section, 'seconds', '4')
+        modified = True
+
     # save the data
     if modified:
         save()

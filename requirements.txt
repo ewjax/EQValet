@@ -1,3 +1,5 @@
+psutil~=5.9.1
+pywin32
 pyinstaller
-pyperclip
+pyperclip~=1.8.2
 

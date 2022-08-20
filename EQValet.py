@@ -8,6 +8,8 @@ import EverquestLogFile
 import DamageParser
 import PetParser
 import RandomParser
+import DeathLoopParser
+import util
 from util import starprint
 
 
@@ -35,6 +37,11 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
         # use a PetParser class to deal with all things pets
         self.pet_parser = PetParser.PetParser()
+
+        # use a DeathLoopParser class to deal with all things Deathloop
+        self.deathloop_parser = DeathLoopParser.DeathLoopParser()
+
+        util.get_window_rect()
 
     #
     # process each line
@@ -107,6 +114,9 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # check for pet-related content
         self.pet_parser.process_line(line)
 
+        # check for deathloop-related content
+        self.deathloop_parser.process_line(line)
+
     #
     #
     @staticmethod
@@ -132,6 +142,10 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('Combat')
         starprint('  .ct            : Toggle combat damage tracking on/off')
         starprint('  .cto           : Show current value for how many seconds until combat times out')
+        starprint('Death Loops')
+        starprint('  .dlt           : Toggle death loop tracking on/off')
+        starprint('  .dl            : Show death loop parameters')
+        starprint('  .deathloop     : Simulate a death, for testing')
         starprint('Randoms')
         starprint('  .rt            : Toggle combat damage tracking on/off')
         starprint('  .rolls         : Show a summary of all random groups, including their index values N')

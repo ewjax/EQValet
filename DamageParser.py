@@ -1038,7 +1038,7 @@ class DamageParser:
                     the_target = self.get_target(target_name)
                     if not the_target.in_combat:
                         the_target.start_combat(line)
-                        starprint(f'Combat begun: {target_name}', '^', '~')
+                        starprint(f'Combat begun: [{target_name}]', '^', '-')
                         starprint(f'(spell landed)', '^')
 
                     # is this spell already in the DE list for the player, and still ticking?
@@ -1116,7 +1116,7 @@ class DamageParser:
                 the_target = self.get_target(target_name)
                 if not the_target.in_combat:
                     the_target.start_combat(line)
-                    starprint(f'Combat begun: {target_name}', '^', '~')
+                    starprint(f'Combat begun: [{target_name}]', '^', '-')
                     starprint(f'(non-melee event)', '^')
 
                 # if there is a spell pending, then assume that this event represents the DD component of that spell
@@ -1141,7 +1141,7 @@ class DamageParser:
                 the_target = self.get_target(target_name)
                 if not the_target.in_combat:
                     the_target.start_combat(line)
-                    starprint(f'Combat begun: {target_name}', '^', '~')
+                    starprint(f'Combat begun: [{target_name}]', '^', '-')
                     starprint(f'(melee miss by you)', '^')
 
             #
@@ -1162,7 +1162,7 @@ class DamageParser:
                 the_target = self.get_target(target_name)
                 if not the_target.in_combat:
                     the_target.start_combat(line)
-                    starprint(f'Combat begun: {target_name}', '^', '~')
+                    starprint(f'Combat begun: [{target_name}]', '^', '-')
                     starprint(f'(melee hit by you)', '^')
 
                 # add the DamageEvent
@@ -1191,7 +1191,7 @@ class DamageParser:
                     the_target = self.get_target(attacker_name)
                     if not the_target.in_combat:
                         the_target.start_combat(line)
-                        starprint(f'Combat begun: {attacker_name}', '^', '~')
+                        starprint(f'Combat begun: [{attacker_name}]', '^', '-')
                         starprint(f'(melee event vs you, or Player, or Pet)', '^')
 
                     the_target.check_max_melee(damage)
@@ -1206,7 +1206,7 @@ class DamageParser:
                     the_target = self.get_target(target_name)
                     if not the_target.in_combat:
                         the_target.start_combat(line)
-                        starprint(f'Combat begun: {target_name}', '^', '~')
+                        starprint(f'Combat begun: [{target_name}]', '^', '-')
                         starprint(f'(melee event vs mob)', '^')
 
                     # add the DamageEvent
