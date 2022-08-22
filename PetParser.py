@@ -84,6 +84,7 @@ class Pet:
         self.max_melee = 0
         self.pet_rank = 0
         self.pet_level = 0
+        self.pet_lifetap = 0
 
     def created_report(self):
         rv = 'Pet created: {}'.format(self.pet_name)
@@ -104,6 +105,7 @@ class Pet:
         rv += f'Pet: **{self.pet_name}**, ' \
               f'Level: {self.pet_level}, ' \
               f'Max Melee: {self.max_melee}, ' \
+              f'Lifetap: {self.pet_lifetap}, ' \
               f'Rank (1-{len(self.pet_spell.pet_level_list)}): {self.pet_rank}'
 
         if self.pet_spell:
@@ -281,10 +283,11 @@ class PetParser:
                     self.current_pet.lifetap_pending = False
 
                     # find the pet rank
-                    for petstat in self.current_pet.pet_spell.pet_level_list:
-                        if (petstat.lifetap == dmg) and (self.current_pet.pet_rank != petstat.rank):
-                            self.current_pet.pet_rank = petstat.rank
-                            self.current_pet.pet_level = petstat.pet_level
+                    for pet_stats in self.current_pet.pet_spell.pet_level_list:
+                        if (pet_stats.lifetap == dmg) and (self.current_pet.pet_rank != pet_stats.rank):
+                            self.current_pet.pet_rank = pet_stats.rank
+                            self.current_pet.pet_level = pet_stats.pet_level
+                            self.current_pet.pet_lifetap = pet_stats.lifetap
 
                             # announce the pet rank
                             starprint(str(self.current_pet))
@@ -319,10 +322,11 @@ class PetParser:
                         self.current_pet.max_melee = damage
 
                         # find the new rank
-                        for petstat in self.current_pet.pet_spell.pet_level_list:
-                            if petstat.max_melee == damage:
-                                self.current_pet.pet_rank = petstat.rank
-                                self.current_pet.pet_level = petstat.pet_level
+                        for pet_stats in self.current_pet.pet_spell.pet_level_list:
+                            if pet_stats.max_melee == damage:
+                                self.current_pet.pet_rank = pet_stats.rank
+                                self.current_pet.pet_level = pet_stats.pet_level
+                                self.current_pet.pet_lifetap = pet_stats.lifetap
 
                         # if charmed pet, determine implied level here
                         if self.current_pet.pet_spell.spell_name == 'CharmPet':

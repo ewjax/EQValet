@@ -86,7 +86,6 @@ def get_window_rect():
 
     # FindWindow takes the Window Class name (can be None if unknown), and the window's display text.
     window_handle = FindWindow(None, 'EQValet')
-    window_rect = GetWindowRect(window_handle)
-
-    print(window_rect)
-    # (0, 0, 800, 600)
+    if window_handle:
+        window_rect = GetWindowRect(window_handle)
+        print(window_rect)

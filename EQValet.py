@@ -133,7 +133,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('')
         starprint('General')
         starprint('  .help          : This message')
-        starprint('  .bt            : Toggle bell tone on/off.  Summary results can optionally be accompanied with a notification bell tone')
+        starprint('  .bt            : Toggle summary reports bell tone on/off')
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
         starprint('Pets')
@@ -171,9 +171,9 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 async def main():
     # print a startup message
     starprint('')
-    starprint('-------------------------------------------------')
-    starprint('EQValet')
-    starprint('-------------------------------------------------')
+    starprint('=', alignment='^', fill='=')
+    starprint('EQValet', alignment='^')
+    starprint('=', alignment='^', fill='=')
     starprint('')
 
     # create and start the EQValet parser
@@ -181,6 +181,7 @@ async def main():
     config.the_valet.go()
 
     starprint('EQValet running')
+    config.the_valet.help_message()
 
     # while True followed by pass seems to block asyncio coroutines, so give the asyncio task a chance to break out
     while True:

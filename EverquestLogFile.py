@@ -65,7 +65,7 @@ class EverquestLogFile:
         if self.server_name != servername:
 
             self.server_name = servername
-            self.player_names_filename = './data/EQValet-PlayerNames_' + servername + '.dat'
+            self.player_names_filename = 'data/EQValet-PlayerNames_' + servername + '.dat'
 
             # throws and exception if logfile doesn't exist
             try:
@@ -252,6 +252,7 @@ class EverquestLogFile:
                 # read a sample logfile for testing
                 logfile_name = './data/test/randoms.txt'
                 # logfile_name = './data/test/pets.txt'
+                # logfile_name = './data/test/pets2.txt'
                 # logfile_name = './data/test/pets_long.txt'
                 # logfile_name = './data/test/fights.txt'
 

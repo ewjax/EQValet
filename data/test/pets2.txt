@@ -1,0 +1,940 @@
+[Sun Aug 21 12:33:28 2022] You begin casting Emissary of Thule.
+[Sun Aug 21 12:33:31 2022] Yober tells the guild, 'CotH on  --> Nomo  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:33:37 2022] Sinistrus tells the guild, 'using that extra 5 mana per tick on Yober!'
+[Sun Aug 21 12:33:44 2022] Yober tells the guild, 'loving it'
+[Sun Aug 21 12:33:44 2022] Jabtik says 'At your service Master.'
+[Sun Aug 21 12:33:46 2022] Targeting your pet.
+[Sun Aug 21 12:33:47 2022] Jabtik judges you amiably -- it appears to be quite formidable.
+[Sun Aug 21 12:33:55 2022] You begin casting Augment Death.
+[Sun Aug 21 12:33:55 2022] Your Warlock's Pantaloons begins to glow.
+[Sun Aug 21 12:33:58 2022] Jabtik says 'Guarding with my life..oh splendid one.'
+[Sun Aug 21 12:34:10 2022] Jabtik's eyes gleam with madness.
+[Sun Aug 21 12:34:14 2022] You forget Emissary of Thule.
+[Sun Aug 21 12:34:17 2022] Beginning to memorize Lich...
+[Sun Aug 21 12:34:18 2022] You have finished memorizing Lich.
+[Sun Aug 21 12:34:23 2022] Yober tells the guild, 'CotH on  --> Kbazz  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:34:29 2022] You begin casting Lich.
+[Sun Aug 21 12:34:32 2022] You feel the skin peel from your bones.
+[Sun Aug 21 12:34:56 2022] Yober tells the guild, 'CotH on  --> Konstant  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:35:20 2022] Your Location is 34.04, 1842.76, -188.48
+[Sun Aug 21 12:35:24 2022] Kurrat tells the guild, 'Gird thy loins Mubbens, you are incoming to raid.'
+[Sun Aug 21 12:35:25 2022] Your Location is 31.68, 1835.48, -189.97
+[Sun Aug 21 12:35:26 2022] Yober tells the guild, 'CotH on  --> Zainne  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:35:34 2022] Your Location is 39.71, 1753.80, -173.59
+[Sun Aug 21 12:35:40 2022] Your Location is 34.07, 1748.32, -171.70
+[Sun Aug 21 12:35:42 2022] Your Location is 34.07, 1748.32, -171.80
+[Sun Aug 21 12:35:43 2022] Yober tells the guild, 'CotH on  --> Xhago  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:35:44 2022] Your Location is 34.07, 1748.32, -171.23
+[Sun Aug 21 12:35:45 2022] Your Location is 42.93, 1750.66, -172.97
+[Sun Aug 21 12:35:46 2022] Your Location is 61.80, 1771.20, -178.03
+[Sun Aug 21 12:35:47 2022] Kurrat tells the guild, 'Gird thy loins Xydra, you are incoming to raid.'
+[Sun Aug 21 12:36:00 2022] Yober tells the guild, 'CotH on  --> Chloaca  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:36:01 2022] Your flesh returns.
+[Sun Aug 21 12:36:08 2022] Kurrat tells the guild, 'Gird thy loins Vichaya, you are incoming to raid.'
+[Sun Aug 21 12:36:11 2022] Neehigh tells the guild, 'CARE ON COTH. DONT MOVE'
+[Sun Aug 21 12:36:33 2022] Kurrat tells the guild, 'Gird thy loins Ricks, you are incoming to raid.'
+[Sun Aug 21 12:36:33 2022] Darnol tells the guild, 'Got my shield if you get hit by aoe'
+[Sun Aug 21 12:36:44 2022] Yober tells the guild, 'CotH on  --> Angrie  (is LFG) <-- she is coming to the raid!!  Invite her to a group.'
+[Sun Aug 21 12:36:53 2022] Kurrat tells the guild, 'Gird thy loins Okeanos, you are incoming to raid.'
+[Sun Aug 21 12:37:01 2022] Yober tells the guild, 'CotH on  --> Chloaca  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:37:20 2022] Yober tells the guild, 'CotH on  --> Mountainjoy  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:37:22 2022] Your Location is 40.84, 1824.48, -193.47
+[Sun Aug 21 12:37:25 2022] Kurrat tells the guild, 'Gird thy loins Travic, you are incoming to raid.'
+[Sun Aug 21 12:37:29 2022] Your Location is 57.24, 1770.35, -186.20
+[Sun Aug 21 12:37:30 2022] Your Location is 58.08, 1793.65, -187.14
+[Sun Aug 21 12:37:37 2022] Your Location is 37.04, 1859.75, -188.79
+[Sun Aug 21 12:37:37 2022] Yober tells the guild, 'CotH on  --> Fray  (is LFG) <-- she is coming to the raid!!  Invite her to a group.'
+[Sun Aug 21 12:37:40 2022] Your Location is 30.89, 1866.01, -189.95
+[Sun Aug 21 12:38:30 2022] Yober tells the guild, 'invites to literally everyone in lobby'
+[Sun Aug 21 12:38:33 2022] Fray tells the guild, 'Tells to me and Darnol for cures'
+[Sun Aug 21 12:38:35 2022] Yober tells the guild, 'so ur either bugged or not watching'
+[Sun Aug 21 12:38:40 2022] Yober tells the guild, 'CotH on  --> Amgalad  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:39:22 2022] Your Location is 36.15, 1851.48, -190.71
+[Sun Aug 21 12:39:27 2022] Your Location is 53.56, 1760.48, -183.35
+[Sun Aug 21 12:39:28 2022] Your Location is 53.56, 1760.48, -183.60
+[Sun Aug 21 12:39:41 2022] Your Location is -21.19, 1651.94, -187.49
+[Sun Aug 21 12:39:45 2022] Mubbens tells the guild, 'i got no buffs or party for heals : /'
+[Sun Aug 21 12:39:46 2022] Your Location is -9.72, 1667.81, -189.40
+[Sun Aug 21 12:39:48 2022] Your Location is -9.72, 1667.81, -189.30
+[Sun Aug 21 12:39:48 2022] Your Location is -9.72, 1667.81, -189.11
+[Sun Aug 21 12:39:50 2022] Your Location is -9.72, 1667.81, -188.88
+[Sun Aug 21 12:40:00 2022] Your Location is -50.53, 1684.12, -190.91
+[Sun Aug 21 12:40:05 2022] You begin casting Splurt.
+[Sun Aug 21 12:40:05 2022] You can't use that command right now...
+[Sun Aug 21 12:40:07 2022] You can't use that command right now...
+[Sun Aug 21 12:40:09 2022] Sergeant Miidenaer's body begins to splurt.
+[Sun Aug 21 12:40:13 2022] Your Location is 42.70, 1735.43, -194.60
+[Sun Aug 21 12:40:13 2022] Your Location is 53.69, 1747.19, -193.54
+[Sun Aug 21 12:40:14 2022] Your Location is 58.59, 1759.02, -184.29
+[Sun Aug 21 12:40:28 2022] You begin casting Feign Death.
+[Sun Aug 21 12:40:31 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:32 2022] Jabtik tells you, 'Attacking Sergeant Miidenaer Master.'
+[Sun Aug 21 12:40:33 2022] Taunting attacker, Master.
+[Sun Aug 21 12:40:33 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:40:33 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:40:33 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:40:34 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:34 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:35 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:35 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:36 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:36 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:36 2022] Yober tells the guild, 'CotH on  --> Marrios  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:40:37 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:37 2022] Jabtik slices Sergeant Miidenaer for 27 points of damage.
+[Sun Aug 21 12:40:37 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:37 2022] Jabtik slices Sergeant Miidenaer for 58 points of damage.
+[Sun Aug 21 12:40:37 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:40:38 2022] Targeting your pet.
+[Sun Aug 21 12:40:39 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:39 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:40:39 2022] Taunting attacker, Master.
+[Sun Aug 21 12:40:39 2022] Jabtik tries to bash Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:39 2022] Jabtik slices Sergeant Miidenaer for 18 points of damage.
+[Sun Aug 21 12:40:39 2022] Jabtik slices Sergeant Miidenaer for 56 points of damage.
+[Sun Aug 21 12:40:39 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:40 2022] Jabtik slices Sergeant Miidenaer for 49 points of damage.
+[Sun Aug 21 12:40:40 2022] Jabtik slices Sergeant Miidenaer for 37 points of damage.
+[Sun Aug 21 12:40:41 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:41 2022] Sergeant Miidenaer kicks Jabtik for 22 points of damage.
+[Sun Aug 21 12:40:41 2022] You begin casting Shadowbond.
+[Sun Aug 21 12:40:41 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:41 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:40:43 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:43 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:43 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:40:43 2022] Jabtik slices Sergeant Miidenaer for 58 points of damage.
+[Sun Aug 21 12:40:43 2022] Your wounds turn gangrenous.
+[Sun Aug 21 12:40:43 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 12:40:44 2022] Taunting attacker, Master.
+[Sun Aug 21 12:40:44 2022] Jabtik tries to kick Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:44 2022] Jabtik slices Sergeant Miidenaer for 44 points of damage.
+[Sun Aug 21 12:40:45 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:40:45 2022] Sergeant Miidenaer slashes Jabtik for 83 points of damage.
+[Sun Aug 21 12:40:45 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:40:45 2022] You begin casting Vexing Mordinia.
+[Sun Aug 21 12:40:46 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:46 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer dodges!
+[Sun Aug 21 12:40:47 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:47 2022] Sergeant Miidenaer slashes Jabtik for 104 points of damage.
+[Sun Aug 21 12:40:47 2022] Jabtik slices Sergeant Miidenaer for 49 points of damage.
+[Sun Aug 21 12:40:48 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:48 2022] Taunting attacker, Master.
+[Sun Aug 21 12:40:49 2022] Jabtik bashes Sergeant Miidenaer for 21 points of damage.
+[Sun Aug 21 12:40:49 2022] Sergeant Miidenaer slashes Jabtik for 99 points of damage.
+[Sun Aug 21 12:40:49 2022] Sergeant Miidenaer slashes Jabtik for 22 points of damage.
+[Sun Aug 21 12:40:49 2022] Sergeant Miidenaer kicks Jabtik for 24 points of damage.
+[Sun Aug 21 12:40:50 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:40:51 2022] Sergeant Miidenaer slashes Jabtik for 22 points of damage.
+[Sun Aug 21 12:40:51 2022] Vexing Mordinia strengthens your life force.
+[Sun Aug 21 12:40:51 2022] Sergeant Miidenaer staggers under the curse of Vexing Mordinia.
+[Sun Aug 21 12:40:51 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:51 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:40:51 2022] Jabtik slices Sergeant Miidenaer for 27 points of damage.
+[Sun Aug 21 12:40:51 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:40:52 2022] Jabtik slices Sergeant Miidenaer for 58 points of damage.
+[Sun Aug 21 12:40:52 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:40:52 2022] Jabtik slices Sergeant Miidenaer for 42 points of damage.
+[Sun Aug 21 12:40:53 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:40:53 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:53 2022] Yober tells the guild, 'CotH on  --> Supository  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:40:53 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:40:53 2022] Taunting attacker, Master.
+[Sun Aug 21 12:40:54 2022] You begin casting Cessation of Cor.
+[Sun Aug 21 12:40:54 2022] Jabtik bashes Sergeant Miidenaer for 18 points of damage.
+[Sun Aug 21 12:40:54 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:40:55 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:55 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:40:55 2022] Jabtik slices Sergeant Miidenaer for 25 points of damage.
+[Sun Aug 21 12:40:57 2022] Jabtik slices Sergeant Miidenaer for 44 points of damage.
+[Sun Aug 21 12:40:57 2022] Sergeant Miidenaer tries to kick Jabtik, but misses!
+[Sun Aug 21 12:40:57 2022] Sergeant Miidenaer tries to slash Jabtik, but Jabtik dodges!
+[Sun Aug 21 12:40:57 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:40:58 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:40:58 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:58 2022] Taunting attacker, Master.
+[Sun Aug 21 12:40:59 2022] Jabtik tries to bash Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:40:59 2022] Sergeant Miidenaer's blood stills within their veins.
+[Sun Aug 21 12:40:59 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:40:59 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:40:59 2022] Jabtik slices Sergeant Miidenaer for 51 points of damage.
+[Sun Aug 21 12:40:59 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:40:59 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:40:59 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:40:59 2022] Sergeant Miidenaer staggers.
+[Sun Aug 21 12:40:59 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer dodges!
+[Sun Aug 21 12:40:59 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:00 2022] Your Location is 47.85, 1912.99, -191.99
+[Sun Aug 21 12:41:01 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:01 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:01 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:01 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:02 2022] Jabtik slices Sergeant Miidenaer for 23 points of damage.
+[Sun Aug 21 12:41:03 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:03 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:03 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:03 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:03 2022] Jabtik slices Sergeant Miidenaer for 46 points of damage.
+[Sun Aug 21 12:41:03 2022] Jabtik slices Sergeant Miidenaer for 56 points of damage.
+[Sun Aug 21 12:41:03 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:04 2022] Jabtik tries to bash Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:05 2022] Sergeant Miidenaer tries to kick Jabtik, but misses!
+[Sun Aug 21 12:41:05 2022] Jabtik slices Sergeant Miidenaer for 20 points of damage.
+[Sun Aug 21 12:41:05 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:41:05 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:41:06 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:06 2022] Jabtik slices Sergeant Miidenaer for 25 points of damage.
+[Sun Aug 21 12:41:07 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:08 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:08 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:08 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:08 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:41:08 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:41:08 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:41:08 2022] Sergeant Miidenaer staggers.
+[Sun Aug 21 12:41:08 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:08 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:09 2022] Jabtik bashes Sergeant Miidenaer for 26 points of damage.
+[Sun Aug 21 12:41:09 2022] Sergeant Miidenaer slashes Jabtik for 68 points of damage.
+[Sun Aug 21 12:41:09 2022] Jabtik slices Sergeant Miidenaer for 39 points of damage.
+[Sun Aug 21 12:41:09 2022] Jabtik slices Sergeant Miidenaer for 30 points of damage.
+[Sun Aug 21 12:41:09 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:09 2022] You begin casting Shadowbond.
+[Sun Aug 21 12:41:09 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:09 2022] Your pact fades.
+[Sun Aug 21 12:41:09 2022] Yober tells the guild, 'CotH on  --> Misandre  (is LFG) <-- she is coming to the raid!!  Invite her to a group.'
+[Sun Aug 21 12:41:10 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:10 2022] Jabtik slices Sergeant Miidenaer for 39 points of damage.
+[Sun Aug 21 12:41:11 2022] Sergeant Miidenaer slashes Jabtik for 42 points of damage.
+[Sun Aug 21 12:41:11 2022] Sergeant Miidenaer slashes Jabtik for 104 points of damage.
+[Sun Aug 21 12:41:11 2022] Your wounds turn gangrenous.
+[Sun Aug 21 12:41:11 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 12:41:11 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:41:12 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:12 2022] Sergeant Miidenaer bashes Jabtik for 29 points of damage.
+[Sun Aug 21 12:41:13 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:13 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:14 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:14 2022] Jabtik tries to bash Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:14 2022] Jabtik slices Sergeant Miidenaer for 56 points of damage.
+[Sun Aug 21 12:41:14 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:14 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:15 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:15 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:15 2022] You begin casting Torment of Shadows.
+[Sun Aug 21 12:41:15 2022] Your Scythe of the Shadowed Soul begins to glow.
+[Sun Aug 21 12:41:16 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:16 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:16 2022] Jabtik slices Sergeant Miidenaer for 37 points of damage.
+[Sun Aug 21 12:41:17 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:17 2022] Jabtik slices Sergeant Miidenaer for 37 points of damage.
+[Sun Aug 21 12:41:17 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:17 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:41:19 2022] Jabtik slices Sergeant Miidenaer for 30 points of damage.
+[Sun Aug 21 12:41:19 2022] Sergeant Miidenaer slashes Jabtik for 22 points of damage.
+[Sun Aug 21 12:41:19 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:41:19 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:19 2022] Jabtik tries to bash Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:20 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:20 2022] Jabtik slices Sergeant Miidenaer for 53 points of damage.
+[Sun Aug 21 12:41:20 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:20 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:20 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:20 2022] Sergeant Miidenaer kicks Jabtik for 25 points of damage.
+[Sun Aug 21 12:41:21 2022] Sergeant Miidenaer slashes Jabtik for 94 points of damage.
+[Sun Aug 21 12:41:21 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:21 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:21 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:21 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:21 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:23 2022] Jabtik slices Sergeant Miidenaer for 49 points of damage.
+[Sun Aug 21 12:41:23 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:23 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:23 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:41:23 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:41:24 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:24 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer ripostes!
+[Sun Aug 21 12:41:24 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:24 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:24 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:24 2022] Your target resisted the Torment of Shadows spell.
+[Sun Aug 21 12:41:24 2022] Jabtik bashes Sergeant Miidenaer for 26 points of damage.
+[Sun Aug 21 12:41:25 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:25 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:27 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:27 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:27 2022] Jabtik slices Sergeant Miidenaer for 53 points of damage.
+[Sun Aug 21 12:41:27 2022] Sergeant Miidenaer slashes Jabtik for 104 points of damage.
+[Sun Aug 21 12:41:27 2022] Sergeant Miidenaer slashes Jabtik for 99 points of damage.
+[Sun Aug 21 12:41:27 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:28 2022] You begin casting Torment of Shadows.
+[Sun Aug 21 12:41:28 2022] Your Scythe of the Shadowed Soul begins to glow.
+[Sun Aug 21 12:41:28 2022] Sergeant Miidenaer tries to kick Jabtik, but Jabtik dodges!
+[Sun Aug 21 12:41:28 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:28 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:28 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:41:28 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:41:28 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:41:28 2022] Sergeant Miidenaer staggers.
+[Sun Aug 21 12:41:28 2022] Jabtik slices Sergeant Miidenaer for 56 points of damage.
+[Sun Aug 21 12:41:28 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:29 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:29 2022] Sergeant Miidenaer slashes Jabtik for 83 points of damage.
+[Sun Aug 21 12:41:29 2022] Sergeant Miidenaer tries to slash Jabtik, but Jabtik dodges!
+[Sun Aug 21 12:41:29 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:41:29 2022] Jabtik bashes Sergeant Miidenaer for 20 points of damage.
+[Sun Aug 21 12:41:30 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:30 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:30 2022] Jabtik slices Sergeant Miidenaer for 58 points of damage.
+[Sun Aug 21 12:41:31 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:31 2022] Sergeant Miidenaer slashes Jabtik for 42 points of damage.
+[Sun Aug 21 12:41:31 2022] Sergeant Miidenaer slashes Jabtik for 47 points of damage.
+[Sun Aug 21 12:41:32 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:32 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:32 2022] Jabtik slices Sergeant Miidenaer for 27 points of damage.
+[Sun Aug 21 12:41:33 2022] Sergeant Miidenaer slashes Jabtik for 32 points of damage.
+[Sun Aug 21 12:41:33 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:33 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:34 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:34 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:34 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:34 2022] Jabtik kicks Sergeant Miidenaer for 24 points of damage.
+[Sun Aug 21 12:41:35 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:35 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer dodges!
+[Sun Aug 21 12:41:35 2022] Jabtik slices Sergeant Miidenaer for 37 points of damage.
+[Sun Aug 21 12:41:35 2022] Sergeant Miidenaer slashes Jabtik for 114 points of damage.
+[Sun Aug 21 12:41:35 2022] Your pact fades.
+[Sun Aug 21 12:41:35 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:41:36 2022] Sergeant Miidenaer tries to bash Jabtik, but misses!
+[Sun Aug 21 12:41:36 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:37 2022] Yober tells the guild, 'ok lobby looks clear'
+[Sun Aug 21 12:41:37 2022] Your target resisted the Torment of Shadows spell.
+[Sun Aug 21 12:41:37 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:37 2022] Sergeant Miidenaer slashes Jabtik for 37 points of damage.
+[Sun Aug 21 12:41:38 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:38 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:38 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:39 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:39 2022] Sergeant Miidenaer slashes Jabtik for 68 points of damage.
+[Sun Aug 21 12:41:39 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:39 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:39 2022] Jabtik bashes Sergeant Miidenaer for 26 points of damage.
+[Sun Aug 21 12:41:40 2022] You begin casting Shadowbond.
+[Sun Aug 21 12:41:41 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:41 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:41:41 2022] Xytl has healed you for 114 points of damage.
+[Sun Aug 21 12:41:42 2022] Your wounds turn gangrenous.
+[Sun Aug 21 12:41:42 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 12:41:42 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:43 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:43 2022] Jabtik slices Sergeant Miidenaer for 16 points of damage.
+[Sun Aug 21 12:41:43 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:44 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:44 2022] Sergeant Miidenaer bashes Jabtik for 23 points of damage.
+[Sun Aug 21 12:41:45 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:41:45 2022] Sergeant Miidenaer slashes Jabtik for 63 points of damage.
+[Sun Aug 21 12:41:45 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:45 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:46 2022] Jabtik bashes Sergeant Miidenaer for 17 points of damage.
+[Sun Aug 21 12:41:46 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:41:46 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:41:46 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:41:46 2022] Sergeant Miidenaer staggers.
+[Sun Aug 21 12:41:46 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:46 2022] Jabtik slices Sergeant Miidenaer for 46 points of damage.
+[Sun Aug 21 12:41:46 2022] You begin casting Vexing Mordinia.
+[Sun Aug 21 12:41:46 2022] Your Splurt spell has worn off.
+[Sun Aug 21 12:41:46 2022] Your Vexing Mordinia spell has worn off.
+[Sun Aug 21 12:41:47 2022] Jabtik slices Sergeant Miidenaer for 39 points of damage.
+[Sun Aug 21 12:41:47 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer parries!
+[Sun Aug 21 12:41:47 2022] Sergeant Miidenaer slashes Jabtik for 109 points of damage.
+[Sun Aug 21 12:41:47 2022] The Mordinia fades.
+[Sun Aug 21 12:41:48 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:48 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:48 2022] Jabtik slices Sergeant Miidenaer for 20 points of damage.
+[Sun Aug 21 12:41:48 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:41:48 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:41:48 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:41:48 2022] Sergeant Miidenaer staggers.
+[Sun Aug 21 12:41:49 2022] Sergeant Miidenaer slashes Jabtik for 27 points of damage.
+[Sun Aug 21 12:41:50 2022] Jabtik slices Sergeant Miidenaer for 30 points of damage.
+[Sun Aug 21 12:41:51 2022] Jabtik tries to bash Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:51 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:51 2022] Jabtik slices Sergeant Miidenaer for 51 points of damage.
+[Sun Aug 21 12:41:51 2022] Vexing Mordinia strengthens your life force.
+[Sun Aug 21 12:41:51 2022] Sergeant Miidenaer staggers under the curse of Vexing Mordinia.
+[Sun Aug 21 12:41:51 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:51 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:52 2022] Sergeant Miidenaer tries to bash Jabtik, but misses!
+[Sun Aug 21 12:41:52 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:41:53 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:41:53 2022] You begin casting Lich.
+[Sun Aug 21 12:41:53 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:53 2022] Sergeant Miidenaer slashes Jabtik for 99 points of damage.
+[Sun Aug 21 12:41:53 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:41:54 2022] Jabtik slices Sergeant Miidenaer for 53 points of damage.
+[Sun Aug 21 12:41:55 2022] Sergeant Miidenaer slashes Jabtik for 58 points of damage.
+[Sun Aug 21 12:41:55 2022] Jabtik slices Sergeant Miidenaer for 49 points of damage.
+[Sun Aug 21 12:41:56 2022] Jabtik kicks Sergeant Miidenaer for 25 points of damage.
+[Sun Aug 21 12:41:56 2022] You feel the skin peel from your bones.
+[Sun Aug 21 12:41:57 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:57 2022] Jabtik slices Sergeant Miidenaer for 25 points of damage.
+[Sun Aug 21 12:41:57 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:57 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:41:57 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:57 2022] Sergeant Miidenaer tries to slash Jabtik, but misses!
+[Sun Aug 21 12:41:58 2022] Taunting attacker, Master.
+[Sun Aug 21 12:41:58 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:41:58 2022] Jabtik slices Sergeant Miidenaer for 42 points of damage.
+[Sun Aug 21 12:41:58 2022] Jabtik beams a smile at Sergeant Miidenaer
+[Sun Aug 21 12:41:58 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:41:58 2022] Sergeant Miidenaer was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:41:58 2022] Sergeant Miidenaer staggers.
+[Sun Aug 21 12:41:59 2022] Sergeant Miidenaer bashes Jabtik for 26 points of damage.
+[Sun Aug 21 12:41:59 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:41:59 2022] Jabtik slices Sergeant Miidenaer for 32 points of damage.
+[Sun Aug 21 12:42:01 2022] Jabtik tries to kick Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:42:01 2022] Sergeant Miidenaer slashes Jabtik for 47 points of damage.
+[Sun Aug 21 12:42:01 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer ripostes!
+[Sun Aug 21 12:42:01 2022] Jabtik slices Sergeant Miidenaer for 61 points of damage.
+[Sun Aug 21 12:42:01 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:42:01 2022] Sergeant Miidenaer slashes Jabtik for 120 points of damage.
+[Sun Aug 21 12:42:02 2022] Jabtik slices Sergeant Miidenaer for 44 points of damage.
+[Sun Aug 21 12:42:03 2022] Taunting attacker, Master.
+[Sun Aug 21 12:42:03 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:42:03 2022] Sergeant Miidenaer slashes Jabtik for 22 points of damage.
+[Sun Aug 21 12:42:03 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:42:03 2022] Sergeant Miidenaer tries to slash Jabtik, but Jabtik ripostes!
+[Sun Aug 21 12:42:04 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:42:04 2022] Jabtik tries to slice Sergeant Miidenaer, but Sergeant Miidenaer dodges!
+[Sun Aug 21 12:42:04 2022] Jabtik tries to slice Sergeant Miidenaer, but misses!
+[Sun Aug 21 12:42:04 2022] You have slain Sergeant Miidenaer!
+[Sun Aug 21 12:42:04 2022] Your faction standing with ClawsofVeeshan could not possibly get any better.
+[Sun Aug 21 12:42:04 2022] Your faction standing with KingTormax could not possibly get any worse.
+[Sun Aug 21 12:42:04 2022] Your faction standing with Kromrif could not possibly get any worse.
+[Sun Aug 21 12:42:04 2022] Your faction standing with Kromzek could not possibly get any worse.
+[Sun Aug 21 12:42:04 2022] You gain experience!!
+[Sun Aug 21 12:42:05 2022] Xytl has healed you for 101 points of damage.
+[Sun Aug 21 12:42:06 2022] Your Location is 47.76, 1905.64, -191.48
+[Sun Aug 21 12:42:08 2022] You receive 8 gold, 6 silver and 9 copper from the corpse.
+[Sun Aug 21 12:42:09 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:42:09 2022] Your pact fades.
+[Sun Aug 21 12:42:09 2022] --You have looted a Giant Militia Longsword.--
+[Sun Aug 21 12:42:10 2022] --You have looted a Storm Giant Meat.--
+[Sun Aug 21 12:42:14 2022] Your Location is 47.75, 1889.46, -191.99
+[Sun Aug 21 12:42:43 2022] Yober tells the guild, 'CotH on  --> Xlotyl  (is LFG) <-- he is coming to the raid!!  Invite him to a group.'
+[Sun Aug 21 12:42:47 2022] The Mordinia fades.
+[Sun Aug 21 12:42:51 2022] .pet is not online at this time.
+[Sun Aug 21 12:43:41 2022] Stormshadow tells the guild, 'cure'
+[Sun Aug 21 12:43:50 2022] You forget Lich.
+[Sun Aug 21 12:43:53 2022] Beginning to memorize Dead Man Floating...
+[Sun Aug 21 12:43:54 2022] You have finished memorizing Dead Man Floating.
+[Sun Aug 21 12:43:58 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:43:59 2022] You begin casting Dead Man Floating.
+[Sun Aug 21 12:44:05 2022] You become like the dead.
+[Sun Aug 21 12:44:18 2022] Your Location is 36.52, 1881.76, -191.36
+[Sun Aug 21 12:44:18 2022] Klearic tells the guild, 'Zlexak 48&PCT;'
+[Sun Aug 21 12:44:26 2022] Your Location is 38.05, 1866.00, -191.80
+[Sun Aug 21 12:44:38 2022] Your Location is 39.42, 1857.43, -191.47
+[Sun Aug 21 12:44:45 2022] Your Location is 69.75, 1761.09, -191.01
+[Sun Aug 21 12:44:50 2022] You can't use that command right now...
+[Sun Aug 21 12:44:50 2022] You begin casting Splurt.
+[Sun Aug 21 12:44:52 2022] You can't use that command right now...
+[Sun Aug 21 12:44:54 2022] Watchman Dragsk's body begins to splurt.
+[Sun Aug 21 12:44:58 2022] Klearic tells the guild, 'Zlexak 39&PCT;'
+[Sun Aug 21 12:45:01 2022] You begin casting Feign Death.
+[Sun Aug 21 12:45:04 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 12:45:04 2022] Jabtik tells you, 'Attacking Watchman Dragsk Master.'
+[Sun Aug 21 12:45:04 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:04 2022] Jabtik tries to bash Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:04 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:04 2022] Jabtik slices Watchman Dragsk for 16 points of damage.
+[Sun Aug 21 12:45:05 2022] Watchman Dragsk tries to kick Jabtik, but misses!
+[Sun Aug 21 12:45:05 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:05 2022] Watchman Dragsk slashes Jabtik for 112 points of damage.
+[Sun Aug 21 12:45:06 2022] Jabtik slices Watchman Dragsk for 56 points of damage.
+[Sun Aug 21 12:45:06 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:06 2022] Watchman Dragsk slashes Jabtik for 49 points of damage.
+[Sun Aug 21 12:45:06 2022] Jabtik tries to slice Watchman Dragsk, but Watchman Dragsk ripostes!
+[Sun Aug 21 12:45:07 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:07 2022] Targeting your pet.
+[Sun Aug 21 12:45:07 2022] Jabtik slices Watchman Dragsk for 16 points of damage.
+[Sun Aug 21 12:45:07 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:09 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:09 2022] Jabtik slices Watchman Dragsk for 51 points of damage.
+[Sun Aug 21 12:45:09 2022] Jabtik beams a smile at Watchman Dragsk
+[Sun Aug 21 12:45:09 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:45:09 2022] Watchman Dragsk was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:45:09 2022] Watchman Dragsk staggers.
+[Sun Aug 21 12:45:09 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:09 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:09 2022] Watchman Dragsk slashes Jabtik for 20 points of damage.
+[Sun Aug 21 12:45:09 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:09 2022] You begin casting Shadowbond.
+[Sun Aug 21 12:45:10 2022] Jabtik tries to bash Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:10 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:10 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:11 2022] Watchman Dragsk slashes Jabtik for 34 points of damage.
+[Sun Aug 21 12:45:11 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:11 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:11 2022] Your wounds turn gangrenous.
+[Sun Aug 21 12:45:11 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 12:45:12 2022] Watchman Dragsk bashes Jabtik for 20 points of damage.
+[Sun Aug 21 12:45:13 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:45:13 2022] Jabtik slices Watchman Dragsk for 44 points of damage.
+[Sun Aug 21 12:45:13 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:13 2022] Jabtik slices Watchman Dragsk for 37 points of damage.
+[Sun Aug 21 12:45:13 2022] Watchman Dragsk slashes Jabtik for 20 points of damage.
+[Sun Aug 21 12:45:13 2022] You begin casting Vexing Mordinia.
+[Sun Aug 21 12:45:14 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:14 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:15 2022] Jabtik bashes Watchman Dragsk for 22 points of damage.
+[Sun Aug 21 12:45:15 2022] Jabtik beams a smile at Watchman Dragsk
+[Sun Aug 21 12:45:15 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:45:15 2022] Watchman Dragsk was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:45:15 2022] Watchman Dragsk staggers.
+[Sun Aug 21 12:45:15 2022] Watchman Dragsk slashes Jabtik for 34 points of damage.
+[Sun Aug 21 12:45:15 2022] Watchman Dragsk slashes Jabtik for 68 points of damage.
+[Sun Aug 21 12:45:16 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:16 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:16 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:45:17 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:17 2022] Watchman Dragsk slashes Jabtik for 39 points of damage.
+[Sun Aug 21 12:45:18 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:18 2022] Jabtik slices Watchman Dragsk for 18 points of damage.
+[Sun Aug 21 12:45:19 2022] Vexing Mordinia strengthens your life force.
+[Sun Aug 21 12:45:19 2022] Watchman Dragsk staggers under the curse of Vexing Mordinia.
+[Sun Aug 21 12:45:19 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:19 2022] Watchman Dragsk slashes Jabtik for 68 points of damage.
+[Sun Aug 21 12:45:20 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 12:45:20 2022] Jabtik bashes Watchman Dragsk for 21 points of damage.
+[Sun Aug 21 12:45:20 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:20 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:20 2022] Jabtik slices Watchman Dragsk for 25 points of damage.
+[Sun Aug 21 12:45:20 2022] Watchman Dragsk bashes Jabtik for 23 points of damage.
+[Sun Aug 21 12:45:20 2022] You begin casting Cessation of Cor.
+[Sun Aug 21 12:45:21 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:22 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:45:22 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:23 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:23 2022] Watchman Dragsk tries to slash Jabtik, but Jabtik dodges!
+[Sun Aug 21 12:45:24 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:24 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:24 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:45:24 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:25 2022] Jabtik tries to bash Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:25 2022] Jabtik slices Watchman Dragsk for 53 points of damage.
+[Sun Aug 21 12:45:25 2022] Jabtik slices Watchman Dragsk for 39 points of damage.
+[Sun Aug 21 12:45:25 2022] Watchman Dragsk's blood stills within their veins.
+[Sun Aug 21 12:45:25 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:25 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:26 2022] Jabtik slices Watchman Dragsk for 53 points of damage.
+[Sun Aug 21 12:45:26 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:26 2022] Jabtik beams a smile at Watchman Dragsk
+[Sun Aug 21 12:45:26 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 12:45:26 2022] Watchman Dragsk was hit by non-melee for 48 points of damage.
+[Sun Aug 21 12:45:26 2022] Watchman Dragsk staggers.
+[Sun Aug 21 12:45:28 2022] Watchman Dragsk slashes Jabtik for 73 points of damage.
+[Sun Aug 21 12:45:28 2022] Watchman Dragsk tries to slash Jabtik, but Jabtik dodges!
+[Sun Aug 21 12:45:28 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:28 2022] Watchman Dragsk bashes Jabtik for 30 points of damage.
+[Sun Aug 21 12:45:29 2022] Klearic tells the guild, 'Zlexak 35&PCT;'
+[Sun Aug 21 12:45:30 2022] Watchman Dragsk slashes Jabtik for 87 points of damage.
+[Sun Aug 21 12:45:30 2022] Watchman Dragsk slashes Jabtik for 102 points of damage.
+[Sun Aug 21 12:45:30 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 12:45:30 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:30 2022] Jabtik tries to bash Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:30 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:31 2022] Jabtik tries to slice Watchman Dragsk, but misses!
+[Sun Aug 21 12:45:32 2022] Watchman Dragsk slashes Jabtik for 82 points of damage.
+[Sun Aug 21 12:45:32 2022] Watchman Dragsk slashes Jabtik for 97 points of damage.
+[Sun Aug 21 12:45:33 2022] Jabtik slices Watchman Dragsk for 39 points of damage.
+[Sun Aug 21 12:45:33 2022] Jabtik slices Watchman Dragsk for 37 points of damage.
+[Sun Aug 21 12:45:33 2022] Jabtik slices Watchman Dragsk for 39 points of damage.
+[Sun Aug 21 12:45:34 2022] Watchman Dragsk tries to slash Jabtik, but misses!
+[Sun Aug 21 12:45:34 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 12:45:34 2022] Nonphixion tells the guild, '<<RAIDTICK>>  If you are not here and think you deserve credit (dead/porting/etc) please send ME a tell with "creditt" (two T's) and who should get credit!'
+[Sun Aug 21 12:45:34 2022] Jabtik tries to slice Watchman Dragsk, but Watchman Dragsk parries!
+[Sun Aug 21 12:45:34 2022] Jabtik slices Watchman Dragsk for 61 points of damage.
+[Sun Aug 21 12:45:35 2022] Taunting attacker, Master.
+[Sun Aug 21 12:45:35 2022] Jabtik bashes Watchman Dragsk for 23 points of damage.
+[Sun Aug 21 12:45:36 2022] Jabtik tries to slice Watchman Dragsk, but Watchman Dragsk parries!
+[Sun Aug 21 12:45:36 2022] Watchman Dragsk bashes Jabtik for 27 points of damage.
+[Sun Aug 21 12:45:36 2022] Your pact fades.
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 12:45:36 2022]
+[Sun Aug 21 13:10:18 2022] Your Location is 7.37, 1687.02, -187.52
+[Sun Aug 21 13:10:24 2022] Your target is out of range, get closer!
+[Sun Aug 21 13:10:28 2022] You begin casting Splurt.
+[Sun Aug 21 13:10:30 2022] Your Location is -50.05, 1675.05, -187.73
+[Sun Aug 21 13:10:32 2022] Lieutenant Coldforge's body begins to splurt.
+[Sun Aug 21 13:10:32 2022] Your Location is -40.70, 1678.39, -187.11
+[Sun Aug 21 13:10:34 2022] Your Location is 2.05, 1699.45, -187.78
+[Sun Aug 21 13:10:35 2022] Your Location is 26.14, 1716.17, -187.78
+[Sun Aug 21 13:10:35 2022] Your Location is 38.69, 1729.36, -187.15
+[Sun Aug 21 13:10:36 2022] Your Location is 51.26, 1749.51, -187.60
+[Sun Aug 21 13:10:39 2022] Your Location is 52.77, 1842.84, -186.71
+[Sun Aug 21 13:10:41 2022] Your Location is 46.86, 1899.67, -187.49
+[Sun Aug 21 13:10:44 2022] Your Location is 46.45, 1910.19, -187.23
+[Sun Aug 21 13:10:53 2022] You begin casting Feign Death.
+[Sun Aug 21 13:10:57 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:10:57 2022] Jabtik tells you, 'Attacking Lieutenant Coldforge Master.'
+[Sun Aug 21 13:10:58 2022] Taunting attacker, Master.
+[Sun Aug 21 13:10:58 2022] Lieutenant Coldforge bashes Jabtik for 36 points of damage.
+[Sun Aug 21 13:10:58 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:10:59 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:10:59 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:10:59 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:00 2022] Lieutenant Coldforge hits Jabtik for 117 points of damage.
+[Sun Aug 21 13:11:00 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:00 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:01 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:01 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:01 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:02 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:02 2022] Lieutenant Coldforge hits Jabtik for 122 points of damage.
+[Sun Aug 21 13:11:02 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:02 2022] Jabtik slices Lieutenant Coldforge for 46 points of damage.
+[Sun Aug 21 13:11:02 2022] Jabtik slices Lieutenant Coldforge for 16 points of damage.
+[Sun Aug 21 13:11:02 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:02 2022] Jabtik says 'Sorry, Master..calming down.'
+[Sun Aug 21 13:11:03 2022] Your Location is 46.45, 1910.19, -187.73
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:04 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge hits Jabtik for 74 points of damage.
+[Sun Aug 21 13:11:04 2022] Jabtik tries to bash Lieutenant Coldforge, but Lieutenant Coldforge ripostes!
+[Sun Aug 21 13:11:04 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:04 2022] Jabtik slices Lieutenant Coldforge for 23 points of damage.
+[Sun Aug 21 13:11:04 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:04 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:04 2022] Jabtik slices Lieutenant Coldforge for 23 points of damage.
+[Sun Aug 21 13:11:04 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:04 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:04 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:04 2022] Targeting your pet.
+[Sun Aug 21 13:11:05 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:05 2022] Jabtik slices Lieutenant Coldforge for 27 points of damage.
+[Sun Aug 21 13:11:06 2022] Lieutenant Coldforge hits Jabtik for 36 points of damage.
+[Sun Aug 21 13:11:06 2022] Lieutenant Coldforge hits Jabtik for 106 points of damage.
+[Sun Aug 21 13:11:06 2022] Lieutenant Coldforge tries to bash Jabtik, but misses!
+[Sun Aug 21 13:11:06 2022] You begin casting Shadowbond.
+[Sun Aug 21 13:11:06 2022] Jabtik slices Lieutenant Coldforge for 42 points of damage.
+[Sun Aug 21 13:11:06 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:07 2022] Lieutenant Coldforge hits Jabtik for 26 points of damage.
+[Sun Aug 21 13:11:08 2022] Jabtik slices Lieutenant Coldforge for 18 points of damage.
+[Sun Aug 21 13:11:08 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:08 2022] Your wounds turn gangrenous.
+[Sun Aug 21 13:11:08 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 13:11:08 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:09 2022] Jabtik tries to bash Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:09 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:09 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:09 2022] Jabtik slices Lieutenant Coldforge for 34 points of damage.
+[Sun Aug 21 13:11:09 2022] Lieutenant Coldforge hits Jabtik for 26 points of damage.
+[Sun Aug 21 13:11:09 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 13:11:10 2022] You begin casting Vexing Mordinia.
+[Sun Aug 21 13:11:10 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:11 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:11 2022] Lieutenant Coldforge hits Jabtik for 90 points of damage.
+[Sun Aug 21 13:11:12 2022] Jabtik slices Lieutenant Coldforge for 37 points of damage.
+[Sun Aug 21 13:11:12 2022] Jabtik slices Lieutenant Coldforge for 44 points of damage.
+[Sun Aug 21 13:11:12 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:13 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:13 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:13 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:13 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:13 2022] Lieutenant Coldforge bashes Jabtik for 36 points of damage.
+[Sun Aug 21 13:11:14 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:15 2022] Lieutenant Coldforge hits Jabtik for 68 points of damage.
+[Sun Aug 21 13:11:15 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:15 2022] Jabtik bashes Lieutenant Coldforge for 26 points of damage.
+[Sun Aug 21 13:11:15 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:15 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:15 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:15 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:15 2022] Jabtik slices Lieutenant Coldforge for 39 points of damage.
+[Sun Aug 21 13:11:16 2022] Vexing Mordinia strengthens your life force.
+[Sun Aug 21 13:11:16 2022] Lieutenant Coldforge staggers under the curse of Vexing Mordinia.
+[Sun Aug 21 13:11:16 2022] You are enveloped in a swirling maelstrom.
+[Sun Aug 21 13:11:17 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:17 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:17 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:17 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:17 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:17 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:17 2022] Lieutenant Coldforge hits Jabtik for 122 points of damage.
+[Sun Aug 21 13:11:17 2022] Lieutenant Coldforge hits Jabtik for 106 points of damage.
+[Sun Aug 21 13:11:17 2022] You begin casting Cessation of Cor.
+[Sun Aug 21 13:11:18 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:18 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:19 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:20 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:20 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:20 2022] Jabtik slices Lieutenant Coldforge for 53 points of damage.
+[Sun Aug 21 13:11:20 2022] Jabtik tries to bash Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:21 2022] Lieutenant Coldforge hits Jabtik for 58 points of damage.
+[Sun Aug 21 13:11:21 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:21 2022] Jabtik slices Lieutenant Coldforge for 58 points of damage.
+[Sun Aug 21 13:11:21 2022] Lieutenant Coldforge tries to bash Jabtik, but misses!
+[Sun Aug 21 13:11:22 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:22 2022] Lieutenant Coldforge's blood stills within their veins.
+[Sun Aug 21 13:11:22 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge dodges!
+[Sun Aug 21 13:11:22 2022] Jabtik slices Lieutenant Coldforge for 32 points of damage.
+[Sun Aug 21 13:11:23 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:23 2022] Lieutenant Coldforge hits Jabtik for 95 points of damage.
+[Sun Aug 21 13:11:23 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:24 2022] Jabtik slices Lieutenant Coldforge for 34 points of damage.
+[Sun Aug 21 13:11:24 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:25 2022] Lieutenant Coldforge hits Jabtik for 122 points of damage.
+[Sun Aug 21 13:11:25 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:25 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge parries!
+[Sun Aug 21 13:11:25 2022] Jabtik tries to kick Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:26 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:26 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:26 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:26 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:26 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:28 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:28 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:28 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:28 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:29 2022] Lieutenant Coldforge tries to kick Jabtik, but misses!
+[Sun Aug 21 13:11:29 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:29 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:29 2022] Jabtik slices Lieutenant Coldforge for 16 points of damage.
+[Sun Aug 21 13:11:30 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:30 2022] Jabtik bashes Lieutenant Coldforge for 26 points of damage.
+[Sun Aug 21 13:11:31 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:32 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:32 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:32 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:32 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:33 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:33 2022] Jabtik slices Lieutenant Coldforge for 18 points of damage.
+[Sun Aug 21 13:11:34 2022] Your pact fades.
+[Sun Aug 21 13:11:34 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:34 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:34 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:34 2022] Lieutenant Coldforge tries to hit Jabtik, but Jabtik ripostes!
+[Sun Aug 21 13:11:35 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:35 2022] You begin casting Shadowbond.
+[Sun Aug 21 13:11:35 2022] Jabtik bashes Lieutenant Coldforge for 23 points of damage.
+[Sun Aug 21 13:11:36 2022] Lieutenant Coldforge hits Jabtik for 106 points of damage.
+[Sun Aug 21 13:11:36 2022] Lieutenant Coldforge tries to hit Jabtik, but Jabtik dodges!
+[Sun Aug 21 13:11:36 2022] Jabtik slices Lieutenant Coldforge for 20 points of damage.
+[Sun Aug 21 13:11:36 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:37 2022] Your wounds turn gangrenous.
+[Sun Aug 21 13:11:37 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 13:11:37 2022] Lieutenant Coldforge tries to bash Jabtik, but misses!
+[Sun Aug 21 13:11:37 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:37 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge parries!
+[Sun Aug 21 13:11:37 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:37 2022] Jabtik slices Lieutenant Coldforge for 34 points of damage.
+[Sun Aug 21 13:11:38 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:38 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:38 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:39 2022] Jabtik slices Lieutenant Coldforge for 46 points of damage.
+[Sun Aug 21 13:11:39 2022] Jabtik slices Lieutenant Coldforge for 37 points of damage.
+[Sun Aug 21 13:11:39 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:40 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:40 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:40 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:40 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:40 2022] Jabtik bashes Lieutenant Coldforge for 24 points of damage.
+[Sun Aug 21 13:11:40 2022] You begin casting Torment of Shadows.
+[Sun Aug 21 13:11:40 2022] Your Scythe of the Shadowed Soul begins to glow.
+[Sun Aug 21 13:11:42 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:42 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:42 2022] Lieutenant Coldforge hits Jabtik for 36 points of damage.
+[Sun Aug 21 13:11:42 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge ripostes!
+[Sun Aug 21 13:11:42 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:42 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:43 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:43 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:43 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:43 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:43 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:43 2022] Jabtik slices Lieutenant Coldforge for 39 points of damage.
+[Sun Aug 21 13:11:44 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:44 2022] Lieutenant Coldforge hits Jabtik for 31 points of damage.
+[Sun Aug 21 13:11:44 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:44 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:44 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:45 2022] Lieutenant Coldforge tries to bash Jabtik, but misses!
+[Sun Aug 21 13:11:45 2022] Lieutenant Coldforge hits Jabtik for 122 points of damage.
+[Sun Aug 21 13:11:45 2022] Jabtik tries to bash Lieutenant Coldforge, but Lieutenant Coldforge ripostes!
+[Sun Aug 21 13:11:46 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:46 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:46 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:46 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:46 2022] Jabtik slices Lieutenant Coldforge for 23 points of damage.
+[Sun Aug 21 13:11:46 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:47 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:47 2022] Jabtik slices Lieutenant Coldforge for 44 points of damage.
+[Sun Aug 21 13:11:47 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:47 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:47 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:48 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge dodges!
+[Sun Aug 21 13:11:48 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:48 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:48 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:48 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:48 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:49 2022] Lieutenant Coldforge hits Jabtik for 58 points of damage.
+[Sun Aug 21 13:11:49 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:49 2022] Lieutenant Coldforge is gripped by shadows of fear and terror.
+[Sun Aug 21 13:11:50 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:50 2022] Jabtik slices Lieutenant Coldforge for 49 points of damage.
+[Sun Aug 21 13:11:50 2022] Jabtik slices Lieutenant Coldforge for 20 points of damage.
+[Sun Aug 21 13:11:50 2022] Jabtik bashes Lieutenant Coldforge for 26 points of damage.
+[Sun Aug 21 13:11:51 2022] Jabtik slices Lieutenant Coldforge for 49 points of damage.
+[Sun Aug 21 13:11:51 2022] Jabtik slices Lieutenant Coldforge for 34 points of damage.
+[Sun Aug 21 13:11:51 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge dodges!
+[Sun Aug 21 13:11:51 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:51 2022] Lieutenant Coldforge hits Jabtik for 26 points of damage.
+[Sun Aug 21 13:11:52 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:52 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:52 2022] Lieutenant Coldforge kicks Jabtik for 26 points of damage.
+[Sun Aug 21 13:11:53 2022] Jabtik slices Lieutenant Coldforge for 23 points of damage.
+[Sun Aug 21 13:11:53 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:53 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:11:54 2022] Jabtik slices Lieutenant Coldforge for 18 points of damage.
+[Sun Aug 21 13:11:54 2022] Jabtik slices Lieutenant Coldforge for 27 points of damage.
+[Sun Aug 21 13:11:55 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:55 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:55 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:55 2022] Jabtik bashes Lieutenant Coldforge for 22 points of damage.
+[Sun Aug 21 13:11:56 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:11:57 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:57 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:57 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:57 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:57 2022] Taunting attacker, Master.
+[Sun Aug 21 13:11:57 2022] Lieutenant Coldforge hits Jabtik for 85 points of damage.
+[Sun Aug 21 13:11:58 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:11:58 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:58 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:58 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:11:58 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:11:58 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:11:58 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:11:58 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:11:59 2022] Lieutenant Coldforge hits Jabtik for 52 points of damage.
+[Sun Aug 21 13:11:59 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:11:59 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:11:59 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:12:00 2022] Lieutenant Coldforge tries to bash Jabtik, but misses!
+[Sun Aug 21 13:12:00 2022] Jabtik bashes Lieutenant Coldforge for 26 points of damage.
+[Sun Aug 21 13:12:01 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:12:01 2022] Lieutenant Coldforge hits Jabtik for 117 points of damage.
+[Sun Aug 21 13:12:01 2022] Jabtik slices Lieutenant Coldforge for 42 points of damage.
+[Sun Aug 21 13:12:01 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:02 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:12:02 2022] Taunting attacker, Master.
+[Sun Aug 21 13:12:02 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge parries!
+[Sun Aug 21 13:12:02 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:12:02 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:02 2022] Jabtik slices Lieutenant Coldforge for 44 points of damage.
+[Sun Aug 21 13:12:02 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:03 2022] Lieutenant Coldforge hits Jabtik for 111 points of damage.
+[Sun Aug 21 13:12:03 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:12:04 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:04 2022] Your pact fades.
+[Sun Aug 21 13:12:04 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:12:05 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:12:05 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:05 2022] You begin casting Shadowbond.
+[Sun Aug 21 13:12:05 2022] Jabtik tries to bash Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:06 2022] Jabtik slices Lieutenant Coldforge for 44 points of damage.
+[Sun Aug 21 13:12:06 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:12:06 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:12:06 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:12:06 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:12:06 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:06 2022] Jabtik slices Lieutenant Coldforge for 20 points of damage.
+[Sun Aug 21 13:12:06 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:12:07 2022] Taunting attacker, Master.
+[Sun Aug 21 13:12:07 2022] Your wounds turn gangrenous.
+[Sun Aug 21 13:12:07 2022] Jabtik pulses with a blue-green aura.
+[Sun Aug 21 13:12:08 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:12:08 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:12:08 2022] Lieutenant Coldforge tries to bash Jabtik, but misses!
+[Sun Aug 21 13:12:08 2022] Lieutenant Coldforge hits Jabtik for 117 points of damage.
+[Sun Aug 21 13:12:09 2022] You haven't recovered yet...
+[Sun Aug 21 13:12:09 2022] Jabtik slices Lieutenant Coldforge for 32 points of damage.
+[Sun Aug 21 13:12:09 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:10 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:12:10 2022] You begin casting Vexing Mordinia.
+[Sun Aug 21 13:12:10 2022] Lieutenant Coldforge hits Jabtik for 47 points of damage.
+[Sun Aug 21 13:12:10 2022] Lieutenant Coldforge hits Jabtik for 101 points of damage.
+[Sun Aug 21 13:12:10 2022] Jabtik tries to kick Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:10 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:10 2022] Your Splurt spell has worn off.
+[Sun Aug 21 13:12:10 2022] Your Vexing Mordinia spell has worn off.
+[Sun Aug 21 13:12:11 2022] The Mordinia fades.
+[Sun Aug 21 13:12:11 2022] Taunting attacker, Master.
+[Sun Aug 21 13:12:12 2022] Jabtik tries to slice Lieutenant Coldforge, but Lieutenant Coldforge parries!
+[Sun Aug 21 13:12:12 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:12:13 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:12:13 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:12:13 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:12:13 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:12:13 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:12:13 2022] Jabtik slices Lieutenant Coldforge for 16 points of damage.
+[Sun Aug 21 13:12:13 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:12:13 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:12:13 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:12:13 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:12:14 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:12:14 2022] Lieutenant Coldforge hits Jabtik for 26 points of damage.
+[Sun Aug 21 13:12:15 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:12:15 2022] Jabtik slices Lieutenant Coldforge for 32 points of damage.
+[Sun Aug 21 13:12:15 2022] Jabtik bashes Lieutenant Coldforge for 26 points of damage.
+[Sun Aug 21 13:12:16 2022] Vexing Mordinia strengthens your life force.
+[Sun Aug 21 13:12:16 2022] Lieutenant Coldforge staggers under the curse of Vexing Mordinia.
+[Sun Aug 21 13:12:16 2022] Xytl has healed you for 122 points of damage.
+[Sun Aug 21 13:12:16 2022] Lieutenant Coldforge kicks Jabtik for 34 points of damage.
+[Sun Aug 21 13:12:16 2022] Jabtik slices Lieutenant Coldforge for 25 points of damage.
+[Sun Aug 21 13:12:16 2022] Lieutenant Coldforge hits Jabtik for 128 points of damage.
+[Sun Aug 21 13:12:16 2022] Taunting attacker, Master.
+[Sun Aug 21 13:12:17 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:17 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:18 2022] Lieutenant Coldforge tries to hit Jabtik, but misses!
+[Sun Aug 21 13:12:19 2022] Jabtik slices Lieutenant Coldforge for 39 points of damage.
+[Sun Aug 21 13:12:20 2022] You have healed Jabtik for 125 points of damage.
+[Sun Aug 21 13:12:20 2022] Lieutenant Coldforge hits Jabtik for 47 points of damage.
+[Sun Aug 21 13:12:20 2022] You begin casting Lich.
+[Sun Aug 21 13:12:20 2022] Jabtik slices Lieutenant Coldforge for 20 points of damage.
+[Sun Aug 21 13:12:20 2022] Jabtik slices Lieutenant Coldforge for 20 points of damage.
+[Sun Aug 21 13:12:20 2022] Jabtik slices Lieutenant Coldforge for 42 points of damage.
+[Sun Aug 21 13:12:20 2022] Jabtik beams a smile at Lieutenant Coldforge
+[Sun Aug 21 13:12:20 2022] Jabtik says 'Ahhh, I feel much better now...'
+[Sun Aug 21 13:12:20 2022] Lieutenant Coldforge was hit by non-melee for 48 points of damage.
+[Sun Aug 21 13:12:20 2022] Lieutenant Coldforge staggers.
+[Sun Aug 21 13:12:20 2022] Jabtik tries to bash Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:21 2022] Taunting attacker, Master.
+[Sun Aug 21 13:12:21 2022] Jabtik slices Lieutenant Coldforge for 53 points of damage.
+[Sun Aug 21 13:12:21 2022] Jabtik slices Lieutenant Coldforge for 61 points of damage.
+[Sun Aug 21 13:12:21 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:22 2022] Jabtik tries to slice Lieutenant Coldforge, but misses!
+[Sun Aug 21 13:12:22 2022] Lieutenant Coldforge tries to hit Jabtik, but Jabtik ripostes!
+[Sun Aug 21 13:12:22 2022] Xytl has healed you for 110 points of damage.
+[Sun Aug 21 13:12:23 2022] You have slain Lieutenant Coldforge!
+
