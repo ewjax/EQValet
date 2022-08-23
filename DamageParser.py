@@ -1108,7 +1108,7 @@ class DamageParser:
                 # will usually be player name, unless, this message is from a pet lifetap
                 attacker_name = config.the_valet.char_name
                 the_pet = config.the_valet.pet_parser.current_pet
-                if (the_pet and the_pet.lifetap_pending and the_pet.pet_lifetap == damage):
+                if the_pet and the_pet.lifetap_pending and the_pet.pet_lifetap == damage:
                     attacker_name = config.the_valet.pet_parser.pet_name()
 
                 # any damage event indicates we are in combat

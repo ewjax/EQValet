@@ -83,6 +83,7 @@ def get_eqgame_pid_list() -> list[int]:
             pid_list.append(p.pid)
     return pid_list
 
+
 #
 #
 def get_window_coordinates() -> (int, int, int, int):
