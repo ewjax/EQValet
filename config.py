@@ -126,6 +126,28 @@ def verify_settings() -> None:
         config_data.set(section, 'seconds', '4')
         modified = True
 
+    # screen positions section
+    section = 'ConsoleWindowPosition'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+        modified = True
+
+    if not config_data.has_option(section, 'x'):
+        config_data.set(section, 'x', '100')
+        modified = True
+
+    if not config_data.has_option(section, 'y'):
+        config_data.set(section, 'y', '100')
+        modified = True
+
+    if not config_data.has_option(section, 'width'):
+        config_data.set(section, 'width', '1000')
+        modified = True
+
+    if not config_data.has_option(section, 'height'):
+        config_data.set(section, 'height', '600')
+        modified = True
+
     # save the data
     if modified:
         save()

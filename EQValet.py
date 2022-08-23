@@ -2,6 +2,8 @@ import re
 import asyncio
 
 # import the global config data
+import win32console
+
 import config
 
 import EverquestLogFile
@@ -23,6 +25,13 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # force global data to load from ini logfile
         config.load()
 
+        # move console window to saved position
+        x = config.config_data.getint('ConsoleWindowPosition', 'x')
+        y = config.config_data.getint('ConsoleWindowPosition', 'y')
+        width = config.config_data.getint('ConsoleWindowPosition', 'width')
+        height = config.config_data.getint('ConsoleWindowPosition', 'height')
+        util.move_window(x, y, width, height)
+
         # parent ctor
         base_dir = config.config_data.get('Everquest', 'base_directory')
         logs_dir = config.config_data.get('Everquest', 'logs_directory')
@@ -41,8 +50,6 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         # use a DeathLoopParser class to deal with all things Deathloop
         self.deathloop_parser = DeathLoopParser.DeathLoopParser()
 
-        util.get_window_rect()
-
     #
     # process each line
     async def process_line(self, line: str, printline: bool = False) -> None:
@@ -51,6 +58,22 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
+
+        # save console window positioning
+        target = r'^\.save '
+        m = re.match(target, trunc_line)
+        if m:
+            (x, y, width, height) = util.get_window_coordinates()
+
+            section = 'ConsoleWindowPosition'
+            config.config_data[section]['x'] = f'{x}'
+            config.config_data[section]['y'] = f'{y}'
+            config.config_data[section]['width'] = f'{width}'
+            config.config_data[section]['height'] = f'{height}'
+
+            # save the updated ini logfile
+            config.save()
+            starprint(f'Console window position saved to .ini file')
 
         # todo - just testing the ability to enter a waypoint, with positive and negative value
         target = r'^\.wp\.(?P<eqx>[0-9-]+)\.(?P<eqy>[0-9-]+) '
@@ -136,6 +159,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('  .bt            : Toggle summary reports bell tone on/off')
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
+        starprint('  .save          : Force console window on screen position to be saved/remembered')
         starprint('Pets')
         starprint('  .pet           : Show information about current pet')
         starprint('  .pt            : Toggle pet tracking on/off')
@@ -169,6 +193,9 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
 
 async def main():
+    # set console title
+    win32console.SetConsoleTitle('EQValet')
+
     # print a startup message
     starprint('')
     starprint('=', alignment='^', fill='=')

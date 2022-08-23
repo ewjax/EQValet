@@ -1108,9 +1108,8 @@ class DamageParser:
                 # will usually be player name, unless, this message is from a pet lifetap
                 attacker_name = config.the_valet.char_name
                 the_pet = config.the_valet.pet_parser.current_pet
-                if the_pet:
-                    if the_pet.lifetap_pending and the_pet.pet_lifetap == damage:
-                        attacker_name = config.the_valet.pet_parser.pet_name()
+                if (the_pet and the_pet.lifetap_pending and the_pet.pet_lifetap == damage):
+                    attacker_name = config.the_valet.pet_parser.pet_name()
 
                 # any damage event indicates we are in combat
                 the_target = self.get_target(target_name)
@@ -1121,7 +1120,7 @@ class DamageParser:
 
                 # if there is a spell pending, and this isn't a lifetap, then assume that this event represents the DD component of that spell
                 if self.spell_pending:
-                    if not (the_pet.lifetap_pending and the_pet.pet_lifetap == damage):
+                    if not (the_pet and the_pet.lifetap_pending and the_pet.pet_lifetap == damage):
                         dmg_type = self.spell_pending.damage_type()
 
                 # add the DamageEvent
