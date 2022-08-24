@@ -1,5 +1,5 @@
 bumpversion build --allow-dirty
-git add config.py
+git add _version.py
 git add .bumpversion.cfg
 
 
