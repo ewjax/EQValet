@@ -1,3 +1,4 @@
+bumpversion
 psutil~=5.9.1
 pywin32
 pyinstaller

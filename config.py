@@ -3,6 +3,10 @@ import configparser
 from util import starprint
 # global data
 
+# version number
+__VERSION__ = '2.2.1.Build.13'
+
+
 # begin by reading in the config data
 config_data = configparser.ConfigParser()
 

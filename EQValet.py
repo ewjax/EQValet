@@ -14,7 +14,6 @@ import DeathLoopParser
 import util
 from util import starprint
 
-
 #################################################################################################
 
 class EQValet(EverquestLogFile.EverquestLogFile):
@@ -74,6 +73,12 @@ class EQValet(EverquestLogFile.EverquestLogFile):
             # save the updated ini logfile
             config.save()
             starprint(f'Console window position saved to .ini file')
+
+        # show current version number
+        target = r'^\.ver '
+        m = re.match(target, trunc_line)
+        if m:
+            starprint(f'EQValet {config.__VERSION__}')
 
         # todo - just testing the ability to enter a waypoint, with positive and negative value
         target = r'^\.wp\.(?P<eqx>[0-9-]+)\.(?P<eqy>[0-9-]+) '
@@ -160,6 +165,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
         starprint('  .save          : Force console window on screen position to be saved/remembered')
+        starprint('  .ver           : Display EQValet current version')
         starprint('Pets')
         starprint('  .pet           : Show information about current pet')
         starprint('  .pt            : Toggle pet tracking on/off')
@@ -199,7 +205,7 @@ async def main():
     # print a startup message
     starprint('')
     starprint('=', alignment='^', fill='=')
-    starprint('EQValet', alignment='^')
+    starprint(f'EQValet {config.__VERSION__}', alignment='^')
     starprint('=', alignment='^', fill='=')
     starprint('')
 
