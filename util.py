@@ -6,6 +6,7 @@ MAXBUFFLENGTH = 1950
 
 #
 #
+#
 class SmartBuffer:
     """
     A class to help manage long streams of text being sent to Discord
