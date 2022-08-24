@@ -1,7 +1,6 @@
 # specific files
 EQValet.ini
 data/EQValet-PlayerNames_*.dat
-.bumpversion.cfg
 
 # directories for this project
 pics/

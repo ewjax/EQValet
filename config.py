@@ -4,7 +4,7 @@ from util import starprint
 # global data
 
 # version number
-__VERSION__ = '2.3.0.Build.1'
+__VERSION__ = '2.3.0.Build.4'
 
 
 # begin by reading in the config data
