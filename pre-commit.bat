@@ -1,3 +1,3 @@
-bumpversion build --allow-dirty --tag
+bumpversion build --allow-dirty
 git add config.py
 
