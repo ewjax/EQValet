@@ -5,6 +5,7 @@ import asyncio
 import win32console
 
 import config
+import _version
 
 import EverquestLogFile
 import DamageParser
@@ -13,6 +14,7 @@ import RandomParser
 import DeathLoopParser
 import util
 from util import starprint
+
 
 #################################################################################################
 
@@ -78,7 +80,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         target = r'^\.ver '
         m = re.match(target, trunc_line)
         if m:
-            starprint(f'EQValet {config.__VERSION__}')
+            starprint(f'EQValet {_version.__VERSION__}')
 
         # todo - just testing the ability to enter a waypoint, with positive and negative value
         target = r'^\.wp\.(?P<eqx>[0-9-]+)\.(?P<eqy>[0-9-]+) '
@@ -205,7 +207,7 @@ async def main():
     # print a startup message
     starprint('')
     starprint('=', alignment='^', fill='=')
-    starprint(f'EQValet {config.__VERSION__}', alignment='^')
+    starprint(f'EQValet {_version.__VERSION__}', alignment='^')
     starprint('=', alignment='^', fill='=')
     starprint('')
 

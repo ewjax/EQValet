@@ -1,18 +1,14 @@
 import configparser
-
 from util import starprint
-# global data
-
-# version number
-__VERSION__ = '2.3.0.Build.4'
-
-
-# begin by reading in the config data
-config_data = configparser.ConfigParser()
 
 # global instance of the EQValet class
 the_valet = None
 ini_filename = 'EQValet.ini'
+
+
+# global data
+# begin by reading in the config data
+config_data = configparser.ConfigParser()
 
 
 def load() -> None:
@@ -145,11 +141,11 @@ def verify_settings() -> None:
         modified = True
 
     if not config_data.has_option(section, 'width'):
-        config_data.set(section, 'width', '1000')
+        config_data.set(section, 'width', '1200')
         modified = True
 
     if not config_data.has_option(section, 'height'):
-        config_data.set(section, 'height', '600')
+        config_data.set(section, 'height', '800')
         modified = True
 
     # save the data
