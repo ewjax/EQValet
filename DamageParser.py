@@ -1033,18 +1033,21 @@ class DamageParser:
                 m = re.match(pending_regexp, trunc_line)
                 if m:
 
-                    # extract RE data
-                    target_name = m.group('target_name')
+                    # don't parse events vs eyes of zomm
+                    if not DamageParser.is_zomm(target_name):
 
-                    # set the attacker name to the player name
-                    attacker_name = config.the_valet.char_name
+                        # extract RE data
+                        target_name = m.group('target_name')
 
-                    # any damage event indicates we are in combat
-                    the_target = self.get_target(target_name)
-                    if not the_target.in_combat:
-                        the_target.start_combat(line)
-                        starprint(f'Combat begun: [{target_name}]', '^', '-')
-                        starprint(f'(spell landed)', '^')
+                        # set the attacker name to the player name
+                        attacker_name = config.the_valet.char_name
+
+                        # any damage event indicates we are in combat
+                        the_target = self.get_target(target_name)
+                        if not the_target.in_combat:
+                            the_target.start_combat(line)
+                            starprint(f'Combat begun: [{target_name}]', '^', '-')
+                            starprint(f'(spell landed)', '^')
 
                     # is this spell already in the DE list for the player, and still ticking?
                     # if so, close the existing, and add the new one
@@ -1109,29 +1112,32 @@ class DamageParser:
                 dmg_type = m.group('dmg_type')
                 damage = int(m.group('damage'))
 
-                # set the attacker name
-                # will usually be player name, unless, this message is from a pet lt_proc
-                attacker_name = config.the_valet.char_name
-                the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
-                if the_pet and the_pet.lifetap_pending:
-                    if the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
-                        attacker_name = config.the_valet.pet_parser.pet_name()
+                # don't parse events vs eyes of zomm
+                if not DamageParser.is_zomm(target_name):
 
-                # any damage event indicates we are in combat
-                the_target = self.get_target(target_name)
-                if not the_target.in_combat:
-                    the_target.start_combat(line)
-                    starprint(f'Combat begun: [{target_name}]', '^', '-')
-                    starprint(f'(non-melee event)', '^')
+                    # set the attacker name
+                    # will usually be player name, unless, this message is from a pet lt_proc
+                    attacker_name = config.the_valet.char_name
+                    the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
+                    if the_pet and the_pet.lifetap_pending:
+                        if the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
+                            attacker_name = config.the_valet.pet_parser.pet_name()
 
-                # if there is a spell pending, and this isn't a lt_proc, then assume that this event represents the DD component of that spell
-                if self.spell_pending:
-                    if not (the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage):
-                        dmg_type = self.spell_pending.damage_type()
+                    # any damage event indicates we are in combat
+                    the_target = self.get_target(target_name)
+                    if not the_target.in_combat:
+                        the_target.start_combat(line)
+                        starprint(f'Combat begun: [{target_name}]', '^', '-')
+                        starprint(f'(non-melee event)', '^')
 
-                # add the DamageEvent
-                dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                the_target.add_incoming_damage_event(dde)
+                    # if there is a spell pending, and this isn't a lt_proc, then assume that this event represents the DD component of that spell
+                    if self.spell_pending:
+                        if not (the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage):
+                            dmg_type = self.spell_pending.damage_type()
+
+                    # add the DamageEvent
+                    dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                    the_target.add_incoming_damage_event(dde)
 
             #
             # watch for melee misses by me
@@ -1143,12 +1149,15 @@ class DamageParser:
                 # extract RE data
                 target_name = m.group('target_name')
 
-                # any damage event indicates we are in combat
-                the_target = self.get_target(target_name)
-                if not the_target.in_combat:
-                    the_target.start_combat(line)
-                    starprint(f'Combat begun: [{target_name}]', '^', '-')
-                    starprint(f'(melee miss by you)', '^')
+                # don't parse events vs eyes of zomm
+                if not DamageParser.is_zomm(target_name):
+
+                    # any damage event indicates we are in combat
+                    the_target = self.get_target(target_name)
+                    if not the_target.in_combat:
+                        the_target.start_combat(line)
+                        starprint(f'Combat begun: [{target_name}]', '^', '-')
+                        starprint(f'(melee miss by you)', '^')
 
             #
             # watch for melee messages by me
@@ -1164,16 +1173,19 @@ class DamageParser:
                 target_name = m.group('target_name')
                 damage = int(m.group('damage'))
 
-                # any damage event indicates we are in combat
-                the_target = self.get_target(target_name)
-                if not the_target.in_combat:
-                    the_target.start_combat(line)
-                    starprint(f'Combat begun: [{target_name}]', '^', '-')
-                    starprint(f'(melee hit by you)', '^')
+                # don't parse events vs eyes of zomm
+                if not DamageParser.is_zomm(target_name):
 
-                # add the DamageEvent
-                dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                the_target.add_incoming_damage_event(dde)
+                    # any damage event indicates we are in combat
+                    the_target = self.get_target(target_name)
+                    if not the_target.in_combat:
+                        the_target.start_combat(line)
+                        starprint(f'Combat begun: [{target_name}]', '^', '-')
+                        starprint(f'(melee hit by you)', '^')
+
+                    # add the DamageEvent
+                    dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                    the_target.add_incoming_damage_event(dde)
 
             #
             # watch for melee messages
@@ -1190,34 +1202,53 @@ class DamageParser:
                 target_name = m.group('target_name')
                 damage = int(m.group('damage'))
 
-                # the case where the Mob is attacking YOU, or a Player, or any pet
-                if (target_name == 'YOU') or (target_name in config.the_valet.player_names_set) or (target_name in self.pet_names_set):
+                # don't parse events vs eyes of zomm
+                if not DamageParser.is_zomm(target_name):
 
-                    # any damage event indicates we are in combat
-                    the_target = self.get_target(attacker_name)
-                    if not the_target.in_combat:
-                        the_target.start_combat(line)
-                        starprint(f'Combat begun: [{attacker_name}]', '^', '-')
-                        starprint(f'(melee event vs you, or Player, or Pet)', '^')
+                    # the case where the Mob is attacking YOU, or a Player, or any pet
+                    if (target_name == 'YOU') or (target_name in config.the_valet.player_names_set) or (target_name in self.pet_names_set):
 
-                    the_target.check_max_melee(damage)
+                        # any damage event indicates we are in combat
+                        the_target = self.get_target(attacker_name)
+                        if not the_target.in_combat:
+                            the_target.start_combat(line)
+                            starprint(f'Combat begun: [{attacker_name}]', '^', '-')
+                            starprint(f'(melee event vs you, or Player, or Pet)', '^')
 
-                    # add the DamageEvent
-                    dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                    the_target.add_outgoing_damage_event(dde)
+                        the_target.check_max_melee(damage)
 
-                # the case where a Player is attacking the Mob
-                else:
-                    # any damage event indicates we are in combat
-                    the_target = self.get_target(target_name)
-                    if not the_target.in_combat:
-                        the_target.start_combat(line)
-                        starprint(f'Combat begun: [{target_name}]', '^', '-')
-                        starprint(f'(melee event vs mob)', '^')
+                        # add the DamageEvent
+                        dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                        the_target.add_outgoing_damage_event(dde)
 
-                    # add the DamageEvent
-                    dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                    the_target.add_incoming_damage_event(dde)
+                    # the case where a Player is attacking the Mob
+                    else:
+                        # any damage event indicates we are in combat
+                        the_target = self.get_target(target_name)
+                        if not the_target.in_combat:
+                            the_target.start_combat(line)
+                            starprint(f'Combat begun: [{target_name}]', '^', '-')
+                            starprint(f'(melee event vs mob)', '^')
+
+                        # add the DamageEvent
+                        dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                        the_target.add_incoming_damage_event(dde)
+
+    #
+    #
+    @staticmethod
+    def is_zomm(target_name: str) -> bool:
+        """
+        Use this to screen out parsing on events where players are smacking eyes of zomm
+
+        Args:
+            target_name: target name
+
+        Returns:
+            bool: True if this target name begins with the string 'Eye of '
+        """
+        zomm_target = 'Eye of '
+        return zomm_target == target_name[:7]
 
     #
     #
