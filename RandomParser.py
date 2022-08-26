@@ -587,7 +587,7 @@ class RandomParser:
 
                     # create the roll object
                     roll = PlayerRandomRoll(player, value, low, high, line)
-                    starprint(f'Random: {roll.report("")}')
+                    # starprint(f'Random: {roll.report("")}')
 
                     # add it to the list of all rolls
                     self.all_rolls.append(roll)

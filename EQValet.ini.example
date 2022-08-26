@@ -22,3 +22,10 @@ parse = True
 parse = True
 deaths = 4
 seconds = 120
+
+[ConsoleWindowPosition]
+x = 100
+y = 100
+width = 1200
+height = 8000
+

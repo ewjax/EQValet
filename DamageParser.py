@@ -4,6 +4,7 @@ import pyperclip
 import re
 from datetime import datetime
 
+import PetParser
 import config
 import util
 from util import starprint
@@ -572,10 +573,14 @@ class Target:
         Returns:
             Elapsed seconds in combat
         """
-        now = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
-        elapsed_timedelta = now - self.last_combat_datetime
-        elapsed_seconds = elapsed_timedelta.total_seconds()
-        return elapsed_seconds
+
+        try:
+            now = datetime.strptime(eq_timestamp[0:26], '[%a %b %d %H:%M:%S %Y]')
+            elapsed_timedelta = now - self.last_combat_datetime
+            elapsed_seconds = elapsed_timedelta.total_seconds()
+            return elapsed_seconds
+        except ValueError:
+            return 0.0
 
     #
     #
@@ -1105,11 +1110,12 @@ class DamageParser:
                 damage = int(m.group('damage'))
 
                 # set the attacker name
-                # will usually be player name, unless, this message is from a pet lifetap
+                # will usually be player name, unless, this message is from a pet lt_proc
                 attacker_name = config.the_valet.char_name
-                the_pet = config.the_valet.pet_parser.current_pet
-                if the_pet and the_pet.lifetap_pending and the_pet.pet_lifetap == damage:
-                    attacker_name = config.the_valet.pet_parser.pet_name()
+                the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
+                if the_pet and the_pet.lifetap_pending:
+                    if the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
+                        attacker_name = config.the_valet.pet_parser.pet_name()
 
                 # any damage event indicates we are in combat
                 the_target = self.get_target(target_name)
@@ -1118,9 +1124,9 @@ class DamageParser:
                     starprint(f'Combat begun: [{target_name}]', '^', '-')
                     starprint(f'(non-melee event)', '^')
 
-                # if there is a spell pending, and this isn't a lifetap, then assume that this event represents the DD component of that spell
+                # if there is a spell pending, and this isn't a lt_proc, then assume that this event represents the DD component of that spell
                 if self.spell_pending:
-                    if not (the_pet and the_pet.lifetap_pending and the_pet.pet_lifetap == damage):
+                    if not (the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage):
                         dmg_type = self.spell_pending.damage_type()
 
                 # add the DamageEvent
