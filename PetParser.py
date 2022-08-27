@@ -72,17 +72,17 @@ class PetSpell:
         self.eq_class = eq_class
         self.caster_level = caster_level
         self.pet_level_list = pet_level_list
-        self.mage_subtype = mage_subtype
+        self.mage_type = mage_subtype
 
     # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self):
-        rv = f'({self.spell_name}, {self.mage_subtype}, {self.eq_class}, {self.caster_level}, \n{self.pet_level_list})'
+        rv = f'({self.spell_name}, {self.mage_type}, {self.eq_class}, {self.caster_level}, \n{self.pet_level_list})'
         return rv
 
     def get_full_spellname(self):
         rv = f'{self.spell_name}'
-        if self.mage_subtype:
-            rv += f': {self.mage_subtype}'
+        if self.mage_type:
+            rv += f': {self.mage_type}'
         return rv
 
 
@@ -105,7 +105,15 @@ class Pet:
 
         self.pet_name = None
         self.name_pending = True
+
+        # necro pets have a lifetap proc
         self.lifetap_pending = False
+
+        # mage fire pets have a damage shield proc
+        self.damage_shield_pending = False
+
+        # mage fire/water pets will proc
+        self.procced = False
 
         # which PetSpell was used to create this pet
         # note that each PetSpell object contains a list of PetLevel objects, one for each possible level of this pet
@@ -158,8 +166,8 @@ class Pet:
 
         if self.pet_spell:
             rv += f' ({self.pet_spell.spell_name}'
-            if self.pet_spell.mage_subtype:
-                rv += f': {self.pet_spell.mage_subtype}'
+            if self.pet_spell.mage_type:
+                rv += f': {self.pet_spell.mage_type}'
             rv += ')'
 
         if desc:
@@ -197,6 +205,9 @@ class PetParser:
         # a dictionary of pet spells, keys = Pet Spell Names, values = associated PetSpell objects
         self.pet_dict = {}
         self.load_pet_dict()
+
+        # keep track of the previous non-melee damage amount (for mage fire/watere pet proc messages)
+        self.prev_non_melee_damage = 0
 
     # get pet name
     def pet_name(self) -> str:
@@ -308,7 +319,7 @@ class PetParser:
                 # does the spell name match one of the pets we know about?
                 if spell_name in self.pet_dict:
                     pet_spell: PetSpell = copy.copy(self.pet_dict[spell_name])
-                    pet_spell.mage_subtype = mage_type
+                    pet_spell.mage_type = mage_type
                     self.current_pet = Pet(pet_spell)
                     starprint(f'Pet being created from spell ({pet_spell.get_full_spellname()}), name TBD')
 
@@ -330,30 +341,100 @@ class PetParser:
                     starprint(self.current_pet.created_report())
 
             #
-            # if the flag is set that we have a lt_proc message and don't have the amount yet,
-            # search for the non-melee message
+            # check for lifetaps, procs, and damage shields.  Start by getting the non-melee damage amount for use in all
             #
-            if self.current_pet and self.current_pet.lifetap_pending:
-
+            # For necro pet lifetaps and mage fire pet damage shields, the order of occurrence in the log file is
+            #       first: the particular phrase indicating the occurrence of the lifetap or damage shield event
+            #       then: non-melee damage message (usually the very next line, not sure if that is always true)
+            #
+            #       To parse for those events, we start by setting a 'pending' flag, then watch for the non-melee message
+            #
+            # For mage fire/water pet procs, the order is reversed
+            #       first: non-melee damage message
+            #       then: the particular phrase indicating the occurrence of the lifetap or damage shield event
+            #             (usually the very next line, not sure if that is always true)
+            #
+            #       To parse for these events, we set a 'proceed' flag, then remember the previous non-melee event as the proc amount
+            #
+            non_melee_damage = 0
+            if self.current_pet:
                 target = r'^(?P<target_name>[\w` ]+) was hit by non-melee for (?P<damage>[\d]+) points of damage'
                 m = re.match(target, trunc_line)
                 if m:
+                    non_melee_damage = int(m.group('damage'))
 
-                    # fetch the damage, and reset the pending flag
-                    dmg = int(m.group('damage'))
+            #
+            # if the flag is set that we have a lifetap_pending...
+            if self.current_pet and self.current_pet.lifetap_pending and non_melee_damage > 0:
+
+                # did we have a lifetap that matches the current pet?
+                if self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.lifetap_proc == non_melee_damage:
                     self.current_pet.lifetap_pending = False
 
-                    # new PetLevel?
-                    if (self.current_pet.my_PetLevel is None) or (self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.lifetap_proc != dmg):
+                # new PetLevel?
+                if (self.current_pet.my_PetLevel is None) or \
+                   (self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.lifetap_proc != non_melee_damage):
 
-                        # find the new PetLevel
-                        for pet_level in self.current_pet.pet_spell.pet_level_list:
-                            if pet_level.lifetap_proc == dmg:
-                                self.current_pet.my_PetLevel = pet_level
+                    # find the new PetLevel
+                    for pet_level in self.current_pet.pet_spell.pet_level_list:
+                        if pet_level.lifetap_proc == non_melee_damage:
+                            self.current_pet.my_PetLevel = pet_level
+                            self.current_pet.max_melee = pet_level.max_melee
+                            self.current_pet.lifetap_pending = False
 
-                                # announce the pet rank
-                                starprint(str(self.current_pet))
-                                starprint('  (Identified via lifetap signature)')
+                            # announce the pet rank
+                            starprint(str(self.current_pet))
+                            starprint('  (Identified via lifetap signature)')
+
+            #
+            # if the flag is set that we have a damage shield pending...
+            if self.current_pet and self.current_pet.damage_shield_pending and non_melee_damage > 0:
+
+                # did we have a DS that matches the current pet?
+                if self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.damage_shield == non_melee_damage:
+                    self.current_pet.damage_shield_pending = False
+
+                # new PetLevel?
+                if (self.current_pet.my_PetLevel is None) or \
+                        (self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.damage_shield != non_melee_damage):
+
+                    # find the new PetLevel
+                    for pet_level in self.current_pet.pet_spell.pet_level_list:
+                        if pet_level.damage_shield == non_melee_damage:
+                            self.current_pet.my_PetLevel = pet_level
+                            self.current_pet.max_melee = pet_level.max_melee
+                            self.current_pet.damage_shield_pending = False
+
+                            # announce the pet rank
+                            starprint(str(self.current_pet))
+                            starprint('  (Identified via damage shield signature)')
+
+            #
+            # if the flag is set that we had a proc event...
+            if self.current_pet and self.current_pet.procced:
+
+                # did we have a proc that matches the current pet?
+                if self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.lifetap_proc == self.prev_non_melee_damage:
+                    self.current_pet.procced = False
+
+                # new PetLevel?
+                if (self.current_pet.my_PetLevel is None) or \
+                        (self.current_pet.my_PetLevel and self.current_pet.my_PetLevel.lifetap_proc != self.prev_non_melee_damage):
+
+                    # find the new PetLevel
+                    for pet_level in self.current_pet.pet_spell.pet_level_list:
+                        if pet_level.lifetap_proc == self.prev_non_melee_damage:
+                            self.current_pet.my_PetLevel = pet_level
+                            self.current_pet.max_melee = pet_level.max_melee
+                            self.current_pet.procced = False
+
+                            # announce the pet rank
+                            starprint(str(self.current_pet))
+                            starprint('  (Identified via proc signature)')
+
+            # save the non-melee damage event for use in next proc
+            if non_melee_damage > 0:
+                self.prev_non_melee_damage = non_melee_damage
 
             #
             # if we have a pet, do several scans....
@@ -362,11 +443,24 @@ class PetParser:
 
                 #
                 # look for lt_proc 'beams a smile' message coming from our pet
-                #
-                target = r'^{} beams a smile at (?P<target_name>[\w` ]+)'.format(self.current_pet.pet_name)
+                target = f'^{self.current_pet.pet_name} beams a smile at (?P<target_name>[\\w` ]+)'
                 m = re.match(target, trunc_line, re.IGNORECASE)
                 if m:
                     self.current_pet.lifetap_pending = True
+
+                #
+                # look for mage fire pet DS 'was burned' message coming from our pet
+                target = f'^(?P<target_name>[\\w` ]+ was burned)'
+                m = re.match(target, trunc_line, re.IGNORECASE)
+                if m:
+                    self.current_pet.damage_shield_pending = True
+
+                #
+                # look for the mage fire/water pet proc messages
+                target = f'^(?P<target_name>[\\w` ]+ (is slashed by ice)|(is engulfed by fire))'
+                m = re.match(target, trunc_line, re.IGNORECASE)
+                if m:
+                    self.current_pet.procced = True
 
                 #
                 # look for max melee value
@@ -482,6 +576,19 @@ class PetParser:
         # Necro pets
         #
         pet_level_list = list()
+        pet_level_list.append(PetLevel(rank=1, pet_level=1, max_melee=8, max_bashkick=0, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=2, pet_level=2, max_melee=10, max_bashkick=0, max_backstab=0, lt_proc=0))
+        pet_spell = PetSpell('Cavorting Bones', 'Necro', caster_level=1, pet_level_list=pet_level_list.copy())
+        self.pet_dict[pet_spell.spell_name] = pet_spell
+
+        pet_level_list.clear()
+        pet_level_list.append(PetLevel(rank=1, pet_level=3, max_melee=8, max_bashkick=0, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=2, pet_level=4, max_melee=10, max_bashkick=0, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=3, pet_level=5, max_melee=12, max_bashkick=0, max_backstab=0, lt_proc=0, desc='Max'))
+        pet_spell = PetSpell('Leering Corpse', 'Necro', caster_level=4, pet_level_list=pet_level_list.copy())
+        self.pet_dict[pet_spell.spell_name] = pet_spell
+
+        pet_level_list.clear()
         pet_level_list.append(PetLevel(rank=1, pet_level=6, max_melee=8, max_bashkick=8, max_backstab=0, lt_proc=0))
         pet_level_list.append(PetLevel(rank=2, pet_level=7, max_melee=10, max_bashkick=10, max_backstab=0, lt_proc=0))
         pet_level_list.append(PetLevel(rank=3, pet_level=8, max_melee=12, max_bashkick=12, max_backstab=0, lt_proc=0))
@@ -566,7 +673,7 @@ class PetParser:
         pet_level_list.append(PetLevel(rank=3, pet_level=39, max_melee=51, max_bashkick=23, max_backstab=0, lt_proc=40))
         pet_level_list.append(PetLevel(rank=4, pet_level=40, max_melee=52, max_bashkick=24, max_backstab=0, lt_proc=41))
         pet_level_list.append(PetLevel(rank=5, pet_level=41, max_melee=55, max_bashkick=24, max_backstab=0, lt_proc=42, desc='Max'))
-        pet_level_list.append(PetLevel(rank=6, pet_level=42, max_melee=57, max_bashkick=25, max_backstab=0, lt_proc=43, desc='Max + Focus'))
+        pet_level_list.append(PetLevel(rank=6, pet_level=42, max_melee=57, max_bashkick=25, max_backstab=0, lt_proc=43, desc='Max+Focus'))
         pet_spell = PetSpell('Invoke Death', 'Necro', caster_level=49, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
@@ -576,7 +683,7 @@ class PetParser:
         pet_level_list.append(PetLevel(rank=3, pet_level=42, max_melee=52, max_bashkick=0, max_backstab=159, lt_proc=42))
         pet_level_list.append(PetLevel(rank=4, pet_level=43, max_melee=55, max_bashkick=0, max_backstab=165, lt_proc=43))
         pet_level_list.append(PetLevel(rank=5, pet_level=44, max_melee=56, max_bashkick=0, max_backstab=171, lt_proc=44, desc='Max'))
-        pet_level_list.append(PetLevel(rank=6, pet_level=45, max_melee=59, max_bashkick=0, max_backstab=177, lt_proc=45, desc='Max + Focus'))
+        pet_level_list.append(PetLevel(rank=6, pet_level=45, max_melee=59, max_bashkick=0, max_backstab=177, lt_proc=45, desc='Max+Focus'))
         pet_spell = PetSpell('Minion of Shadows', 'Necro', caster_level=53, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
@@ -586,7 +693,7 @@ class PetParser:
         pet_level_list.append(PetLevel(rank=3, pet_level=42, max_melee=55, max_bashkick=66, max_backstab=0, lt_proc=43))
         pet_level_list.append(PetLevel(rank=4, pet_level=43, max_melee=56, max_bashkick=68, max_backstab=0, lt_proc=44))
         pet_level_list.append(PetLevel(rank=5, pet_level=44, max_melee=59, max_bashkick=69, max_backstab=0, lt_proc=45, desc='Max'))
-        pet_level_list.append(PetLevel(rank=6, pet_level=45, max_melee=61, max_bashkick=71, max_backstab=0, lt_proc=46, desc='Max + Focus'))
+        pet_level_list.append(PetLevel(rank=6, pet_level=45, max_melee=61, max_bashkick=71, max_backstab=0, lt_proc=46, desc='Max+Focus'))
         pet_spell = PetSpell('Servant of Bones', 'Necro', caster_level=56, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
@@ -596,7 +703,7 @@ class PetParser:
         pet_level_list.append(PetLevel(rank=3, pet_level=45, max_melee=56, max_bashkick=25, max_backstab=0, lt_proc=46))
         pet_level_list.append(PetLevel(rank=4, pet_level=46, max_melee=59, max_bashkick=25, max_backstab=0, lt_proc=47))
         pet_level_list.append(PetLevel(rank=5, pet_level=47, max_melee=61, max_bashkick=26, max_backstab=0, lt_proc=48, desc='Max'))
-        pet_level_list.append(PetLevel(rank=6, pet_level=48, max_melee=62, max_bashkick=26, max_backstab=0, lt_proc=49, desc='Max + Focus'))
+        pet_level_list.append(PetLevel(rank=6, pet_level=48, max_melee=62, max_bashkick=26, max_backstab=0, lt_proc=49, desc='Max+Focus'))
         pet_spell = PetSpell('Emissary of Thule', 'Necro', caster_level=59, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
@@ -824,7 +931,7 @@ class PetParser:
         pet_spell = PetSpell('Greater Summoning', 'Magician', caster_level=29, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
-        # todo missing mage 34, 39, 44, 49, 51 earth, 52 fire, 53 air, 54 water, 57 earth, 58 fire, 59 air, 60 water
+        # todo missing mage 34+ pets
 
         # mage epic pet
         pet_level_list.clear()

@@ -712,10 +712,15 @@ class Target:
             for (dmg_type, dmg_type_sum) in sorted(dmg_type_summary_dict.items(), key=lambda val: val[1], reverse=True):
                 reportbuffer += f'{dmg_type:>35}: {dmg_type_sum:>5}\n'
 
-            frac = 0
+            frac = 0.0
             if grand_total_outgoing != 0:
                 frac = round(target_total / grand_total_outgoing * 100.0)
-            reportbuffer += f'{"Total":>35}: {target_total:>5} ({frac}%)\n'
+
+            dps = 0.0
+            if self.combat_duration_seconds() > 0:
+                dps = target_total / self.combat_duration_seconds()
+
+            reportbuffer += f'{"Total":>35}: {target_total:>5} ({frac}%) (@{dps:.1f} dps)\n'
 
         reportbuffer += '\n'
         reportbuffer += f'{"Grand Total":>35}: {grand_total_outgoing:>5} (100%) (@{dps_outgoing:.1f} dps)\n'
@@ -743,7 +748,12 @@ class Target:
             frac = 0
             if grand_total_incoming != 0:
                 frac = round(attacker_total / grand_total_incoming * 100)
-            reportbuffer += f'{"Total":>35}: {attacker_total:>5} ({frac}%)\n'
+
+            dps = 0.0
+            if self.combat_duration_seconds() > 0:
+                dps = attacker_total / self.combat_duration_seconds()
+
+            reportbuffer += f'{"Total":>35}: {attacker_total:>5} ({frac}%) (@{dps:.1f} dps)\n'
 
         dps_incoming = 0.0
         if self.combat_duration_seconds() > 0:
@@ -796,7 +806,11 @@ class Target:
             fraction = 0
             if grand_total_incoming != 0:
                 fraction = round(attacker_total / grand_total_incoming * 100.0)
-            clipboard_report += f' | {attacker} {attacker_total} [{fraction}%]'
+            dps = 0
+            if self.combat_duration_seconds() > 0:
+                dps = round(attacker_total / self.combat_duration_seconds())
+
+            clipboard_report += f' | {attacker} {attacker_total}@{dps} [{fraction}%]'
 
         # send this to clipboard
         pyperclip.copy(clipboard_report)
@@ -811,6 +825,7 @@ class DamageParser:
     """
     Class to do all the damage tracking work
     """
+    prev_dde: DiscreteDamageEvent
 
     # ctor
     def __init__(self):
@@ -834,6 +849,10 @@ class DamageParser:
         # set of pet names
         self.pet_names_set = set()
         self.read_pet_names()
+
+        # keep track of the previous non-melee DirectDamageEvent (for mage fire/watere pet proc messages)
+        self.prev_dde = None
+        self.prev_target = None
 
     #
     #
@@ -1033,11 +1052,11 @@ class DamageParser:
                 m = re.match(pending_regexp, trunc_line)
                 if m:
 
+                    # extract RE data
+                    target_name = m.group('target_name')
+
                     # don't parse events vs eyes of zomm
                     if not DamageParser.is_zomm(target_name):
-
-                        # extract RE data
-                        target_name = m.group('target_name')
 
                         # set the attacker name to the player name
                         attacker_name = config.the_valet.char_name
@@ -1049,25 +1068,25 @@ class DamageParser:
                             starprint(f'Combat begun: [{target_name}]', '^', '-')
                             starprint(f'(spell landed)', '^')
 
-                    # is this spell already in the DE list for the player, and still ticking?
-                    # if so, close the existing, and add the new one
-                    de_list = the_target.incoming_damage_events_dict.get(attacker_name)
-                    # for each event in the player's DE list
-                    if de_list:
-                        for de in de_list:
-                            if de.is_ticking():
-                                if self.spell_pending.spell_name == de.spell_name:
-                                    de.set_end_time(line)
-                                    starprint(f'{de.spell_name} overwritten with new')
+                        # is this spell already in the DE list for the player, and still ticking?
+                        # if so, close the existing, and add the new one
+                        de_list = the_target.incoming_damage_events_dict.get(attacker_name)
+                        # for each event in the player's DE list
+                        if de_list:
+                            for de in de_list:
+                                if de.is_ticking():
+                                    if self.spell_pending.spell_name == de.spell_name:
+                                        de.set_end_time(line)
+                                        starprint(f'{de.spell_name} overwritten with new')
 
-                    # add the DamageEvent
-                    de = copy.deepcopy(self.spell_pending)
-                    de.set_instance_data(attacker_name, target_name, line)
-                    the_target.add_incoming_damage_event(de)
+                        # add the DamageEvent
+                        de = copy.deepcopy(self.spell_pending)
+                        de.set_instance_data(attacker_name, target_name, line)
+                        the_target.add_incoming_damage_event(de)
 
-                    # reset the spell pending flag
-                    if not self.spell_pending.is_aoe():
-                        self.spell_pending = None
+                        # reset the spell pending flag
+                        if not self.spell_pending.is_aoe():
+                            self.spell_pending = None
 
             #
             # watch for spell faded conditions -only check DamageEvents that are not closed, i.e. still ticking
@@ -1116,12 +1135,24 @@ class DamageParser:
                 if not DamageParser.is_zomm(target_name):
 
                     # set the attacker name
-                    # will usually be player name, unless, this message is from a pet lt_proc
+                    # will usually be player name, unless, this message is from a
+                    #   pet lt_proc, or
+                    #   mage fire pet DS, or
+                    #   mage fire/water pet proc
                     attacker_name = config.the_valet.char_name
                     the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
+
+                    # if this is a lifetap, assign the attacker as the pet
                     if the_pet and the_pet.lifetap_pending:
                         if the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
                             attacker_name = config.the_valet.pet_parser.pet_name()
+                            dmg_type = 'Lifetap'
+
+                    # if this is a damage shield, assign the attacker as the pet
+                    if the_pet and the_pet.damage_shield_pending:
+                        if the_pet.my_PetLevel and the_pet.my_PetLevel.damage_shield == damage:
+                            attacker_name = config.the_valet.pet_parser.pet_name()
+                            dmg_type = 'Damage Shield'
 
                     # any damage event indicates we are in combat
                     the_target = self.get_target(target_name)
@@ -1138,6 +1169,27 @@ class DamageParser:
                     # add the DamageEvent
                     dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
                     the_target.add_incoming_damage_event(dde)
+
+                    # save this for possible use later if we encounter a mage fire/water pet proc
+                    # self.prev_dde = copy.copy(dde)
+                    self.prev_dde = dde
+                    self.prev_target = the_target
+
+            #
+            # did we have a mage fire/water pet proc?
+            # this is kind of messy, since by the time we get the proc message, the proc DDE has already been added
+            # to the Target under the wrong attacker, with damage type 'non-melee'
+            the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
+            if the_pet and the_pet.procced:
+
+                # make a copy of the old DDE, then correct the attacker and dmg type, and add it back to the target
+                redo_dde = copy.copy(self.prev_dde)
+                redo_dde.attacker_name = config.the_valet.pet_parser.pet_name()
+                redo_dde.dmg_type = 'proc'
+                self.prev_target.add_incoming_damage_event(redo_dde)
+
+                # now zero out the damage of the DDE that already got added
+                self.prev_dde.dmg_amount = 0
 
             #
             # watch for melee misses by me
