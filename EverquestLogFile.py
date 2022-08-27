@@ -9,8 +9,8 @@ from util import starprint
 
 
 # allow for testing, by forcing the bot to read an old log logfile
-TEST_ELF = False
-# TEST_ELF = True
+# TEST_ELF = False
+TEST_ELF = True
 
 
 class EverquestLogFile:
@@ -255,6 +255,7 @@ class EverquestLogFile:
                 # logfile_name = './data/test/pets2.txt'
                 # logfile_name = './data/test/pets_long.txt'
                 logfile_name = './data/test/mage_pets_level4-29.txt'
+                # logfile_name = './data/test/xarantik.txt'
                 # logfile_name = './data/test/fights.txt'
 
                 # start parsing, but in this case, start reading from the beginning of the logfile,

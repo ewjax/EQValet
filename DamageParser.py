@@ -966,6 +966,77 @@ class DamageParser:
         if config.config_data.getboolean('DamageParser', 'parse'):
 
             #
+            # watch for non-melee messages
+            #
+            non_melee_regexp = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) point(s)? of damage'
+            m = re.match(non_melee_regexp, trunc_line)
+            if m:
+                # extract RE data
+                target_name = m.group('target_name')
+                dmg_type = m.group('dmg_type')
+                damage = int(m.group('damage'))
+
+                # don't parse events vs eyes of zomm
+                if not DamageParser.is_zomm(target_name):
+
+                    # set the attacker name
+                    # will usually be player name, unless, this message is from a
+                    #   pet lt_proc, or
+                    #   mage fire pet DS, or
+                    #   mage fire/water pet proc
+                    attacker_name = config.the_valet.char_name
+                    the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
+
+                    # if this is a lifetap, assign the attacker as the pet
+                    if the_pet and the_pet.lifetap_pending:
+                        if the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
+                            attacker_name = config.the_valet.pet_parser.pet_name()
+                            dmg_type = 'Lifetap'
+
+                    # if this is a damage shield, assign the attacker as the pet
+                    if the_pet and the_pet.damage_shield_pending:
+                        if the_pet.my_PetLevel and the_pet.my_PetLevel.damage_shield == damage:
+                            attacker_name = config.the_valet.pet_parser.pet_name()
+                            dmg_type = 'Damage Shield'
+
+                    # any damage event indicates we are in combat
+                    the_target = self.get_target(target_name)
+                    if not the_target.in_combat:
+                        the_target.start_combat(line)
+                        starprint(f'Combat begun: [{target_name}]', '^', '-')
+                        starprint(f'(non-melee event)', '^')
+
+                    # if there is a spell pending, and this isn't a lt_proc, then assume that this event represents the DD component of that spell
+                    if self.spell_pending:
+                        if not (the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage):
+                            dmg_type = self.spell_pending.damage_type()
+
+                    # add the DamageEvent
+                    dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
+                    the_target.add_incoming_damage_event(dde)
+
+                    # save this for possible use later if we encounter a mage fire/water pet proc
+                    # self.prev_dde = copy.copy(dde)
+                    self.prev_dde = dde
+                    self.prev_target = the_target
+
+            #
+            # did we have a mage fire/water pet proc?
+            # this is kind of messy, since by the time we get the proc message, the proc DDE has already been added
+            # to the Target under the wrong attacker, with damage type 'non-melee'
+            the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
+            if the_pet and the_pet.procced:
+
+                # make a copy of the old DDE, then correct the attacker and dmg type, and add it back to the target
+                redo_dde = copy.copy(self.prev_dde)
+                redo_dde.attacker_name = config.the_valet.pet_parser.pet_name()
+                redo_dde.dmg_type = 'proc'
+                self.prev_target.add_incoming_damage_event(redo_dde)
+
+                # now zero out the damage of the DDE that already got added
+                self.prev_dde.dmg_amount = 0
+
+            #
             # watch for conditions indicating combat is finished
             #
             if len(self.active_target_dict) > 0:
@@ -1120,76 +1191,6 @@ class DamageParser:
                     self.spell_pending = self.spell_dict[spell_name]
                     self.spell_pending.event_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
 
-            #
-            # watch for non-melee messages
-            #
-            non_melee_regexp = r'^(?P<target_name>[\w` ]+) was hit by (?P<dmg_type>[\w`\- ]+) for (?P<damage>[\d]+) point(s)? of damage'
-            m = re.match(non_melee_regexp, trunc_line)
-            if m:
-                # extract RE data
-                target_name = m.group('target_name')
-                dmg_type = m.group('dmg_type')
-                damage = int(m.group('damage'))
-
-                # don't parse events vs eyes of zomm
-                if not DamageParser.is_zomm(target_name):
-
-                    # set the attacker name
-                    # will usually be player name, unless, this message is from a
-                    #   pet lt_proc, or
-                    #   mage fire pet DS, or
-                    #   mage fire/water pet proc
-                    attacker_name = config.the_valet.char_name
-                    the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
-
-                    # if this is a lifetap, assign the attacker as the pet
-                    if the_pet and the_pet.lifetap_pending:
-                        if the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
-                            attacker_name = config.the_valet.pet_parser.pet_name()
-                            dmg_type = 'Lifetap'
-
-                    # if this is a damage shield, assign the attacker as the pet
-                    if the_pet and the_pet.damage_shield_pending:
-                        if the_pet.my_PetLevel and the_pet.my_PetLevel.damage_shield == damage:
-                            attacker_name = config.the_valet.pet_parser.pet_name()
-                            dmg_type = 'Damage Shield'
-
-                    # any damage event indicates we are in combat
-                    the_target = self.get_target(target_name)
-                    if not the_target.in_combat:
-                        the_target.start_combat(line)
-                        starprint(f'Combat begun: [{target_name}]', '^', '-')
-                        starprint(f'(non-melee event)', '^')
-
-                    # if there is a spell pending, and this isn't a lt_proc, then assume that this event represents the DD component of that spell
-                    if self.spell_pending:
-                        if not (the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage):
-                            dmg_type = self.spell_pending.damage_type()
-
-                    # add the DamageEvent
-                    dde = DiscreteDamageEvent(attacker_name, target_name, line, dmg_type, damage)
-                    the_target.add_incoming_damage_event(dde)
-
-                    # save this for possible use later if we encounter a mage fire/water pet proc
-                    # self.prev_dde = copy.copy(dde)
-                    self.prev_dde = dde
-                    self.prev_target = the_target
-
-            #
-            # did we have a mage fire/water pet proc?
-            # this is kind of messy, since by the time we get the proc message, the proc DDE has already been added
-            # to the Target under the wrong attacker, with damage type 'non-melee'
-            the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
-            if the_pet and the_pet.procced:
-
-                # make a copy of the old DDE, then correct the attacker and dmg type, and add it back to the target
-                redo_dde = copy.copy(self.prev_dde)
-                redo_dde.attacker_name = config.the_valet.pet_parser.pet_name()
-                redo_dde.dmg_type = 'proc'
-                self.prev_target.add_incoming_damage_event(redo_dde)
-
-                # now zero out the damage of the DDE that already got added
-                self.prev_dde.dmg_amount = 0
 
             #
             # watch for melee misses by me

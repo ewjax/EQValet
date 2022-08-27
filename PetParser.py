@@ -457,7 +457,7 @@ class PetParser:
 
                 #
                 # look for the mage fire/water pet proc messages
-                target = f'^(?P<target_name>[\\w` ]+ (is slashed by ice)|(is engulfed by fire))'
+                target = f'^(?P<target_name>[\\w` ]+ ((is slashed by ice)|(is engulfed by fire)))'
                 m = re.match(target, trunc_line, re.IGNORECASE)
                 if m:
                     self.current_pet.procced = True

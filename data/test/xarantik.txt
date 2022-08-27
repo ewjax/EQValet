@@ -1,0 +1,113 @@
+[Thu Aug 25 00:25:26 2022] You begin casting Summoning: Water.
+[Thu Aug 25 00:25:38 2022] Xarantik says 'At your service Master.'
+[Thu Aug 25 00:25:43 2022] Your Location is 929.22, 4584.31, -51.47
+[Thu Aug 25 00:25:45 2022] Xarantik says 'Sorry, Master..calming down.'
+[Thu Aug 25 00:25:45 2022] Xarantik tells you, 'Attacking orc centurion Master.'
+[Thu Aug 25 00:25:45 2022] Taunting attacker, Master.
+[Thu Aug 25 00:25:45 2022] orc centurion says, 'Centurions!! Attack!!'
+[Thu Aug 25 00:25:45 2022] Xarantik kicks orc centurion for 17 points of damage.
+[Thu Aug 25 00:25:45 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:25:45 2022] Orc centurion tries to bash Xarantik, but misses!
+[Thu Aug 25 00:25:45 2022] Orc centurion slashes Xarantik for 17 points of damage.
+[Thu Aug 25 00:25:46 2022] orc centurion was hit by non-melee for 24 points of damage.
+[Thu Aug 25 00:25:46 2022] Orc centurion is slashed by ice.
+[Thu Aug 25 00:25:48 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:25:48 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:25:50 2022] Taunting attacker, Master.
+[Thu Aug 25 00:25:50 2022] orc centurion says 'I'll teach you to interfere with me Xarantik000.'
+[Thu Aug 25 00:25:51 2022] Xarantik tries to hit orc centurion, but misses!
+[Thu Aug 25 00:25:51 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:25:53 2022] Xarantik bashes orc centurion for 13 points of damage.
+[Thu Aug 25 00:25:54 2022] Xarantik tries to hit orc centurion, but misses!
+[Thu Aug 25 00:25:55 2022] Taunting attacker, Master.
+[Thu Aug 25 00:25:55 2022] Orc centurion tries to kick Xarantik, but misses!
+[Thu Aug 25 00:25:55 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:25:57 2022] orc centurion was hit by non-melee for 24 points of damage.
+[Thu Aug 25 00:25:57 2022] Orc centurion is slashed by ice.
+[Thu Aug 25 00:25:57 2022] Xarantik tries to hit orc centurion, but misses!
+[Thu Aug 25 00:25:58 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:26:00 2022] Taunting attacker, Master.
+[Thu Aug 25 00:26:00 2022] orc centurion says 'I'll teach you to interfere with me Xarantik000.'
+[Thu Aug 25 00:26:00 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:26:01 2022] Xarantik bashes orc centurion for 17 points of damage.
+[Thu Aug 25 00:26:03 2022] Orc centurion tries to bash Xarantik, but misses!
+[Thu Aug 25 00:26:03 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:26:03 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:26:04 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:26:05 2022] Taunting attacker, Master.
+[Thu Aug 25 00:26:05 2022] orc centurion says 'I'll teach you to interfere with me Xarantik000.'
+[Thu Aug 25 00:26:06 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:26:07 2022] Xarantik hits orc centurion for 16 points of damage.
+[Thu Aug 25 00:26:08 2022] Hrongar auctions, 'WTS 10 Dose Blood of the Wolfx8 100pp each PST'
+[Thu Aug 25 00:26:09 2022] Xarantik bashes orc centurion for 17 points of damage.
+[Thu Aug 25 00:26:09 2022] orc centurion was hit by non-melee for 24 points of damage.
+[Thu Aug 25 00:26:09 2022] Orc centurion is slashed by ice.
+[Thu Aug 25 00:26:09 2022] orc centurion has been slain by Xarantik!
+[Thu Aug 25 00:26:09 2022] Your faction standing with AshenOrder got better.
+[Thu Aug 25 00:26:09 2022] Your faction standing with CommonsResidents got better.
+[Thu Aug 25 00:26:09 2022] Your faction standing with DeathfistOrcs got worse.
+[Thu Aug 25 00:26:09 2022] Your faction standing with GuardiansoftheVale got better.
+[Thu Aug 25 00:26:09 2022] Your faction standing with KnightsofTruth got better.
+[Thu Aug 25 00:26:09 2022] orc centurion says, 'Aaarrghh!! The Deathfist shall hunt you down. My death will not go unnoticed.'
+[Thu Aug 25 00:26:58 2022] Xarantik says 'Sorry, Master..calming down.'
+[Thu Aug 25 00:26:58 2022] Xarantik tells you, 'Attacking orc centurion Master.'
+[Thu Aug 25 00:26:59 2022] Taunting attacker, Master.
+[Thu Aug 25 00:26:59 2022] orc centurion says 'I'll teach you to interfere with me Xarantik000.'
+[Thu Aug 25 00:26:59 2022] orc centurion says, 'Centurions!! Attack!!'
+[Thu Aug 25 00:26:59 2022] Xarantik bashes orc centurion for 17 points of damage.
+[Thu Aug 25 00:26:59 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:27:00 2022] orc centurion was hit by non-melee for 24 points of damage.
+[Thu Aug 25 00:27:00 2022] Orc centurion is slashed by ice.
+[Thu Aug 25 00:27:01 2022] Orc centurion tries to kick Xarantik, but misses!
+[Thu Aug 25 00:27:01 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:27:01 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:27:02 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:27:04 2022] Taunting attacker, Master.
+[Thu Aug 25 00:27:04 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:27:05 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:27:05 2022] Xarantik hits orc centurion for 16 points of damage.
+[Thu Aug 25 00:27:07 2022] Xarantik bashes orc centurion for 17 points of damage.
+[Thu Aug 25 00:27:08 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:27:08 2022] Xarantik hits orc centurion for 20 points of damage.
+[Thu Aug 25 00:27:09 2022] Taunting attacker, Master.
+[Thu Aug 25 00:27:09 2022] Orc centurion bashes Xarantik for 11 points of damage.
+[Thu Aug 25 00:27:09 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:27:11 2022] Xarantik hits orc centurion for 23 points of damage.
+[Thu Aug 25 00:27:12 2022] Orc centurion tries to slash Xarantik, but misses!
+[Thu Aug 25 00:27:13 2022] orc centurion was hit by non-melee for 24 points of damage.
+[Thu Aug 25 00:27:13 2022] Orc centurion is slashed by ice.
+[Thu Aug 25 00:27:14 2022] Taunting attacker, Master.
+[Thu Aug 25 00:27:14 2022] orc centurion says 'I'll teach you to interfere with me Xarantik000.'
+[Thu Aug 25 00:27:14 2022] Xarantik hits orc centurion for 11 points of damage.
+[Thu Aug 25 00:27:15 2022] Xarantik bashes orc centurion for 17 points of damage.
+[Thu Aug 25 00:27:15 2022] orc centurion has been slain by Xarantik!
+[Thu Aug 25 00:27:15 2022] Your faction standing with AshenOrder got better.
+[Thu Aug 25 00:27:15 2022] Your faction standing with CommonsResidents got better.
+[Thu Aug 25 00:27:15 2022] Your faction standing with DeathfistOrcs got worse.
+[Thu Aug 25 00:27:15 2022] Your faction standing with GuardiansoftheVale got better.
+[Thu Aug 25 00:27:15 2022] Your faction standing with KnightsofTruth got better.
+[Thu Aug 25 00:27:15 2022] orc centurion says, 'Aaarrghh!! The Deathfist shall hunt you down. My death will not go unnoticed.'
+[Thu Aug 25 00:27:24 2022] orc apprentice begins to cast a spell.
+[Thu Aug 25 00:27:32 2022] Your Location is 957.63, 4596.95, -51.47
+[Thu Aug 25 00:27:34 2022] Your Location is 958.10, 4597.16, -51.47
+[Thu Aug 25 00:27:35 2022] Xarantik says 'Sorry, Master..calming down.'
+[Thu Aug 25 00:27:35 2022] Xarantik tells you, 'Attacking orc apprentice Master.'
+[Thu Aug 25 00:27:36 2022] Taunting attacker, Master.
+[Thu Aug 25 00:27:36 2022] orc apprentice says, 'You shall bleed! All hail the Deathfist!'
+[Thu Aug 25 00:27:36 2022] Xarantik bashes orc apprentice for 12 points of damage.
+[Thu Aug 25 00:27:36 2022] Xarantik hits orc apprentice for 23 points of damage.
+[Thu Aug 25 00:27:38 2022] Orc apprentice pierces Xarantik for 3 points of damage.
+[Thu Aug 25 00:27:39 2022] Xarantik hits orc apprentice for 23 points of damage.
+[Thu Aug 25 00:27:39 2022] orc apprentice begins to cast a spell.
+[Thu Aug 25 00:27:40 2022] orc apprentice was hit by non-melee for 24 points of damage.
+[Thu Aug 25 00:27:40 2022] Orc apprentice is slashed by ice.
+[Thu Aug 25 00:27:40 2022] orc apprentice has been slain by Xarantik!
+[Thu Aug 25 00:27:40 2022] Your faction standing with AshenOrder got better.
+[Thu Aug 25 00:27:40 2022] Your faction standing with CommonsResidents got better.
+[Thu Aug 25 00:27:40 2022] Your faction standing with DeathfistOrcs got worse.
+[Thu Aug 25 00:27:40 2022] Your faction standing with GuardiansoftheVale got better.
+[Thu Aug 25 00:27:40 2022] Your faction standing with KnightsofTruth got better.
+[Thu Aug 25 00:27:40 2022] orc apprentice says, 'Aaarrghh!! The Deathfist shall hunt you down. My death will not go unnoticed.'
+[Thu Aug 25 00:27:45 2022] You begin casting Reclaim Energy.
+[Thu Aug 25 00:27:47 2022] Xarantik disperses.
+[Thu Aug 25 00:27:53 2022] Your spell fizzles!
