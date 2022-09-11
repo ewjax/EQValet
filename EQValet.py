@@ -164,6 +164,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('General')
         starprint('  .help          : This message')
         starprint('  .bt            : Toggle summary reports bell tone on/off')
+        starprint('  .at            : Toggle auto-archive logfiles on/off')
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
         starprint('  .save          : Force console window on screen position to be saved/remembered')

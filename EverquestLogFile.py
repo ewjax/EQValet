@@ -5,12 +5,14 @@ import re
 import asyncio
 import time
 
+import config
+
 from util import starprint
 
 
 # allow for testing, by forcing the bot to read an old log logfile
-# TEST_ELF = False
-TEST_ELF = True
+TEST_ELF = False
+# TEST_ELF = True
 
 
 class EverquestLogFile:
@@ -50,6 +52,13 @@ class EverquestLogFile:
 
         self.prevtime = time.time()
         self.heartbeat = heartbeat
+
+        # keep track of this for use in creating the archive filename
+        self.latest_eq_timestamp = ''
+
+        # use this as both the flag indicating archiving is needed, as well as the archive filename
+        self.archive_filename = None
+        self.camp5time = time.time()
 
     #
     #
@@ -311,8 +320,33 @@ class EverquestLogFile:
                 elapsed_seconds = (now - self.prevtime)
 
                 if elapsed_seconds > self.heartbeat:
+
                     starprint(f'[{self.char_name}] heartbeat over limit, elapsed seconds = {elapsed_seconds:.2f}')
                     self.prevtime = now
+
+                    # is a logfile archive needed?
+                    if self.archive_filename:
+
+                        path, logfilename = os.path.split(self.logfile_name)
+                        path, archivefilename = os.path.split(self.archive_filename)
+
+                        # do the archiving
+                        starprint('Archiving log file')
+                        starprint(f'Path:               [{path}]')
+                        starprint(f'Log filename:       [{logfilename}]')
+                        starprint(f'Archive filename:   [{archivefilename}]')
+
+                        # todo perform the rename
+                        # this step is failing because Winerror 32, other processes have the file open
+                        # how to fix?????
+                        # os.rename(self.logfile_name, self.archive_filename)
+
+                        # reset the combination archive filename and flag
+                        self.archive_filename = None
+
+                        starprint('')
+                        starprint('', '^', '*')
+                        starprint('')
 
                     # attempt to open latest log logfile - returns True if a new logfile is opened
                     if self.open_latest():
@@ -336,8 +370,37 @@ class EverquestLogFile:
         if printline:
             print(line.rstrip())
 
+        # save the EQ timestamp
+        self.latest_eq_timestamp = line[:26]
+
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
+
+        # check for .at command
+        target = r'^\.at'
+        m = re.match(target, trunc_line)
+        if m:
+            # the relevant section and key from the ini configfile
+            section = 'Everquest'
+            key = 'auto_archive'
+            archive = config.config_data.getboolean(section, key)
+
+            if archive:
+                config.config_data[section][key] = 'False'
+                onoff = 'Off'
+            else:
+                config.config_data[section][key] = 'True'
+                onoff = 'On'
+
+            # save the updated ini logfile
+            config.save()
+            starprint(f'Auto-Archive logfiles: {onoff}')
+
+        # if we are doing the auto-archive thing...
+        section = 'Everquest'
+        key = 'auto_archive'
+        if config.config_data.getboolean(section, key):
+            self.check_logfile(trunc_line)
 
         # watch for .who|.w user commands
         target = r'^(\.who )|(\.w )'
@@ -350,6 +413,83 @@ class EverquestLogFile:
         m = re.match(who_regexp, trunc_line)
         if m:
             self.who()
+
+        # was the archive flag set, but the user abort the campout?
+        if self.archive_filename:
+            # self.camp5time is set when the logfile sees the 5 seconds to go camping message
+            now = time.time()
+            elapsed_seconds = (now - self.camp5time)
+            if elapsed_seconds > 5.0:
+                # if we got here, user started a campout but aborted it, so reset the archive flag info
+                self.archive_filename = None
+                starprint('** User aborted campout process - Archiving postponed **', alignment='^')
+
+    #
+    #
+    def check_logfile(self, trunc_line: str) -> None:
+        """
+        Check to see if an archive action is needed on the logfile
+
+        Args:
+            trunc_line: current line being parsed
+        """
+
+        # watch for campout message
+        target = r'^It will take about 5 more seconds to prepare your camp'
+
+        m = re.match(target, trunc_line)
+        if m:
+
+            # set the campout timer
+            self.camp5time = time.time()
+
+            starprint('')
+            starprint('', '^', '*')
+            starprint('')
+            starprint('Archive Logfile Check', '^')
+            starprint('')
+
+            # get the size limit (MB) and convert it to bytes
+            section = 'Everquest'
+            key = 'auto_archive_size_mb'
+            size_limit = config.config_data.getfloat(section, key) * 1024 * 1024
+
+            # get log file size
+            logfile_size = 0
+            try:
+                logfile_size = os.path.getsize(self.logfile_name)
+            except FileNotFoundError:
+                pass
+
+            # split fully qualified pathname into path and filename
+            path, filename = os.path.split(self.logfile_name)
+
+            starprint(f'Logfile path:       [{path}]')
+            starprint(f'Filename:           [{filename}]')
+            starprint(f'Size limit (bytes)  [{size_limit:,.0f}]')
+            starprint(f'Size (bytes)        [{logfile_size:,.0f}]')
+
+            # over the limit?
+            if logfile_size > size_limit:
+
+                # set the archive flag / archive filename
+                starprint('')
+                starprint('Logfile needs to be archived', alignment='^')
+                starprint('This action will occur after this character camps out, plus one heartbeat check', alignment='^')
+
+                # take the standard EQ timestamp, strip off [] brackets, replace spaces with dash, replace colons with periods
+                modified_timestamp = self.latest_eq_timestamp[1:25].replace(' ', '-').replace(':', '.')
+
+                # split filename into root and extension
+                root, ext = os.path.splitext(filename)
+
+                # build the archive filename = original filename + modified EQ timestamp
+                # note that this variable serves dual purposes of a) indicating the need to do an archive, b) holding the new file name
+                self.archive_filename = path + '\\' + root + '_' + modified_timestamp + ext
+
+            starprint('')
+            starprint('', '^', '*')
+            starprint('')
 
     #
     #

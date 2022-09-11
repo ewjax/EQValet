@@ -66,6 +66,14 @@ def verify_settings() -> None:
         config_data.set(section, 'heartbeat', '15')
         modified = True
 
+    if not config_data.has_option(section, 'auto_archive'):
+        config_data.set(section, 'auto_archive', 'False')
+        modified = True
+
+    if not config_data.has_option(section, 'auto_archive_size_mb'):
+        config_data.set(section, 'auto_archive_size_mb', '10')
+        modified = True
+
     # RandomParser section
     section = 'RandomParser'
     if not config_data.has_section(section):
