@@ -1,9 +1,10 @@
 import re
 import asyncio
 
-# import the global config data
+import pywin32_bootstrap
 import win32console
 
+# import the global config data
 import config
 import _version
 

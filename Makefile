@@ -30,7 +30,7 @@ libs.clean:
 
 # exe make targets ###########################
 exe: libs
-	pyinstaller --onefile --icon data/icons/diamond.ico $(PACKAGE).py
+	pyinstaller --onefile --hidden-import win32console --icon data/icons/diamond.ico $(PACKAGE).py
 
 exe.clean: libs.clean
 	rm -rfd build
