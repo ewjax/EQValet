@@ -1663,6 +1663,12 @@ class DamageParser:
         sp = SplurtSpell(spell_name, 102, r'^(?P<target_name>[\w` ]+)\'s body begins to splurt')
         self.spell_dict[spell_name] = sp
 
+        # necro non-linear dot spell from VP staff clicky
+        spell_name = 'Soul Well'
+        sp = SplurtSpell(spell_name, 60, r'^(?P<target_name>[\w` ]+) staggers')
+        self.spell_dict[spell_name] = sp
+
+
         #
         # shaman DD spells
         #
