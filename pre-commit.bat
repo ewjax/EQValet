@@ -1,5 +1,3 @@
-bumpversion build --allow-dirty
+vbump
+git add .vbump.ini
 git add _version.py
-git add .bumpversion.cfg
-
-
