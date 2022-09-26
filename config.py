@@ -91,7 +91,7 @@ def verify_settings() -> None:
         modified = True
 
     if not config_data.has_option(section, 'spell_pending_timeout_sec'):
-        config_data.set(section, 'spell_pending_timeout_sec', '10')
+        config_data.set(section, 'spell_pending_timeout_sec', '12')
         modified = True
 
     if not config_data.has_option(section, 'combat_timeout_sec'):
