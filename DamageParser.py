@@ -987,7 +987,7 @@ class DamageParser(Parser.Parser):
                     #   pet lt_proc, or
                     #   mage fire pet DS, or
                     #   mage fire/water pet proc
-                    attacker_name = config.the_valet.char_name
+                    attacker_name = config.the_valet._char_name
                     the_pet: PetParser.Pet = config.the_valet.pet_parser.current_pet
 
                     # if this is a lifetap, assign the attacker as the pet
@@ -1133,7 +1133,7 @@ class DamageParser(Parser.Parser):
                     if not DamageParser.is_zomm(target_name):
 
                         # set the attacker name to the player name
-                        attacker_name = config.the_valet.char_name
+                        attacker_name = config.the_valet._char_name
 
                         # any damage event indicates we are in combat
                         the_target = self.get_target(target_name)
@@ -1167,7 +1167,7 @@ class DamageParser(Parser.Parser):
             #
             for targ in self.active_target_dict.values():
                 if targ.in_combat:
-                    attacker_name = config.the_valet.char_name
+                    attacker_name = config.the_valet._char_name
                     de_list = targ.incoming_damage_events_dict.get(attacker_name)
                     # for each event in the player's DE list
                     if de_list:
@@ -1223,7 +1223,7 @@ class DamageParser(Parser.Parser):
             if m:
 
                 # extract RE data
-                attacker_name = config.the_valet.char_name
+                attacker_name = config.the_valet._char_name
                 dmg_type = m.group('dmg_type')
                 target_name = m.group('target_name')
                 damage = int(m.group('damage'))

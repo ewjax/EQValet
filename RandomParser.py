@@ -456,7 +456,7 @@ class RandomParser(Parser.Parser):
                     # bell sound
                     if config.config_data.getboolean('EQValet', 'bell'):
                         print('\a')
-                    print(f'{rg.report_summary(ndx, config.the_valet.char_name)}')
+                    print(f'{rg.report_summary(ndx, config.the_valet._char_name)}')
 
         #
         # cut off the leading date-time stamp info
@@ -689,7 +689,7 @@ class RandomParser(Parser.Parser):
                 if not rg.expired:
                     rg.expired = True
                     rg.sort_descending_randoms()
-                    print(f'{rg.report_summary(n, config.the_valet.char_name)}')
+                    print(f'{rg.report_summary(n, config.the_valet._char_name)}')
 
     #
     # show a report for one specific randomgroup
@@ -706,7 +706,7 @@ class RandomParser(Parser.Parser):
 
             # get the RandomGroup at ndx
             rg: RandomGroup = self.all_random_groups[ndx]
-            reportbuffer = rg.report_detail(ndx, config.the_valet.char_name)
+            reportbuffer = rg.report_detail(ndx, config.the_valet._char_name)
             print(f'{reportbuffer}')
 
         else:
@@ -733,7 +733,7 @@ class RandomParser(Parser.Parser):
         # add the list of random events
         rg: RandomGroup
         for (ndx, rg) in enumerate(self.all_random_groups):
-            reportbuffer += f'{rg.report_summary(ndx, config.the_valet.char_name)}'
+            reportbuffer += f'{rg.report_summary(ndx, config.the_valet._char_name)}'
 
         reportbuffer += f'{"":{fill1}^{width}}\n'
 

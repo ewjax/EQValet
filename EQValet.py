@@ -47,19 +47,17 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         self.player_names_count = 0
         self.player_names_filename = 'Unknown'
 
-        # use a RandomParser class to deal with all things random numbers and rolls
-        self.random_parser = RandomParser.RandomParser()
+        # add all but PetParser
+        self.parser_list = [
+            RandomParser.RandomParser(),
+            DamageParser.DamageParser(),
+            DeathLoopParser.DeathLoopParser(),
+            ParseTarget.ParseTargetParser(),
+        ]
 
-        # use a DamageParser class to keep track of total damage dealt by spells and by pets
-        self.damage_parser = DamageParser.DamageParser()
-
-        # use a PetParser class to deal with all things pets
+        # keep a pointer to the pet parser since we need explicit access to it later
         self.pet_parser = PetParser.PetParser()
-
-        # use a DeathLoopParser class to deal with all things Deathloop
-        self.deathloop_parser = DeathLoopParser.DeathLoopParser()
-
-        self.parse_target_parser = ParseTarget.ParseTargetParser()
+        self.parser_list.append(self.pet_parser)
 
     #
     # process each line
@@ -157,23 +155,13 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         if m:
             self.who()
 
-        # check for a random
-        await self.random_parser.process_line(line)
-
-        # check for damage-related content
-        await self.damage_parser.process_line(line)
-
-        # check for pet-related content
-        await self.pet_parser.process_line(line)
-
-        # check for deathloop-related content
-        await self.deathloop_parser.process_line(line)
-
-        await self.parse_target_parser.process_line(line)
+        # sweep through the list of parsers and have them check the current line
+        for parser in self.parser_list:
+            await parser.process_line(line)
 
     def set_char_name(self, name: str) -> None:
         """
-        override base class setter function to also sweep thru list of parse targets
+        override base class setter function to also sweep through list of parse targets
         and set their parsing player names
 
         Args:
