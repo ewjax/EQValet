@@ -1,1 +1,1 @@
-.venv\Scripts\deactivate.bat
+.EQValet.venv\Scripts\deactivate.bat

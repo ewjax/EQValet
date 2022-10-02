@@ -1,6 +1,7 @@
 import re
 import copy
 
+import Parser
 import config
 from util import starprint
 
@@ -181,10 +182,11 @@ class Pet:
 #
 # class to do all the pet tracking work
 #
-class PetParser:
+class PetParser(Parser.Parser):
     """
     Class to do all the pet tracking work
     """
+    super().__init__()
 
     # type declaraations
     current_pet: Pet
@@ -193,6 +195,7 @@ class PetParser:
 
     # ctor
     def __init__(self):
+        super().__init__()
 
         # pointer to current pet
         self.current_pet = None
@@ -224,12 +227,13 @@ class PetParser:
     #
     # check for pet related items
     #
-    def process_line(self, line: str) -> None:
+    async def process_line(self, line: str) -> None:
         """
         The parse logic for this particular parser.
 
         :param line: complete line to be parsed, i.e. timestamp and content
         """
+        await super().process_line(line)
 
         # cut off the leading date-time stamp info
         trunc_line = line[27:]

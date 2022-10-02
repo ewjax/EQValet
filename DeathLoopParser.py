@@ -2,6 +2,8 @@ import re
 import os
 import signal
 from datetime import datetime
+
+import Parser
 from util import starprint
 from util import get_eqgame_pid_list
 
@@ -14,13 +16,14 @@ import config
 #
 # class to do all the damage tracking work
 #
-class DeathLoopParser:
+class DeathLoopParser(Parser.Parser):
     """
     Class to do all the damage tracking work
     """
 
     # ctor
     def __init__(self):
+        super().__init__()
 
         # list of death messages
         # this will function as a scrolling queue, with the oldest message at position 0,
@@ -46,7 +49,7 @@ class DeathLoopParser:
 
     #
     #
-    def process_line(self, line: str) -> None:
+    async def process_line(self, line: str) -> None:
         """
         This method gets called by the base class parsing thread once for each parsed line.
         We overload it here to perform our special case parsing tasks.
@@ -57,6 +60,7 @@ class DeathLoopParser:
         # check for death messages
         # check for indications the player is really not AFK
         # are we death looping?  if so, kill the process
+        await super().process_line(line)
 
         #
         # cut off the leading date-time stamp info

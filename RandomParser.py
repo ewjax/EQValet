@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 
 # import the global config data
+import Parser
 import config
 
 import util
@@ -418,7 +419,7 @@ class RandomGroup:
 #
 # Class to do all the random tracking work
 #
-class RandomParser:
+class RandomParser(Parser.Parser):
     """
     Class to do all the random tracking work
     """
@@ -429,19 +430,22 @@ class RandomParser:
         """
         RandomParser ctor
         """
+        super().__init__()
+
         # list of all random rolls, and all RandomEvents
         self.all_rolls = list()
         self.all_random_groups = list()
 
     #
     # check if a random is occurring
-    def process_line(self, line: str) -> None:
+    async def process_line(self, line: str) -> None:
         """
         This function does all the parsing work for the RandomParser class
 
         Args:
             line: current line from the EQ logfile being parsed
         """
+        await super().process_line(line)
 
         # begin by checking if any of the RandomEvents is due to expire
         rg: RandomGroup

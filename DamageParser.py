@@ -4,6 +4,7 @@ import pyperclip
 import re
 from datetime import datetime
 
+import Parser
 import PetParser
 import config
 import util
@@ -821,7 +822,7 @@ class Target:
 #
 # class to do all the damage tracking work
 #
-class DamageParser:
+class DamageParser(Parser.Parser):
     """
     Class to do all the damage tracking work
     """
@@ -829,6 +830,7 @@ class DamageParser:
 
     # ctor
     def __init__(self):
+        super().__init__()
 
         # the target that is being attacked
         # dictionary of {k:v} = {target_name, Target object}
@@ -916,13 +918,14 @@ class DamageParser:
 
     #
     #
-    def process_line(self, line: str) -> None:
+    async def process_line(self, line: str) -> None:
         """
         Check the current line for damage related items
 
         Args:
             line: complete line from the EQ logfile
         """
+        await super().process_line(line)
 
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
@@ -1190,7 +1193,6 @@ class DamageParser:
                 if spell_name in self.spell_dict:
                     self.spell_pending = self.spell_dict[spell_name]
                     self.spell_pending.event_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
-
 
             #
             # watch for melee misses by me
@@ -1667,7 +1669,6 @@ class DamageParser:
         spell_name = 'Soul Well'
         sp = SplurtSpell(spell_name, 60, r'^(?P<target_name>[\w` ]+) staggers')
         self.spell_dict[spell_name] = sp
-
 
         #
         # shaman DD spells

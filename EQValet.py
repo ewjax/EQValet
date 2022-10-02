@@ -1,10 +1,12 @@
 import re
 import asyncio
+import pickle
 
 import pywin32_bootstrap
 import win32console
 
 # import the global config data
+import ParseTarget
 import config
 import _version
 
@@ -40,6 +42,11 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         heartbeat = config.config_data.getint('Everquest', 'heartbeat')
         super().__init__(base_dir, logs_dir, heartbeat)
 
+        # set of player names
+        self.player_names_set = set()
+        self.player_names_count = 0
+        self.player_names_filename = 'Unknown'
+
         # use a RandomParser class to deal with all things random numbers and rolls
         self.random_parser = RandomParser.RandomParser()
 
@@ -51,6 +58,8 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
         # use a DeathLoopParser class to deal with all things Deathloop
         self.deathloop_parser = DeathLoopParser.DeathLoopParser()
+
+        self.parse_target_parser = ParseTarget.ParseTargetParser()
 
     #
     # process each line
@@ -109,7 +118,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         m = re.match(target, trunc_line)
         if m:
             if self.is_parsing():
-                starprint(f'Parsing character log for:    [{self.char_name}]')
+                starprint(f'Parsing character log for:    [{self._char_name}]')
                 starprint(f'Log filename:                 [{self.logfile_name}]')
                 starprint(f'Heartbeat timeout (seconds):  [{self.heartbeat}]')
             else:
@@ -136,17 +145,219 @@ class EQValet(EverquestLogFile.EverquestLogFile):
 
             starprint(f'Bell tone notification: {onoff}')
 
+        # watch for .who|.w user commands
+        target = r'^(\.who )|(\.w )'
+        m = re.match(target, trunc_line)
+        if m:
+            self.who_list()
+
+        # watch for /who in-game commands
+        who_regexp = r'^Players (in|on) EverQuest'
+        m = re.match(who_regexp, trunc_line)
+        if m:
+            self.who()
+
         # check for a random
-        self.random_parser.process_line(line)
+        await self.random_parser.process_line(line)
 
         # check for damage-related content
-        self.damage_parser.process_line(line)
+        await self.damage_parser.process_line(line)
 
         # check for pet-related content
-        self.pet_parser.process_line(line)
+        await self.pet_parser.process_line(line)
 
         # check for deathloop-related content
-        self.deathloop_parser.process_line(line)
+        await self.deathloop_parser.process_line(line)
+
+        await self.parse_target_parser.process_line(line)
+
+    def set_char_name(self, name: str) -> None:
+        """
+        override base class setter function to also sweep thru list of parse targets
+        and set their parsing player names
+
+        Args:
+            name: player whose log file is being parsed
+        """
+        super().set_char_name(name)
+
+    def set_server_name(self, server_name: str) -> None:
+        """
+        override base class setter function to open player name database
+
+        Args:
+            server_name: server name
+        """
+        # super().set_server_name(server_name)
+        self.read_player_names(server_name)
+
+    #
+    #
+    def read_player_names(self, servername) -> bool:
+        """
+        Read player names from the database logfile being maintained
+
+        Returns:
+            Boolean indicating read success/failure
+        """
+
+        # only read names if the servername has changed
+        if self._server_name != servername:
+
+            self._server_name = servername
+            self.player_names_filename = 'data/EQValet-PlayerNames_' + servername + '.dat'
+
+            # throws and exception if logfile doesn't exist
+            try:
+                f = open(self.player_names_filename, 'rb')
+                # discard current names, and reload fresh
+                self.player_names_set.clear()
+                self.player_names_set = pickle.load(f)
+                f.close()
+
+                self.player_names_count = len(self.player_names_set)
+                starprint(f'Read {self.player_names_count} player names from [{self.player_names_filename}]')
+
+                return True
+            except OSError as err:
+                print("OS error: {0}".format(err))
+                print('Unable to open logfile_name: [{}]'.format(self.player_names_filename))
+                return False
+
+    #
+    #
+    def write_player_names(self) -> bool:
+        """
+        Write player names to the database logfile being maintained
+
+        Returns:
+            Boolean indicating write success/failure
+        """
+        try:
+            f = open(self.player_names_filename, 'wb')
+            pickle.dump(self.player_names_set, f)
+            f.close()
+
+            old_count = self.player_names_count
+            new_count = len(self.player_names_set)
+            self.player_names_count = new_count
+
+            starprint(f'{new_count - old_count} new, {new_count} total player names written to [{self.player_names_filename}]')
+            return True
+
+        except OSError as err:
+            print("OS error: {0}".format(err))
+            print('Unable to open logfile_name: [{}]'.format(self.player_names_filename))
+            return False
+
+    #
+    #
+    def who_list(self) -> None:
+        """
+        Print out a full list of all names in the /who database
+        """
+        namebuffer = f'Sorted list of all player names stored in /who database: {self.player_names_filename}\n'
+        current_firstchar = None
+
+        # walk the sorted list of names
+        for name in sorted(self.player_names_set):
+
+            # check first character of current name
+            testchar = name[0]
+
+            # new first character detected
+            if testchar != current_firstchar:
+                # print current with the old first character
+                print(namebuffer)
+
+                # now reset the data and get it ready for this character
+                current_firstchar = testchar
+                namebuffer = f'\n[{current_firstchar}] Names:\n'
+                namebuffer += f'{name}, '
+
+            # same first char
+            else:
+                # just append this name to the namebuffer
+                namebuffer += f'{name}, '
+
+        # print the last namebuffer
+        print(namebuffer)
+
+    #
+    #
+    def who(self) -> None:
+        """
+        Process the list of names from an in-game /who command
+        """
+        starprint('/who detected, checking for new names to add to database')
+        processing_names = True
+        player_names_set_modified = False
+
+        # # debugging output
+        # [Sun Dec 19 20:33:44 2021] Players on EverQuest:
+        # [Sun Dec 19 20:33:44 2021] ---------------------------
+        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Aijalon
+        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yihao
+        # [Sun Dec 19 20:33:44 2021] [54 Disciple] Weth (Iksar) <Safe Space>
+        # [Sun Dec 19 20:33:44 2021] [54 Disciple] Rcva (Iksar) <Kingdom>
+        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yula  <Force of Will>
+        # [Sun Dec 19 20:33:44 2021] [57 Master] Twywu (Iksar) <Safe Space>
+        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Tenedorf  <Safe Space>
+        # [Sun Dec 19 20:33:44 2021] [60 Grave Lord] Gratton (Troll) <Force of Will>
+        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Bloodreign
+        # [Sun Dec 19 20:33:44 2021] [60 Phantasmist] Azleep (Elemental) <Force of Will>
+        # [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
+
+        # get next line - many dashes
+        self.readline()
+        # nextline = self.readline()
+        # print(nextline, end='')
+
+        # read all the name(s) in the /who report
+        while processing_names:
+
+            # get next line
+            nextline = self.readline()
+            # print(nextline, end='')
+            trunc_line = nextline[27:]
+
+            # as a safety net, just presume this is not the next name on the report
+            processing_names = False
+
+            # oddly, sometimes the name lists is preceeded by a completely blank line,
+            # usually when a /who all command has been issued
+            # this regex allows for a blank line
+            name_regexp = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w]+)|^$)'
+            m = re.match(name_regexp, trunc_line)
+            if m:
+                # since we did successfully find a name, extend the processing for another line
+                processing_names = True
+
+                # process the name.  will return None if got here via the empty ^$ line that /who all puts out
+                record = ''
+                player_name = m.group('player_name')
+                if player_name:
+                    record += player_name
+                    if player_name not in self.player_names_set:
+                        self.player_names_set.add(player_name)
+                        player_names_set_modified = True
+
+                player_level = m.group('player_level')
+                if player_level:
+                    record += ' '
+                    record += player_level
+
+                player_class = m.group('player_class')
+                if player_class:
+                    record += ' '
+                    record += player_class
+
+                # if record != '':
+                #     print(record)
+
+        # done processing /who list
+        if player_names_set_modified:
+            self.write_player_names()
 
     #
     #

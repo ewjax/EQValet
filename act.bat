@@ -1,3 +1,3 @@
-.venv\Scripts\activate.bat
+.EQValet.venv\Scripts\activate.bat
 
 

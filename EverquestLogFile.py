@@ -1,4 +1,3 @@
-import pickle
 import glob
 import os
 import re
@@ -35,15 +34,10 @@ class EverquestLogFile:
         # instance data
         self.base_directory = base_directory
         self.logs_directory = logs_directory
-        self.char_name = 'Unknown'
-        self.server_name = 'Unknown'
+        self._char_name = 'Unknown'
+        self._server_name = 'Unknown'
         self.logfile_name = 'Unknown'
         self.logfile = None
-
-        # set of player names
-        self.player_names_set = set()
-        self.player_names_count = 0
-        self.player_names_filename = 'Unknown'
 
         # are we parsing
         self._parsing = False
@@ -51,64 +45,23 @@ class EverquestLogFile:
         self.prevtime = time.time()
         self.heartbeat = heartbeat
 
-    #
-    #
-    def read_player_names(self, servername) -> bool:
+    def set_char_name(self, name: str) -> None:
         """
-        Read player names from the database logfile being maintained
+        allow derived classes to override this as necessary, to do whatever is needed when tracking toon changes
 
-        Returns:
-            Boolean indicating read success/failure
+        Args:
+            name: player whose log file is being parsed
         """
+        self._char_name = name
 
-        # only read names if the servername has changed
-        if self.server_name != servername:
-
-            self.server_name = servername
-            self.player_names_filename = 'data/EQValet-PlayerNames_' + servername + '.dat'
-
-            # throws and exception if logfile doesn't exist
-            try:
-                f = open(self.player_names_filename, 'rb')
-                # discard current names, and reload fresh
-                self.player_names_set.clear()
-                self.player_names_set = pickle.load(f)
-                f.close()
-
-                self.player_names_count = len(self.player_names_set)
-                starprint(f'Read {self.player_names_count} player names from [{self.player_names_filename}]')
-
-                return True
-            except OSError as err:
-                print("OS error: {0}".format(err))
-                print('Unable to open logfile_name: [{}]'.format(self.player_names_filename))
-                return False
-
-    #
-    #
-    def write_player_names(self) -> bool:
+    def set_server_name(self, name: str) -> None:
         """
-        Write player names to the database logfile being maintained
+        allow derived classes to override this as necessary, to do whatever is needed when server changes
 
-        Returns:
-            Boolean indicating write success/failure
+        Args:
+            name: server name
         """
-        try:
-            f = open(self.player_names_filename, 'wb')
-            pickle.dump(self.player_names_set, f)
-            f.close()
-
-            old_count = self.player_names_count
-            new_count = len(self.player_names_set)
-            self.player_names_count = new_count
-
-            starprint(f'{new_count - old_count} new, {new_count} total player names written to [{self.player_names_filename}]')
-            return True
-
-        except OSError as err:
-            print("OS error: {0}".format(err))
-            print('Unable to open logfile_name: [{}]'.format(self.player_names_filename))
-            return False
+        self._server_name = name
 
     def set_parsing(self) -> None:
         """
@@ -172,16 +125,15 @@ class EverquestLogFile:
             # stop parsing old and open the new logfile
             self.close()
 
-            self.char_name = m.group('charname')
-            self.read_player_names(m.group('servername'))
-
+            self.set_char_name(m.group('charname'))
+            self.set_server_name(m.group('servername'))
             rv = self.open(latest_file, seek_end)
 
         # if we aren't parsing any logfile, then open latest
         elif not self.is_parsing():
 
-            self.char_name = m.group('charname')
-            self.read_player_names(m.group('servername'))
+            self.set_char_name(m.group('charname'))
+            self.set_server_name(m.group('servername'))
 
             rv = self.open(latest_file, seek_end)
 
@@ -242,7 +194,7 @@ class EverquestLogFile:
 
         # already parsing?
         if self.is_parsing():
-            starprint('Already parsing character log for: [{}]'.format(self.char_name))
+            starprint('Already parsing character log for: [{}]'.format(self._char_name))
 
         else:
 
@@ -254,9 +206,10 @@ class EverquestLogFile:
                 # logfile_name = './data/test/pets.txt'
                 # logfile_name = './data/test/pets2.txt'
                 # logfile_name = './data/test/pets_long.txt'
-                logfile_name = './data/test/mage_pets_level4-29.txt'
+                # logfile_name = './data/test/mage_pets_level4-29.txt'
                 # logfile_name = './data/test/xarantik.txt'
                 # logfile_name = './data/test/fights.txt'
+                logfile_name = './data/test/test_input.txt'
 
                 # start parsing, but in this case, start reading from the beginning of the logfile,
                 # rather than the end (default)
@@ -270,13 +223,13 @@ class EverquestLogFile:
             # if the log logfile was successfully opened, then initiate parsing
             if rv:
                 # status message
-                starprint('Now parsing character log for: [{}]'.format(self.char_name))
+                starprint('Now parsing character log for: [{}]'.format(self._char_name))
 
                 # create the asyncio coroutine and kick it off
                 asyncio.create_task(self.run())
 
             else:
-                starprint('ERROR: Could not open character log logfile for: [{}]'.format(self.char_name))
+                starprint('ERROR: Could not open character log logfile for: [{}]'.format(self._char_name))
                 starprint('Log logfile_name: [{}]'.format(self.logfile_name))
 
         return rv
@@ -311,17 +264,17 @@ class EverquestLogFile:
                 elapsed_seconds = (now - self.prevtime)
 
                 if elapsed_seconds > self.heartbeat:
-                    starprint(f'[{self.char_name}] heartbeat over limit, elapsed seconds = {elapsed_seconds:.2f}')
+                    starprint(f'[{self._char_name}] heartbeat over limit, elapsed seconds = {elapsed_seconds:.2f}')
                     self.prevtime = now
 
                     # attempt to open latest log logfile - returns True if a new logfile is opened
                     if self.open_latest():
-                        starprint('Now parsing character log for: [{}]'.format(self.char_name))
+                        starprint('Now parsing character log for: [{}]'.format(self._char_name))
 
                 # if we didn't read a line, pause just for a 100 msec blink
                 await asyncio.sleep(0.1)
 
-        starprint(f'Stopped parsing character log for: [{self.char_name}]')
+        starprint(f'Stopped parsing character log for: [{self._char_name}]')
 
     async def process_line(self, line: str, printline: bool = False) -> None:
         """
@@ -335,130 +288,6 @@ class EverquestLogFile:
 
         if printline:
             print(line.rstrip())
-
-        # cut off the leading date-time stamp info
-        trunc_line = line[27:]
-
-        # watch for .who|.w user commands
-        target = r'^(\.who )|(\.w )'
-        m = re.match(target, trunc_line)
-        if m:
-            self.who_list()
-
-        # watch for /who in-game commands
-        who_regexp = r'^Players (in|on) EverQuest'
-        m = re.match(who_regexp, trunc_line)
-        if m:
-            self.who()
-
-    #
-    #
-    def who_list(self) -> None:
-        """
-        Print out a full list of all names in the /who database
-        """
-        namebuffer = f'Sorted list of all player names stored in /who database: {self.player_names_filename}\n'
-        current_firstchar = None
-
-        # walk the sorted list of names
-        for name in sorted(self.player_names_set):
-
-            # check first character of current name
-            testchar = name[0]
-
-            # new first character detected
-            if testchar != current_firstchar:
-                # print current with the old first character
-                print(namebuffer)
-
-                # now reset the data and get it ready for this character
-                current_firstchar = testchar
-                namebuffer = f'\n[{current_firstchar}] Names:\n'
-                namebuffer += f'{name}, '
-
-            # same first char
-            else:
-                # just append this name to the namebuffer
-                namebuffer += f'{name}, '
-
-        # print the last namebuffer
-        print(namebuffer)
-
-    #
-    #
-    def who(self) -> None:
-        """
-        Process the list of names from an in-game /who command
-        """
-        starprint('/who detected, checking for new names to add to database')
-        processing_names = True
-        player_names_set_modified = False
-
-        # # debugging output
-        # [Sun Dec 19 20:33:44 2021] Players on EverQuest:
-        # [Sun Dec 19 20:33:44 2021] ---------------------------
-        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Aijalon
-        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yihao
-        # [Sun Dec 19 20:33:44 2021] [54 Disciple] Weth (Iksar) <Safe Space>
-        # [Sun Dec 19 20:33:44 2021] [54 Disciple] Rcva (Iksar) <Kingdom>
-        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Yula  <Force of Will>
-        # [Sun Dec 19 20:33:44 2021] [57 Master] Twywu (Iksar) <Safe Space>
-        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Tenedorf  <Safe Space>
-        # [Sun Dec 19 20:33:44 2021] [60 Grave Lord] Gratton (Troll) <Force of Will>
-        # [Sun Dec 19 20:33:44 2021] [ANONYMOUS] Bloodreign
-        # [Sun Dec 19 20:33:44 2021] [60 Phantasmist] Azleep (Elemental) <Force of Will>
-        # [Sun Dec 19 20:33:44 2021] There are 10 players in Trakanon's Teeth.
-
-        # get next line - many dashes
-        self.readline()
-        # nextline = self.readline()
-        # print(nextline, end='')
-
-        # read all the name(s) in the /who report
-        while processing_names:
-
-            # get next line
-            nextline = self.readline()
-            # print(nextline, end='')
-            trunc_line = nextline[27:]
-
-            # as a safety net, just presume this is not the next name on the report
-            processing_names = False
-
-            # oddly, sometimes the name lists is preceeded by a completely blank line,
-            # usually when a /who all command has been issued
-            # this regex allows for a blank line
-            name_regexp = r'(^(?: AFK +)?(?:<LINKDEAD>)?\[(?P<player_level>\d+ )?(?P<player_class>[A-z ]+)\] (?P<player_name>[\w]+)|^$)'
-            m = re.match(name_regexp, trunc_line)
-            if m:
-                # since we did successfully find a name, extend the processing for another line
-                processing_names = True
-
-                # process the name.  will return None if got here via the empty ^$ line that /who all puts out
-                record = ''
-                player_name = m.group('player_name')
-                if player_name:
-                    record += player_name
-                    if player_name not in self.player_names_set:
-                        self.player_names_set.add(player_name)
-                        player_names_set_modified = True
-
-                player_level = m.group('player_level')
-                if player_level:
-                    record += ' '
-                    record += player_level
-
-                player_class = m.group('player_class')
-                if player_class:
-                    record += ' '
-                    record += player_class
-
-                # if record != '':
-                #     print(record)
-
-        # done processing /who list
-        if player_names_set_modified:
-            self.write_player_names()
 
 
 #
