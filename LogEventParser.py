@@ -5,11 +5,10 @@ import logging.handlers
 from datetime import datetime, timezone, timedelta
 
 import Parser
+import config
 
 
 # list of rsyslog (host, port) information
-import config
-
 remote_list = [
     ('192.168.1.127', 514),
     ('ec2-3-133-158-247.us-east-2.compute.amazonaws.com', 22514),
@@ -25,25 +24,6 @@ class LogEventParser(Parser.Parser):
     # ctor
     def __init__(self):
         super().__init__()
-
-        # global log_event_list
-        # self.log_event_list = log_event_list
-        # self.log_event_list = [
-        #     VesselDrozlin_Event(),
-        #     VerinaTomb_Event(),
-        #     DainFrostreaverIV_Event(),
-        #     Severilous_Event(),
-        #     CazicThule_Event(),
-        #     MasterYael_Event(),
-        #     FTE_Event(),
-        #     PlayerSlain_Event(),
-        #     Earthquake_Event(),
-        #     Random_Event(),
-        #     # CommsFilter_Event(),
-        #     Gratss_Event(),
-        #     TOD_Event(),
-        #     GMOTD_Event(),
-        # ]
 
         # set up a custom logger to use for rsyslog comms
         self.logger_list = []
@@ -65,8 +45,8 @@ class LogEventParser(Parser.Parser):
             name: player whose log file is being parsed
         """
         global log_event_list
-        for parse_target in log_event_list:
-            parse_target.parsing_player = name
+        for log_event in log_event_list:
+            log_event.parsing_player = name
 
     #
     # process each line
@@ -82,9 +62,9 @@ class LogEventParser(Parser.Parser):
         # check current line for matches in any of the list of Parser objects
         # if we find a match, then send the event report to the remote aggregator
         global log_event_list
-        for parse_target in log_event_list:
-            if parse_target.matches(line):
-                report_str = parse_target.report()
+        for log_event in log_event_list:
+            if log_event.matches(line):
+                report_str = log_event.report()
                 # print(report_str, end='')
 
                 # send the info to the remote log aggregator
@@ -99,13 +79,13 @@ class LogEventParser(Parser.Parser):
 # Notes for the developer:
 #   - derived classes constructor should correctly populate the following fields, according to whatever event this
 #     parser is watching for:
-#           self.parse_target_ID, a unique integer for each LogEvent class, to help the server side
+#           self.log_event_ID, a unique integer for each LogEvent class, to help the server side
 #           self.short_description, a text description, and
 #           self._search_list, a list of regular expression(s) that indicate this event has happened
 #   - derived classes can optionally override the _custom_match_hook() method, if special/extra parsing is needed,
 #     or if a customized self.short_description is desired.  This method gets called from inside the standard matches()
 #     method.  The default base case behavior is to simply return True.
-#           see RandomParser() class for a good example, which deals with the fact that Everquest /random events
+#           see Random_Event() class for a good example, which deals with the fact that Everquest /random events
 #           are actually reported in TWO lines of text in the log file
 #
 #   - See the example derived classes in this file to get a better idea how to set these items up
@@ -114,8 +94,8 @@ class LogEventParser(Parser.Parser):
 #     If and when the parser begins parsing a new log file, it is necessary to sweep through whatever list of LogEvent
 #     objects are being maintained, and update the self.parsing_player field in each LogEvent object, e.g. something like:
 #
-#             for parse_target in self.log_event_list:
-#                 parse_target.parsing_player = name
+#             for log_entry in self.log_event_list:
+#                 log_entry.parsing_player = name
 #
 class LogEvent:
     """
@@ -131,11 +111,10 @@ class LogEvent:
 
         # boolean for whether a LogEvent class should be checked.
         # controlled by the ini file setting
-        # self.parse = config.config_data.getboolean('LogEventParser', __class__.__name__)
         self.parse = True
 
         # modify these as necessary in child classes
-        self.parse_target_ID = 0
+        self.log_event_ID = 0
         self.short_description = 'Generic Target Name spawn!'
         self._search_list = [
             '^Generic Target Name begins to cast a spell',
@@ -252,7 +231,7 @@ class LogEvent:
         """
         rv = f'{self.eqmarker}{self.field_separator}'
         rv += f'{self.parsing_player}{self.field_separator}'
-        rv += f'{self.parse_target_ID}{self.field_separator}'
+        rv += f'{self.log_event_ID}{self.field_separator}'
         rv += f'{self.short_description}{self.field_separator}'
         rv += f'{self._utc_datetime}{self.field_separator}'
         # rv += f'{self._local_datetime}{self.field_separator}'
@@ -272,7 +251,7 @@ class VesselDrozlin_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 1
+        self.log_event_ID = 1
         self.short_description = 'Vessel Drozlin spawn!'
         self._search_list = [
             '^Vessel Drozlin begins to cast a spell',
@@ -290,7 +269,7 @@ class VerinaTomb_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 2
+        self.log_event_ID = 2
         self.short_description = 'Verina Tomb spawn!'
         self._search_list = [
             '^Verina Tomb begins to cast a spell',
@@ -308,7 +287,7 @@ class MasterYael_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 3
+        self.log_event_ID = 3
         self.short_description = 'Master Yael spawn!'
         self._search_list = [
             '^Master Yael begins to cast a spell',
@@ -326,7 +305,7 @@ class DainFrostreaverIV_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 4
+        self.log_event_ID = 4
         self.short_description = 'Dain Frostreaver IV spawn!'
         self._search_list = [
             '^Dain Frostreaver IV engages (?P<playername>[\\w ]+)!',
@@ -343,7 +322,7 @@ class Severilous_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 5
+        self.log_event_ID = 5
         self.short_description = 'Severilous spawn!'
         self._search_list = [
             '^Severilous begins to cast a spell',
@@ -361,7 +340,7 @@ class CazicThule_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 6
+        self.log_event_ID = 6
         self.short_description = 'Cazic Thule spawn!'
         self._search_list = [
             '^Cazic Thule engages (?P<playername>[\\w ]+)!',
@@ -380,7 +359,7 @@ class FTE_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 7
+        self.log_event_ID = 7
         self.short_description = 'FTE!'
         self._search_list = [
             '^(?P<target_name>[\\w ]+) engages (?P<playername>[\\w ]+)!'
@@ -402,7 +381,7 @@ class PlayerSlain_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 8
+        self.log_event_ID = 8
         self.short_description = 'Player Slain!'
         self._search_list = [
             '^You have been slain by (?P<target_name>[\\w ]+)'
@@ -416,7 +395,7 @@ class Earthquake_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 9
+        self.log_event_ID = 9
         self.short_description = 'Earthquake!'
         self._search_list = [
             '^The Gods of Norrath emit a sinister laugh as they toy with their creations'
@@ -435,7 +414,7 @@ class Random_Event(LogEvent):
         self.low = -1
         self.high = -1
         self.value = -1
-        self.parse_target_ID = 10
+        self.log_event_ID = 10
         self.short_description = 'Random!'
         self._search_list = [
             '\\*\\*A Magic Die is rolled by (?P<playername>[\\w ]+)\\.',
@@ -552,7 +531,7 @@ class CommsFilter_Event(LogEvent):
         # if we weren't interested in being able to filter only some channels, then this could
         # all be boiled down to just
         #       (?!^[\\w]+ (told|tell(s)?|say(s)?|auction(s)?|shout(s)?|-> [\\w]+:))
-        self.parse_target_ID = 11
+        self.log_event_ID = 11
         self.short_description = 'Comms Filter'
         self._search_list = [
             f'{tell_regex}{say_regex}{group_regex}{auc_regex}{ooc_regex}{shout_regex}{guild_regex}',
@@ -566,7 +545,7 @@ class Gratss_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 12
+        self.log_event_ID = 12
         self.short_description = 'Gratss'
         self._search_list = [
             ".*gratss(?i)",
@@ -583,7 +562,7 @@ class TOD_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 13
+        self.log_event_ID = 13
         self.short_description = 'TOD'
         self._search_list = [
             ".*tod(?i)",
@@ -700,7 +679,7 @@ class GMOTD_Event(LogEvent):
 
     def __init__(self):
         super().__init__()
-        self.parse_target_ID = 14
+        self.log_event_ID = 14
         self.short_description = 'GMOTD'
         self._search_list = [
             '^GUILD MOTD:',
@@ -720,7 +699,7 @@ log_event_list = [
     PlayerSlain_Event(),
     Earthquake_Event(),
     Random_Event(),
-    # CommsFilter_Event(),
+    CommsFilter_Event(),
     Gratss_Event(),
     TOD_Event(),
     GMOTD_Event(),

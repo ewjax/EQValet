@@ -60,7 +60,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         self.pet_parser = PetParser.PetParser()
         self.parser_list.append(self.pet_parser)
 
-        self.parse_target_parser = LogEvent.LogEventParser()
+        self.parse_target_parser = LogEventParser.LogEventParser()
         self.parser_list.append(self.parse_target_parser)
 
     #
@@ -158,6 +158,16 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         m = re.match(who_regexp, trunc_line)
         if m:
             self.who()
+
+        # watch for .lep command
+        target = r'^(\.log )'
+        m = re.match(target, trunc_line)
+        if m:
+            starprint('LogEvents:')
+            for log_entry in LogEventParser.log_event_list:
+                starprint(f'    {log_entry.__class__.__name__:30}: {log_entry.parse}')
+            starprint('To change these settings, edit the .ini file, then reload with the .ini command')
+
 
         # sweep through the list of parsers and have them check the current line
         for parser in self.parser_list:
@@ -371,7 +381,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('  .w or .who     : Show list of all names currently stored player names database')
         starprint('                 : Note that the database is updated every time an in-game /who occurs')
         starprint('  .save          : Force console window on screen position to be saved/remembered')
-        starprint('  .ini           : Display contents of EQValet.ini')
+        starprint('  .ini           : Reload EQValet.ini settings, and display contents')
         starprint('  .ver           : Display EQValet current version')
         starprint('Pets')
         starprint('  .pet           : Show information about current pet')
@@ -392,6 +402,9 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         starprint('  .win.W         : Set the default grouping window to W seconds')
         starprint('  .win.N.W       : Change group N to new grouping window W seconds')
         starprint('                 : All rolls are retained, and groups are combined or split up as necessary')
+        starprint('LogEvent Parsing')
+        starprint('  .log           : Show a summary of all LogEvents and their parsing status (True/False)')
+        starprint('')
         starprint('Examples:')
         starprint('  /t .rolls      : Summary of all random groups')
         starprint('  /t .roll       : Detailed report for the most recent random group')

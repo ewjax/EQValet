@@ -437,7 +437,8 @@ class RandomParser(Parser.Parser):
         self.all_rolls = list()
         self.all_random_groups = list()
 
-        self.random_parser = LogEvent.Random_Parser()
+        # use a RandomEvent_Parser to do the processing
+        self.random_event = LogEventParser.Random_Event()
 
     #
     # check if a random is occurring
@@ -569,11 +570,11 @@ class RandomParser(Parser.Parser):
             #
             # check for a random roll
             #
-            if self.random_parser.matches(line):
-                playername = self.random_parser.playername
-                value = self.random_parser.value
-                low = self.random_parser.low
-                high = self.random_parser.high
+            if self.random_event.matches(line):
+                playername = self.random_event.playername
+                value = self.random_event.value
+                low = self.random_event.low
+                high = self.random_event.high
 
                 # process data
                 # create the roll object

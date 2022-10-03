@@ -127,16 +127,17 @@ def verify_settings() -> None:
         config_data.set(section, 'seconds', '4')
         modified = True
 
-    # LogEvent section
+    # LogEventParser section
     section = 'LogEventParser'
     if not config_data.has_section(section):
         config_data.add_section(section)
         modified = True
 
-    for pt in ParseTarget.log_event_list:
-        if not config_data.has_option(section, pt.__class__.__name__):
-            config_data.set(section, pt.__class__.__name__, 'True')
+    for log_entry in LogEventParser.log_event_list:
+        if not config_data.has_option(section, log_entry.__class__.__name__):
+            config_data.set(section, log_entry.__class__.__name__, 'True')
             modified = True
+        log_entry.parse = config_data.getboolean(section, log_entry.__class__.__name__)
 
     # screen positions section
     section = 'ConsoleWindowPosition'
