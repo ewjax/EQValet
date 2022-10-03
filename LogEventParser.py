@@ -448,7 +448,7 @@ class Random_Event(LogEvent):
         return rv
 
 
-class CommsFilter_Event(LogEvent):
+class AnythingButComms_Event(LogEvent):
     """
     Parser for Comms Filter
     allows filtering on/off the various communications channels
@@ -707,7 +707,7 @@ log_event_list = [
     PlayerSlain_Event(),
     Earthquake_Event(),
     Random_Event(),
-    CommsFilter_Event(),
+    AnythingButComms_Event(),
     Gratss_Event(),
     TOD_Event(),
     GMOTD_Event(),
