@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 import logging
 import logging.handlers
@@ -27,13 +28,20 @@ class LogEventParser(Parser.Parser):
 
         # set up a custom logger to use for rsyslog comms
         self.logger_list = []
-
-        logging.basicConfig(level=logging.INFO)
-
         for (host, port) in remote_list:
             eq_logger = logging.getLogger(f'{host}:{port}')
+            eq_logger.setLevel(logging.INFO)
+
+            # create a handler for the rsyslog communications, with level INFO
             log_handler = logging.handlers.SysLogHandler(address=(host, port))
+            # log_handler.setLevel(logging.INFO)
             eq_logger.addHandler(log_handler)
+
+            # create a handler for console, and set level to 100 to ensure it is silent
+            # console_handler = logging.StreamHandler(sys.stdout)
+            # console_handler.setLevel(100)
+            # eq_logger.addHandler(console_handler)
+
             self.logger_list.append(eq_logger)
 
     def set_char_name(self, name: str) -> None:
@@ -94,8 +102,8 @@ class LogEventParser(Parser.Parser):
 #     If and when the parser begins parsing a new log file, it is necessary to sweep through whatever list of LogEvent
 #     objects are being maintained, and update the self.parsing_player field in each LogEvent object, e.g. something like:
 #
-#             for log_entry in self.log_event_list:
-#                 log_entry.parsing_player = name
+#             for log_event in self.log_event_list:
+#                 log_event.parsing_player = name
 #
 class LogEvent:
     """
@@ -112,6 +120,9 @@ class LogEvent:
         # boolean for whether a LogEvent class should be checked.
         # controlled by the ini file setting
         self.parse = True
+        # print(f'{__class__.__name__}')
+        # print(f'{self.__class__.__name__}')
+        # self.parse = config.config_data.getboolean('LogEventParser', self.__class__.__name__)
 
         # modify these as necessary in child classes
         self.log_event_ID = 0
@@ -153,7 +164,6 @@ class LogEvent:
         rv = False
 
         if self.parse:
-
             # cut off the leading date-time stamp info
             trunc_line = line[27:]
 
