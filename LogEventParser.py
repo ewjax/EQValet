@@ -1,12 +1,10 @@
 import re
-import sys
 import time
 import logging
 import logging.handlers
 from datetime import datetime, timezone, timedelta
 
 import Parser
-import config
 
 
 # list of rsyslog (host, port) information

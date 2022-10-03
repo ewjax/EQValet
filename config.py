@@ -137,6 +137,7 @@ def verify_settings() -> None:
         if not config_data.has_option(section, log_entry.__class__.__name__):
             config_data.set(section, log_entry.__class__.__name__, 'True')
             modified = True
+        # set the parse boolean for each LogEventParser to the value from the ini file
         log_entry.parse = config_data.getboolean(section, log_entry.__class__.__name__)
 
     # screen positions section
