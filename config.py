@@ -1,10 +1,11 @@
 import configparser
+
+import LogEventParser
 from util import starprint
 
 # global instance of the EQValet class
 the_valet = None
 ini_filename = 'EQValet.ini'
-
 
 # global data
 # begin by reading in the config data
@@ -125,6 +126,17 @@ def verify_settings() -> None:
     if not config_data.has_option(section, 'seconds'):
         config_data.set(section, 'seconds', '4')
         modified = True
+
+    # LogEvent section
+    section = 'LogEventParser'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+        modified = True
+
+    for pt in ParseTarget.log_event_list:
+        if not config_data.has_option(section, pt.__class__.__name__):
+            config_data.set(section, pt.__class__.__name__, 'True')
+            modified = True
 
     # screen positions section
     section = 'ConsoleWindowPosition'

@@ -8,6 +8,8 @@ import Parser
 
 
 # list of rsyslog (host, port) information
+import config
+
 remote_list = [
     ('192.168.1.127', 514),
     ('ec2-3-133-158-247.us-east-2.compute.amazonaws.com', 22514),
@@ -16,31 +18,32 @@ remote_list = [
 
 #################################################################################################
 #
-# class to do all the ParseTarget work
+# class to do all the LogEvent work
 #
-class ParseTargetParser(Parser.Parser):
+class LogEventParser(Parser.Parser):
 
     # ctor
     def __init__(self):
         super().__init__()
 
-        # create a list of parsers
-        self.parse_target_list = [
-            VesselDrozlin_Parser(),
-            VerinaTomb_Parser(),
-            DainFrostreaverIV_Parser(),
-            Severilous_Parser(),
-            CazicThule_Parser(),
-            MasterYael_Parser(),
-            FTE_Parser(),
-            PlayerSlain_Parser(),
-            Earthquake_Parser(),
-            Random_Parser(),
-            # CommsFilter_Parser(),
-            Gratss_Parser(),
-            TOD_Parser(),
-            GMOTD_Parser(),
-        ]
+        # global log_event_list
+        # self.log_event_list = log_event_list
+        # self.log_event_list = [
+        #     VesselDrozlin_Event(),
+        #     VerinaTomb_Event(),
+        #     DainFrostreaverIV_Event(),
+        #     Severilous_Event(),
+        #     CazicThule_Event(),
+        #     MasterYael_Event(),
+        #     FTE_Event(),
+        #     PlayerSlain_Event(),
+        #     Earthquake_Event(),
+        #     Random_Event(),
+        #     # CommsFilter_Event(),
+        #     Gratss_Event(),
+        #     TOD_Event(),
+        #     GMOTD_Event(),
+        # ]
 
         # set up a custom logger to use for rsyslog comms
         self.logger_list = []
@@ -61,7 +64,8 @@ class ParseTargetParser(Parser.Parser):
         Args:
             name: player whose log file is being parsed
         """
-        for parse_target in self.parse_target_list:
+        global log_event_list
+        for parse_target in log_event_list:
             parse_target.parsing_player = name
 
     #
@@ -77,7 +81,8 @@ class ParseTargetParser(Parser.Parser):
 
         # check current line for matches in any of the list of Parser objects
         # if we find a match, then send the event report to the remote aggregator
-        for parse_target in self.parse_target_list:
+        global log_event_list
+        for parse_target in log_event_list:
             if parse_target.matches(line):
                 report_str = parse_target.report()
                 # print(report_str, end='')
@@ -94,7 +99,7 @@ class ParseTargetParser(Parser.Parser):
 # Notes for the developer:
 #   - derived classes constructor should correctly populate the following fields, according to whatever event this
 #     parser is watching for:
-#           self.parse_target_ID, a unique integer for each ParseTarget class, to help the server side
+#           self.parse_target_ID, a unique integer for each LogEvent class, to help the server side
 #           self.short_description, a text description, and
 #           self._search_list, a list of regular expression(s) that indicate this event has happened
 #   - derived classes can optionally override the _custom_match_hook() method, if special/extra parsing is needed,
@@ -106,13 +111,13 @@ class ParseTargetParser(Parser.Parser):
 #   - See the example derived classes in this file to get a better idea how to set these items up
 #
 #   - IMPORTANT:  These classes make use of the self.parsing_player field to embed the character name in the report.
-#     If and when the parser begins parsing a new log file, it is necessary to sweep through whatever list of ParseTarget
-#     objects are being maintained, and update the self.parsing_player field in each ParseTarget object, e.g. something like:
+#     If and when the parser begins parsing a new log file, it is necessary to sweep through whatever list of LogEvent
+#     objects are being maintained, and update the self.parsing_player field in each LogEvent object, e.g. something like:
 #
-#             for parse_target in self.parse_target_list:
+#             for parse_target in self.log_event_list:
 #                 parse_target.parsing_player = name
 #
-class ParseTarget:
+class LogEvent:
     """
     Base class that encapsulates all information about any particular event that is detected in a logfile
     """
@@ -123,6 +128,11 @@ class ParseTarget:
         """
         constructor
         """
+
+        # boolean for whether a LogEvent class should be checked.
+        # controlled by the ini file setting
+        # self.parse = config.config_data.getboolean('LogEventParser', __class__.__name__)
+        self.parse = True
 
         # modify these as necessary in child classes
         self.parse_target_ID = 0
@@ -151,7 +161,7 @@ class ParseTarget:
     #
     def matches(self, line: str) -> bool:
         """
-        Check to see if the passed line matches the search criteria for this ParseTarget
+        Check to see if the passed line matches the search criteria for this LogEvent
 
         Args:
             line: line of text from the logfile
@@ -163,22 +173,24 @@ class ParseTarget:
         # return value
         rv = False
 
-        # cut off the leading date-time stamp info
-        trunc_line = line[27:]
+        if self.parse:
 
-        # walk through the target list and trigger list and see if we have any match
-        for trigger in self._search_list:
+            # cut off the leading date-time stamp info
+            trunc_line = line[27:]
 
-            # return value m is either None of an object with information about the RE search
-            m = re.match(trigger, trunc_line)
-            if m:
+            # walk through the target list and trigger list and see if we have any match
+            for trigger in self._search_list:
 
-                # allow for any additional logic to be applied, if needed, by derived classes
-                if self._custom_match_hook(m, line):
-                    rv = True
+                # return value m is either None of an object with information about the RE search
+                m = re.match(trigger, trunc_line)
+                if m:
 
-                    # save the matching line and set the timestamps
-                    self._set_timestamps(line)
+                    # allow for any additional logic to be applied, if needed, by derived classes
+                    if self._custom_match_hook(m, line):
+                        rv = True
+
+                        # save the matching line and set the timestamps
+                        self._set_timestamps(line)
 
         # return self.matched
         return rv
@@ -253,7 +265,7 @@ class ParseTarget:
 # Derived classes
 #
 
-class VesselDrozlin_Parser(ParseTarget):
+class VesselDrozlin_Event(LogEvent):
     """
     Parser for Vessel Drozlin spawn
     """
@@ -271,7 +283,7 @@ class VesselDrozlin_Parser(ParseTarget):
         ]
 
 
-class VerinaTomb_Parser(ParseTarget):
+class VerinaTomb_Event(LogEvent):
     """
     Parser for Verina Tomb spawn
     """
@@ -289,7 +301,7 @@ class VerinaTomb_Parser(ParseTarget):
         ]
 
 
-class MasterYael_Parser(ParseTarget):
+class MasterYael_Event(LogEvent):
     """
     Parser for Master Yael spawn
     """
@@ -307,7 +319,7 @@ class MasterYael_Parser(ParseTarget):
         ]
 
 
-class DainFrostreaverIV_Parser(ParseTarget):
+class DainFrostreaverIV_Event(LogEvent):
     """
     Parser for Dain Frostreaver IV spawn
     """
@@ -324,7 +336,7 @@ class DainFrostreaverIV_Parser(ParseTarget):
         ]
 
 
-class Severilous_Parser(ParseTarget):
+class Severilous_Event(LogEvent):
     """
     Parser for Severilous spawn
     """
@@ -342,7 +354,7 @@ class Severilous_Parser(ParseTarget):
         ]
 
 
-class CazicThule_Parser(ParseTarget):
+class CazicThule_Event(LogEvent):
     """
     Parser for Cazic Thule spawn
     """
@@ -360,7 +372,7 @@ class CazicThule_Parser(ParseTarget):
         ]
 
 
-class FTE_Parser(ParseTarget):
+class FTE_Event(LogEvent):
     """
     Parser for general FTE messages
     overrides _additional_match_logic() for additional info to be captured
@@ -383,7 +395,7 @@ class FTE_Parser(ParseTarget):
             return True
 
 
-class PlayerSlain_Parser(ParseTarget):
+class PlayerSlain_Event(LogEvent):
     """
     Parser for player has been slain
     """
@@ -397,7 +409,7 @@ class PlayerSlain_Parser(ParseTarget):
         ]
 
 
-class Earthquake_Parser(ParseTarget):
+class Earthquake_Event(LogEvent):
     """
     Parser for Earthquake
     """
@@ -411,7 +423,7 @@ class Earthquake_Parser(ParseTarget):
         ]
 
 
-class Random_Parser(ParseTarget):
+class Random_Event(LogEvent):
     """
     Parser for Random (low-high)
     overrides _additional_match_logic() for additional info to be captured
@@ -420,6 +432,9 @@ class Random_Parser(ParseTarget):
     def __init__(self):
         super().__init__()
         self.playername = None
+        self.low = -1
+        self.high = -1
+        self.value = -1
         self.parse_target_ID = 10
         self.short_description = 'Random!'
         self._search_list = [
@@ -437,17 +452,16 @@ class Random_Parser(ParseTarget):
                 self.playername = m.group('playername')
             # if m is true but doesn't have the playername group, then this represents the second line of the random dice roll event
             else:
-                low = m.group('low')
-                high = m.group('high')
-                value = m.group('value')
-                self.short_description = f'Random roll: {self.playername}, {low}-{high}, Value={value}'
-                self.playername = None
+                self.low = m.group('low')
+                self.high = m.group('high')
+                self.value = m.group('value')
+                self.short_description = f'Random roll: {self.playername}, {self.low}-{self.high}, Value={self.value}'
                 rv = True
 
         return rv
 
 
-class CommsFilter_Parser(ParseTarget):
+class CommsFilter_Event(LogEvent):
     """
     Parser for Comms Filter
     allows filtering on/off the various communications channels
@@ -545,7 +559,7 @@ class CommsFilter_Parser(ParseTarget):
         ]
 
 
-class Gratss_Parser(ParseTarget):
+class Gratss_Event(LogEvent):
     """
     Parser for gratss messages
     """
@@ -559,7 +573,7 @@ class Gratss_Parser(ParseTarget):
         ]
 
 
-class TOD_Parser(ParseTarget):
+class TOD_Event(LogEvent):
     """
     Parser for tod messages
 
@@ -679,7 +693,7 @@ class TOD_Parser(ParseTarget):
         return rv
 
 
-class GMOTD_Parser(ParseTarget):
+class GMOTD_Event(LogEvent):
     """
     Parser for GMOTD messages
     """
@@ -691,3 +705,23 @@ class GMOTD_Parser(ParseTarget):
         self._search_list = [
             '^GUILD MOTD:',
         ]
+
+
+# create a global list of parsers
+# this global list is used to toggle parsing on/off for the particular parser in the ini file
+log_event_list = [
+    VesselDrozlin_Event(),
+    VerinaTomb_Event(),
+    DainFrostreaverIV_Event(),
+    Severilous_Event(),
+    CazicThule_Event(),
+    MasterYael_Event(),
+    FTE_Event(),
+    PlayerSlain_Event(),
+    Earthquake_Event(),
+    Random_Event(),
+    # CommsFilter_Event(),
+    Gratss_Event(),
+    TOD_Event(),
+    GMOTD_Event(),
+]

@@ -512,7 +512,7 @@ class PetParser(Parser.Parser):
                 char_name = m.group('char_name')
 
                 # if a pet just declared our character as the leader...
-                if char_name == config.the_valet._char_name:
+                if char_name == config.the_valet.get_char_name():
                     reset_pet = True
 
             # reset pet method 2:  direct the pet to attack itself

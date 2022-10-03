@@ -6,7 +6,7 @@ import pywin32_bootstrap
 import win32console
 
 # import the global config data
-import ParseTarget
+import LogEventParser
 import config
 import _version
 
@@ -47,17 +47,21 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         self.player_names_count = 0
         self.player_names_filename = 'Unknown'
 
-        # add all but PetParser
+        # add some of the parsers
         self.parser_list = [
             RandomParser.RandomParser(),
             DamageParser.DamageParser(),
             DeathLoopParser.DeathLoopParser(),
-            ParseTarget.ParseTargetParser(),
         ]
+
+        # now add the rest, the ones we need a pointer to
 
         # keep a pointer to the pet parser since we need explicit access to it later
         self.pet_parser = PetParser.PetParser()
         self.parser_list.append(self.pet_parser)
+
+        self.parse_target_parser = LogEvent.LogEventParser()
+        self.parser_list.append(self.parse_target_parser)
 
     #
     # process each line
@@ -108,15 +112,15 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         target = r'^\.ini'
         m = re.match(target, trunc_line)
         if m:
-            # show the ini file
-            config.show()
+            # reload, then show the ini file
+            config.load()
 
         # check for .status command
         target = r'^\.status'
         m = re.match(target, trunc_line)
         if m:
             if self.is_parsing():
-                starprint(f'Parsing character log for:    [{self._char_name}]')
+                starprint(f'Parsing character log for:    [{self.get_char_name()}]')
                 starprint(f'Log filename:                 [{self.logfile_name}]')
                 starprint(f'Heartbeat timeout (seconds):  [{self.heartbeat}]')
             else:
@@ -168,6 +172,7 @@ class EQValet(EverquestLogFile.EverquestLogFile):
             name: player whose log file is being parsed
         """
         super().set_char_name(name)
+        self.parse_target_parser.set_char_name(name)
 
     def set_server_name(self, server_name: str) -> None:
         """
@@ -176,8 +181,10 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         Args:
             server_name: server name
         """
-        # super().set_server_name(server_name)
-        self.read_player_names(server_name)
+        # do we need to reload the player name database?
+        if server_name != self.get_server_name():
+            self.read_player_names(server_name)
+        super().set_server_name(server_name)
 
     #
     #
@@ -189,28 +196,24 @@ class EQValet(EverquestLogFile.EverquestLogFile):
             Boolean indicating read success/failure
         """
 
-        # only read names if the servername has changed
-        if self._server_name != servername:
+        self.player_names_filename = 'data/EQValet-PlayerNames_' + servername + '.dat'
 
-            self._server_name = servername
-            self.player_names_filename = 'data/EQValet-PlayerNames_' + servername + '.dat'
+        # throws and exception if logfile doesn't exist
+        try:
+            f = open(self.player_names_filename, 'rb')
+            # discard current names, and reload fresh
+            self.player_names_set.clear()
+            self.player_names_set = pickle.load(f)
+            f.close()
 
-            # throws and exception if logfile doesn't exist
-            try:
-                f = open(self.player_names_filename, 'rb')
-                # discard current names, and reload fresh
-                self.player_names_set.clear()
-                self.player_names_set = pickle.load(f)
-                f.close()
+            self.player_names_count = len(self.player_names_set)
+            starprint(f'Read {self.player_names_count} player names from [{self.player_names_filename}]')
 
-                self.player_names_count = len(self.player_names_set)
-                starprint(f'Read {self.player_names_count} player names from [{self.player_names_filename}]')
-
-                return True
-            except OSError as err:
-                print("OS error: {0}".format(err))
-                print('Unable to open logfile_name: [{}]'.format(self.player_names_filename))
-                return False
+            return True
+        except OSError as err:
+            print("OS error: {0}".format(err))
+            print('Unable to open logfile_name: [{}]'.format(self.player_names_filename))
+            return False
 
     #
     #

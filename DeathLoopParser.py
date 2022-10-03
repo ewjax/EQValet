@@ -193,7 +193,7 @@ class DeathLoopParser(Parser.Parser):
 
             # does this line contain a proof of life - communication
             # this captures tells, say, group, auction, and shout channels
-            regexp = f'^(You told|You say|You tell|You auction|You shout|{config.the_valet._char_name} ->)'
+            regexp = f'^(You told|You say|You tell|You auction|You shout|{config.the_valet.get_char_name()} ->)'
             m = re.match(regexp, trunc_line)
             if m:
                 # player is not AFK

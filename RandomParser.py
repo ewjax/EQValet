@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 
 # import the global config data
+import LogEventParser
 import Parser
 import config
 
@@ -436,6 +437,8 @@ class RandomParser(Parser.Parser):
         self.all_rolls = list()
         self.all_random_groups = list()
 
+        self.random_parser = LogEvent.Random_Parser()
+
     #
     # check if a random is occurring
     async def process_line(self, line: str) -> None:
@@ -456,7 +459,7 @@ class RandomParser(Parser.Parser):
                     # bell sound
                     if config.config_data.getboolean('EQValet', 'bell'):
                         print('\a')
-                    print(f'{rg.report_summary(ndx, config.the_valet._char_name)}')
+                    print(f'{rg.report_summary(ndx, config.the_valet.get_char_name())}')
 
         #
         # cut off the leading date-time stamp info
@@ -566,50 +569,34 @@ class RandomParser(Parser.Parser):
             #
             # check for a random roll
             #
-            target1 = '\\*\\*A Magic Die is rolled by (?P<playername>[\\w ]+)\\.'
-            target2 = '\\*\\*It could have been any number from (?P<low>[0-9]+) to (?P<high>[0-9]+), ' \
-                      'but this time it turned up a (?P<value>[0-9]+)\\.'
+            if self.random_parser.matches(line):
+                playername = self.random_parser.playername
+                value = self.random_parser.value
+                low = self.random_parser.low
+                high = self.random_parser.high
 
-            # return value m is either None of an object with information about the RE search
-            m = re.match(target1, trunc_line)
-            if m:
+                # process data
+                # create the roll object
+                roll = PlayerRandomRoll(playername, value, low, high, line)
+                starprint(f'Random: {roll.report("")}')
 
-                # fetch the player name
-                player = m.group('playername')
+                # add it to the list of all rolls
+                self.all_rolls.append(roll)
 
-                # get next line
-                line = config.the_valet.readline()
-                # print(line, end='')
-                trunc_line = line[27:]
+                added = False
+                # add it to the appropriate RandomGroup - walk the list and try to add the roll to any open randomevents
+                for rg in self.all_random_groups:
+                    if not rg.expired:
+                        if rg.add_roll(roll):
+                            added = True
+                            break
 
-                # fetch the low, high, and value numbers
-                m = re.match(target2, trunc_line)
-                if m:
-                    low = m.group('low')
-                    high = m.group('high')
-                    value = m.group('value')
-
-                    # create the roll object
-                    roll = PlayerRandomRoll(player, value, low, high, line)
-                    # starprint(f'Random: {roll.report("")}')
-
-                    # add it to the list of all rolls
-                    self.all_rolls.append(roll)
-
-                    added = False
-                    # add it to the appropriate RandomGroup - walk the list and try to add the roll to any open randomevents
-                    for rg in self.all_random_groups:
-                        if not rg.expired:
-                            if rg.add_roll(roll):
-                                added = True
-                                break
-
-                    # if the roll wasn't added, create a new RandomGroup to hold this one
-                    if not added:
-                        win = config.config_data['RandomParser']['grouping_window']
-                        rg = RandomGroup(low, high, win)
-                        rg.add_roll(roll)
-                        self.all_random_groups.append(rg)
+                # if the roll wasn't added, create a new RandomGroup to hold this one
+                if not added:
+                    win = config.config_data['RandomParser']['grouping_window']
+                    rg = RandomGroup(low, high, win)
+                    rg.add_roll(roll)
+                    self.all_random_groups.append(rg)
 
     #
     # regroup random groups with a new, different window than what the random events currently have
@@ -689,7 +676,7 @@ class RandomParser(Parser.Parser):
                 if not rg.expired:
                     rg.expired = True
                     rg.sort_descending_randoms()
-                    print(f'{rg.report_summary(n, config.the_valet._char_name)}')
+                    print(f'{rg.report_summary(n, config.the_valet.get_char_name())}')
 
     #
     # show a report for one specific randomgroup
@@ -706,7 +693,7 @@ class RandomParser(Parser.Parser):
 
             # get the RandomGroup at ndx
             rg: RandomGroup = self.all_random_groups[ndx]
-            reportbuffer = rg.report_detail(ndx, config.the_valet._char_name)
+            reportbuffer = rg.report_detail(ndx, config.the_valet.get_char_name())
             print(f'{reportbuffer}')
 
         else:
@@ -733,7 +720,7 @@ class RandomParser(Parser.Parser):
         # add the list of random events
         rg: RandomGroup
         for (ndx, rg) in enumerate(self.all_random_groups):
-            reportbuffer += f'{rg.report_summary(ndx, config.the_valet._char_name)}'
+            reportbuffer += f'{rg.report_summary(ndx, config.the_valet.get_char_name())}'
 
         reportbuffer += f'{"":{fill1}^{width}}\n'
 
