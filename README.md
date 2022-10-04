@@ -45,10 +45,11 @@ An Everquest log parsing utility that provides several helper functions for Ever
 
 ---
 
-**_log event parser_**
+**_log event tracking_**
   - 
-  - parse for a variety of different events (XXX spawn detection, XXX time of death, GRATSS messages, GMOTD messages, random rolls, and more.
-  - detection of the event will cause a message to be forwarded to a remove server (via the rsyslog system) for processing
+  - parse the Everquest log file for a variety of different events (XXX spawn detection, XXX time of death, GRATSS messages, GMOTD messages, random rolls, and more.
+  - detection of the event will cause a message to be forwarded to a remove server for processing
+  - communication to remote server is via the unix rsyslog service, configured to listen for UDP packets (set up for UDP, rather than TCP, so clients can "fire and forget" and not wait on a server reply)
  
 ####*LogEvent base class concepts*
 
@@ -56,7 +57,7 @@ The events to be parsed for are contained in the file *LogEventParser.py*, where
   - LogEvent, the base class
   - several classes which derive from LogEvent, each designed to search for one particular event or occurrence
   
-The fundamental design is for a standard Everquest log parser to read in each line from the log, and then walk the list of LogEvent objects, calling the LogEvent.matches(line) function on each, and if a match is found, to create a one-line report for each using the LogEvent.report() function:
+The fundamental design is for a standard Everquest log parser to read in each line from the log, and then walk its list of LogEvent parsing objects, calling the LogEvent.matches(line) function on each, and if a match is found, to create a one-line report for each using the LogEvent.report() function:
 ```
         # check current line for matches in any of the list of LogEvent objects
         for log_event in self.log_event_list:
@@ -70,9 +71,9 @@ The fundamental design is for a standard Everquest log parser to read in each li
 #### *Base class LogEvent.matches()*
 
 Walks the list of regular expression trigger strings contained in LogEvent._search_list, checking each for a match.  
-If a match is discovered, it then calls LogEvent._custom_match_hook() for any additional processing which may be needed for that LogEvent.
+If a match is discovered, it then calls LogEvent._custom_match_hook() for any additional processing which may be needed for that LogEvent.  Multiple regex strings are allowed, under the theory that there can be more than one way to indicate a certain event (e.g. a desired mob has spawned) has occurred.
 
-The intention is that child class constructor functions will set customized _search_list regular expressions for that particular parse target.
+The intention is that child class will derive from the base class, and in the child constructor functions will set customized _search_list regular expressions for that particular log event.
 Example base class LogEvent._search_list:
 ```
         self.short_description = 'Generic Target Name spawn!'
@@ -84,7 +85,7 @@ Example base class LogEvent._search_list:
             '^You have been slain by Generic Target Name'
         ]
 ```
-Example child class _search_list intended to watch for Vessel Drozlin spawn:
+Example child class VesselDrozlin_Event._search_list intended to watch for Vessel Drozlin spawn:
 ```
         self.short_description = 'Vessel Drozlin spawn!'
         self._search_list = [
@@ -106,7 +107,7 @@ Example child class _search_list intended to watch for FTE messages:
 #### *LogEvent._custom_match_hook()*
 Once LogEvent.matches() finds a match when checking against the _search_list of regular expression triggers, it then calls LogEvent._custom_match_hook() method.  The default behavior is simply to return True, but the intention is to allow child classes to override this function to provide any additional logic.
 
-Examples of possible uses of this function can be seen in the child classes 'FTE_Parser' and 'Random_Parser'.  In particular, FTE_Parser uses this function to capture the player name and target name in the short_description variable, and the Random_Parser class uses this function to add the logic necessary to deal with the fact that Everquest random events actually generate two lines in the log file, rather than one.
+Examples of possible uses of this function can be seen in the child classes 'FTE_Event' and 'Random_Event'.  In particular, FTE_Event uses this function to capture the player name and target name in the short_description variable, and the Random_Event class uses this function to add the logic necessary to deal with the fact that Everquest random events actually generate two lines in the log file, rather than one.
 ```
         self._search_list = [
             '\\*\\*A Magic Die is rolled by (?P<playername>[\\w ]+)\\.',
@@ -136,7 +137,7 @@ Examples of possible uses of this function can be seen in the child classes 'FTE
 #### *LogEvent.report()*
 The concept is that each match generates a single line report that contains the relevant information for this event, with fields separated by LogEvent.field_separator character (default = '|').
 
-Fields included in the report:
+Fields included in the rsyslog report:
 1. A standard marker, default 'EQ__', to assist in downstream parsing
 2. Player name
 3. An integer ID, unique to that particular type of LogEvent,  to assist in downstream sorting and processing
@@ -158,7 +159,7 @@ EQ__|Azleep|14|GMOTD|2021-03-20 02:16:48+00:00|[Fri Mar 19 19:16:48 2021] GUILD 
 #### *LogEvent child classes*
 
 Several child classes are pre-defined in LogEventParser.py, but the opportunity to create additional classes for other desired parsing targets is limited only by the imagination / need.
-The list, along with their assigned event ID values, is as shown:
+The list, along with their assigned event ID values, is as shown below.  Developers should take care to give any newly-developed XXX_Event() parsers a unique ID.
 
 ```
      1 VesselDrozlin_Event()
@@ -196,12 +197,62 @@ Some guidance to the developer for possible future event parsers:
 #   - See the example derived classes in this file to get a better idea how to set these items up
 #
 #   - IMPORTANT:  These classes make use of the self.parsing_player field to embed the character name in the report.
-#     If and when the parser begins parsing a new log file, it is necessary to sweep through whatever list of LogEvent
+#     If and when the logfile parser begins parsing a new log file, it is necessary to sweep through whatever list of LogEvent
 #     objects are being maintained, and update the self.parsing_player field in each LogEvent object, e.g. something like:
 #
-#             for log_event in self.log_event_list:
+#             for log_event in log_event_list:
 #                 log_event.parsing_player = name
 #
+```
+
+#### *Client-Server Communication*
+   
+  - On python client:  done via the SysLogHandler built into the logging standard library
+  - Uses the UDP interface (rather than TCP), so there is no reply acknowledgement required, the client can "fire and forget"
+    - Advantage: speed (no wait for TCP reply)
+    - Disadvantage: no confirmation to the client that the messages are being received by the server
+  - On the server side
+    - the unix rsyslog setup does not typically listen for TCP or UDP packets by default, that will need to be enabled and the service restarted
+    - the default port is 514, but can be configured to something else if desired
+    - the firewall will likely need that port opened for incoming traffic
+    - the default filename to receive the rsyslog messages depends on the flavor of unix being used (usually /var/log/something), but can also be configured 
+  - The client can send information to more than one rsyslog server, by adding hostname/IP address and port number to the following list of (host, port) tuples.  This example is sending the logging information to both a raspberry pi on my home network, as well as an Amazon Web Service EC2 virtual machine: 
+
+```
+# list of rsyslog (host, port) information
+remote_list = [
+    ('192.168.1.127', 514),
+    ('ec2-3-133-158-247.us-east-2.compute.amazonaws.com', 22514),
+]
+```
+
+The server should be able to listen / tail the appropriate rsyslog file, and decode it using something like:
+```
+        # parsing landmarks
+        self.field_separator = '\\|'
+        self.eqmarker = 'EQ__'
+
+        # does this line contain a EQ report?
+        target = f'^.*{self.eqmarker}{self.field_separator}'
+        target += f'(?P<charname>.+){self.field_separator}'
+        target += f'(?P<log_event_ID>.+){self.field_separator}'
+        target += f'(?P<short_desc>.+){self.field_separator}'
+        target += f'(?P<utc_timestamp_str>.+){self.field_separator}'
+        target += f'(?P<eq_log_line>.+)'
+        m = re.match(target, line)
+        if m:
+            # print(line, end='')
+            charname = m.group('charname')
+            log_event_ID = m.group('log_event_ID')
+            short_desc = m.group('short_desc')
+            eq_log_line = m.group('eq_log_line')
+
+            # convert the timestamp string into a datetime object, for use in reporting or de-duping of other reports
+            utc_timestamp_datetime = datetime.fromisoformat(m.group('utc_timestamp_str'))
+
+            # todo - do something useful with the received data, e.g. put all spawn messages in this channel, 
+            # put all TOD messages in that channel, use the UTC timestamp to de-dupe, etc
+            print(f'{charname} --- {log_event_ID} --- {short_desc} --- {utc_timestamp_datetime} --- {eq_log_line}')
 
 ```
 
