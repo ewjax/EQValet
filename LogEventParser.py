@@ -5,6 +5,7 @@ import logging.handlers
 from datetime import datetime, timezone, timedelta
 
 import Parser
+from util import starprint
 
 
 # list of rsyslog (host, port) information
@@ -65,9 +66,24 @@ class LogEventParser(Parser.Parser):
         """
         await super().process_line(line)
 
+        # the global list of log_events
+        global log_event_list
+
+        # cut off the leading date-time stamp info
+        trunc_line = line[27:]
+
+        # watch for .lep command
+        target = r'^(\.log )'
+        m = re.match(target, trunc_line)
+        if m:
+            starprint(f"    {'LogEvent':30}  {'Parse?'}")
+            starprint(f"    {'-':-<30} {'-------'}")
+            for log_event in log_event_list:
+                starprint(f'    {log_event.__class__.__name__:30}:  {log_event.parse}')
+            starprint('To change the Parse True/False settings, edit the .ini file, then reload with the .ini command')
+
         # check current line for matches in any of the list of Parser objects
         # if we find a match, then send the event report to the remote aggregator
-        global log_event_list
         for log_event in log_event_list:
             if log_event.matches(line):
                 report_str = log_event.report()
@@ -699,10 +715,10 @@ class GMOTD_Event(LogEvent):
 log_event_list = [
     VesselDrozlin_Event(),
     VerinaTomb_Event(),
+    MasterYael_Event(),
     DainFrostreaverIV_Event(),
     Severilous_Event(),
     CazicThule_Event(),
-    MasterYael_Event(),
     FTE_Event(),
     PlayerSlain_Event(),
     Earthquake_Event(),

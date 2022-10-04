@@ -159,16 +159,6 @@ class EQValet(EverquestLogFile.EverquestLogFile):
         if m:
             self.who()
 
-        # watch for .lep command
-        target = r'^(\.log )'
-        m = re.match(target, trunc_line)
-        if m:
-            starprint('LogEvents:')
-            for log_entry in LogEventParser.log_event_list:
-                starprint(f'    {log_entry.__class__.__name__:30}: {log_entry.parse}')
-            starprint('To change these settings, edit the .ini file, then reload with the .ini command')
-
-
         # sweep through the list of parsers and have them check the current line
         for parser in self.parser_list:
             await parser.process_line(line)
