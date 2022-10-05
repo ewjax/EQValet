@@ -162,20 +162,27 @@ Several child classes are pre-defined in LogEventParser.py, but the opportunity 
 The list, along with their assigned event ID values, is as shown below.  Developers should take care to give any newly-developed XXX_Event() parsers a unique ID.
 
 ```
-     1 VesselDrozlin_Event()
-     2 VerinaTomb_Event()
-     3 MasterYael_Event()
-     4 DainFrostreaverIV_Event()
-     5 Severilous_Event()
-     6 CazicThule_Event()
-     7 FTE_Event()
-     8 PlayerSlain_Event()
-     9 Earthquake_Event()
-    10 Random_Event()
-    11 AnythingButComms_Event()
-    12 Gratss_Event()
-    13 TOD_Event()
-    14 GMOTD_Event()
+# define some ID constants for the derived classes
+LOGEVENT_BASE: int = 0
+LOGEVENT_VD: int = 1
+LOGEVENT_VT: int = 2
+LOGEVENT_YAEL: int = 3
+LOGEVENT_DAIN: int = 4
+LOGEVENT_SEV: int = 5
+LOGEVENT_CT: int = 6
+LOGEVENT_FTE: int = 7
+LOGEVENT_PLAYERSLAIN: int = 8
+LOGEVENT_QUAKE: int = 9
+LOGEVENT_RANDOM: int = 10
+LOGEVENT_ABC: int = 11
+LOGEVENT_GRATSS: int = 12
+LOGEVENT_TOD: int = 13
+LOGEVENT_GMOTD: int = 14
+
+Example usage, in constructor for VesselDrozlin_Event:
+
+        self.log_event_ID = LOGEVENT_VD
+
 ```
 Some guidance to the developer for possible future event parsers:
 
