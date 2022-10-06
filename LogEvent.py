@@ -315,7 +315,7 @@ class FTE_Event(LogEvent):
     def __init__(self):
         super().__init__()
         self.log_event_ID = LOGEVENT_FTE
-        self.short_description = 'FTE!'
+        self.short_description = 'FTE'
         self._search_list = [
             '^(?P<target_name>[\\w ]+) engages (?P<playername>[\\w ]+)!'
         ]
@@ -501,7 +501,7 @@ class Gratss_Event(LogEvent):
     def __init__(self):
         super().__init__()
         self.log_event_ID = LOGEVENT_GRATSS
-        self.short_description = 'Gratss'
+        self.short_description = 'Possible Gratss sighting!'
         self._search_list = [
             ".*gratss(?i)",
         ]
@@ -518,7 +518,7 @@ class TOD_Event(LogEvent):
     def __init__(self):
         super().__init__()
         self.log_event_ID = LOGEVENT_TOD
-        self.short_description = 'TOD'
+        self.short_description = 'Possible TOD sighting!'
         self._search_list = [
             ".*tod(?i)",
             '^(?P<target_name>[\\w ]+) has been slain',
@@ -618,11 +618,13 @@ class TOD_Event(LogEvent):
         if m:
             rv = True
             # reset the description in case it has been set to something else
-            self.short_description = 'TOD'
+            self.short_description = 'Possible TOD sighting!'
             if 'target_name' in m.groupdict().keys():
                 target_name = m.group('target_name')
                 if target_name in self.known_targets:
-                    self.short_description = f'TOD (Slain Message): {target_name}'
+                    # since we saw the 'has been slain' message,
+                    # change the short description to a more definitive TOD message
+                    self.short_description = f'TOD {target_name}'
 
         return rv
 
@@ -635,7 +637,7 @@ class GMOTD_Event(LogEvent):
     def __init__(self):
         super().__init__()
         self.log_event_ID = LOGEVENT_GMOTD
-        self.short_description = 'GMOTD'
+        self.short_description = 'GMOTD!'
         self._search_list = [
             '^GUILD MOTD:',
         ]
