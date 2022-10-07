@@ -2,7 +2,7 @@ import re
 import asyncio
 import pickle
 
-import pywin32_bootstrap
+# import pywin32_bootstrap
 import win32console
 
 # import the global config data
