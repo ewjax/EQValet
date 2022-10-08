@@ -30,7 +30,7 @@ log_event_list = [
     Gratss_Event(),
     TOD_LowFidelity_Event(),
     GMOTD_Event(),
-    TOD_HighFidelity_Event
+    TOD_HighFidelity_Event(),
 ]
 
 
