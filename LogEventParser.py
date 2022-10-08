@@ -28,8 +28,9 @@ log_event_list = [
     Random_Event(),
     AnythingButComms_Event(),
     Gratss_Event(),
-    TOD_Event(),
+    TOD_LowFidelity_Event(),
     GMOTD_Event(),
+    TOD_HighFidelity_Event
 ]
 
 

@@ -176,8 +176,9 @@ LOGEVENT_QUAKE: int = 9
 LOGEVENT_RANDOM: int = 10
 LOGEVENT_ABC: int = 11
 LOGEVENT_GRATSS: int = 12
-LOGEVENT_TOD: int = 13
+LOGEVENT_TODLO: int = 13
 LOGEVENT_GMOTD: int = 14
+LOGEVENT_TODHI: int = 15
 
 Example usage, in constructor for VesselDrozlin_Event:
 
