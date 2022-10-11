@@ -127,6 +127,24 @@ def verify_settings() -> None:
         config_data.set(section, 'seconds', '4')
         modified = True
 
+    # rsyslog servers
+    section = 'rsyslog servers'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+        modified = True
+
+    if not config_data.has_option(section, 'server1'):
+        config_data.set(section, 'server1', '192.168.1.127:514')
+        modified = True
+
+    if not config_data.has_option(section, 'server2'):
+        config_data.set(section, 'server2', 'ec2-3-133-158-247.us-east-2.compute.amazonaws.com:22514')
+        modified = True
+
+    if not config_data.has_option(section, 'server3'):
+        config_data.set(section, 'server3', 'stanvern-hostname:port')
+        modified = True
+
     # LogEventParser section
     section = 'LogEventParser'
     if not config_data.has_section(section):
@@ -135,10 +153,8 @@ def verify_settings() -> None:
 
     for log_entry in LogEventParser.log_event_list:
         if not config_data.has_option(section, log_entry.__class__.__name__):
-            config_data.set(section, log_entry.__class__.__name__, 'True')
+            config_data.set(section, log_entry.__class__.__name__, 'True, server1, server2, server3')
             modified = True
-        # set the parse boolean for each LogEventParser to the value from the ini file
-        log_entry.parse = config_data.getboolean(section, log_entry.__class__.__name__)
 
     # screen positions section
     section = 'ConsoleWindowPosition'

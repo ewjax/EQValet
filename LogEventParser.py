@@ -1,16 +1,9 @@
-import logging
 import logging.handlers
 
 import Parser
+import config
 from util import starprint
 from LogEvent import *
-
-
-# list of rsyslog (host, port) information
-remote_list = [
-    ('192.168.1.127', 514),
-    ('ec2-3-133-158-247.us-east-2.compute.amazonaws.com', 22514),
-]
 
 
 # create a global list of parsers
@@ -44,23 +37,56 @@ class LogEventParser(Parser.Parser):
     def __init__(self):
         super().__init__()
 
-        # set up a custom logger to use for rsyslog comms
-        self.logger_list = []
-        for (host, port) in remote_list:
-            eq_logger = logging.getLogger(f'{host}:{port}')
-            eq_logger.setLevel(logging.INFO)
+        # set up custom loggers to use for rsyslog comms
+        self.logger_dict = {}
+        server_list = config.config_data.options('rsyslog servers')
+        for server in server_list:
+            try:
+                host_port_str = config.config_data.get('rsyslog servers', server)
+                host_port_list = host_port_str.split(':')
+                host = host_port_list[0]
+                # this will throw an exception if the port number isn't an integer
+                port = int(host_port_list[1])
+                print(f'{host}, {port}')
 
-            # create a handler for the rsyslog communications, with level INFO
-            log_handler = logging.handlers.SysLogHandler(address=(host, port))
-            # log_handler.setLevel(logging.INFO)
-            eq_logger.addHandler(log_handler)
+                # create a handler for the rsyslog communications, with level INFO
+                # this will throw an exception if host:port are nonsensical
+                log_handler = logging.handlers.SysLogHandler(address=(host, port))
 
-            # create a handler for console, and set level to 100 to ensure it is silent
-            # console_handler = logging.StreamHandler(sys.stdout)
-            # console_handler.setLevel(100)
-            # eq_logger.addHandler(console_handler)
+                eq_logger = logging.getLogger(f'{host}:{port}')
+                eq_logger.setLevel(logging.INFO)
 
-            self.logger_list.append(eq_logger)
+                # log_handler.setLevel(logging.INFO)
+                eq_logger.addHandler(log_handler)
+
+                # create a handler for console, and set level to 100 to ensure it is silent
+                # console_handler = logging.StreamHandler(sys.stdout)
+                # console_handler.setLevel(100)
+                # eq_logger.addHandler(console_handler)
+                self.logger_dict[server] = eq_logger
+
+            except ValueError:
+                pass
+
+        # print(self.logger_dict)
+
+        # now walk the list of parsers and set their logging parameters
+        for log_event in log_event_list:
+            log_settings_str = config.config_data.get('LogEventParser', log_event.__class__.__name__)
+            log_settings_list = log_settings_str.split(', ')
+
+            # the 0-th element is a true/false parse flag
+            if log_settings_list[0].lower() == 'true':
+                log_event.parse = True
+            else:
+                log_event.parse = False
+
+            # index 1 and beyond are rsyslog servers
+            for n, elem in enumerate(log_settings_list):
+                if n != 0:
+                    server = log_settings_list[n]
+                    if server in self.logger_dict.keys():
+                        log_event.add_logger(self.logger_dict[server])
 
     def set_char_name(self, name: str) -> None:
         """
@@ -91,23 +117,18 @@ class LogEventParser(Parser.Parser):
         # cut off the leading date-time stamp info
         trunc_line = line[27:]
 
-        # watch for .lep command
+        # watch for .log command
         target = r'^(\.log )'
         m = re.match(target, trunc_line)
         if m:
             starprint(f"    {'LogEvent':30}  {'Parse?'}")
             starprint(f"    {'-':-<30} {'-------'}")
             for log_event in log_event_list:
+                # starprint(f'    {log_event.__class__.__name__:30}:  {log_event.parse}: {log_event.logger_list}')
                 starprint(f'    {log_event.__class__.__name__:30}:  {log_event.parse}')
-            starprint('To change the Parse True/False settings, edit the .ini file, then reload with the .ini command')
 
         # check current line for matches in any of the list of Parser objects
         # if we find a match, then send the event report to the remote aggregator
         for log_event in log_event_list:
             if log_event.matches(line):
-                report_str = log_event.report()
-                # print(report_str, end='')
-
-                # send the info to the remote log aggregator
-                for logger in self.logger_list:
-                    logger.info(report_str)
+                log_event.log_report()
