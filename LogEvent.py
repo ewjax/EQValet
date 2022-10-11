@@ -680,7 +680,7 @@ class GMOTD_Event(LogEvent):
     def __init__(self):
         super().__init__()
         self.log_event_ID = LOGEVENT_GMOTD
-        self.short_description = 'GMOTD!'
+        self.short_description = 'GMOTD'
         self._search_list = [
             '^GUILD MOTD:',
         ]
