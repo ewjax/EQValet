@@ -47,7 +47,7 @@ class LogEventParser(Parser.Parser):
                 host = host_port_list[0]
                 # this will throw an exception if the port number isn't an integer
                 port = int(host_port_list[1])
-                print(f'{host}, {port}')
+                # print(f'{host}, {port}')
 
                 # create a handler for the rsyslog communications, with level INFO
                 # this will throw an exception if host:port are nonsensical
