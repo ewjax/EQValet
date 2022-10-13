@@ -3,6 +3,7 @@ import copy
 import pyperclip
 import re
 from datetime import datetime
+from typing import Optional
 
 import Parser
 import PetParser
@@ -826,7 +827,8 @@ class DamageParser(Parser.Parser):
     """
     Class to do all the damage tracking work
     """
-    prev_dde: DiscreteDamageEvent
+    prev_dde: Optional[DiscreteDamageEvent]
+    prev_target: Optional[Target]
 
     # ctor
     def __init__(self):
@@ -1011,7 +1013,9 @@ class DamageParser(Parser.Parser):
 
                     # if there is a spell pending, and this isn't a lt_proc, then assume that this event represents the DD component of that spell
                     if self.spell_pending:
-                        if not (the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage):
+                        if the_pet and the_pet.lifetap_pending and the_pet.my_PetLevel and the_pet.my_PetLevel.lifetap_proc == damage:
+                            pass
+                        else:
                             dmg_type = self.spell_pending.damage_type()
 
                     # add the DamageEvent

@@ -1,5 +1,6 @@
 import re
 import copy
+from typing import Optional
 
 import Parser
 import config
@@ -98,8 +99,8 @@ class Pet:
     """
 
     # type declarations
-    pet_spell: PetSpell
-    my_PetLevel: PetLevel
+    pet_spell: Optional[PetSpell]
+    my_PetLevel: Optional[PetLevel]
 
     # ctor
     def __init__(self, pet_spell: PetSpell) -> None:
@@ -188,7 +189,7 @@ class PetParser(Parser.Parser):
     """
 
     # type declaraations
-    current_pet: Pet
+    current_pet: Optional[Pet]
     all_pets: list[Pet]
     pet_dict: dict[str, PetSpell]
 
