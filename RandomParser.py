@@ -460,7 +460,8 @@ class RandomParser(Parser.Parser):
                     # bell sound
                     if config.config_data.getboolean('EQValet', 'bell'):
                         print('\a')
-                    print(f'{rg.report_summary(ndx, config.the_valet.get_char_name())}')
+                    self.random_report(ndx)
+                    # print(f'{rg.report_summary(ndx, config.the_valet.get_char_name())}')
 
         #
         # cut off the leading date-time stamp info
