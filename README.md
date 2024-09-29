@@ -271,16 +271,16 @@ EQValet makes use of a virtual python environment, and creates a standalone exec
 
 The build process is controlled via a makefile.
 
-Build steps:
+Clone repo from github to local:
 ```
 git clone git@github.com:ewjax/EQValet.git
 cd EQValet
+```
+Build steps:
+```
 make venv
-```
-Activate the python virtual environment, then continue the build process:
-```
-(unix): source .ascii-plot.venv/bin/activate
-(windows): .ascii-plot.venv\Scripts\activate
+(unix): source .EQValet.venv/bin/activate
+(windows): .EQValet.venv\Scripts\activate
 make all
 Executable will be placed in ./dist subdirectory
 ```
