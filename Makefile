@@ -7,8 +7,8 @@ venv:
 	python -m venv .$(PACKAGE).venv
 
 venv.clean:
-	rm -rfd .$(PACKAGE)venv
-
+	#rm /s /x /r /q .$(PACKAGE)venv
+	rm -rfd .$(PACKAGE).venv
 
 
 ##############################################################################
