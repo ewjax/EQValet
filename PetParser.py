@@ -871,7 +871,14 @@ class PetParser(Parser.Parser):
         pet_spell = PetSpell('Frenzied Spirit', 'Shaman', caster_level=49, pet_level_list=pet_level_list.copy())
         self.pet_dict[pet_spell.spell_name] = pet_spell
 
-        # todo need shaman 55 pet
+        pet_level_list.clear()
+        pet_level_list.append(PetLevel(rank=1, pet_level=35, max_melee=45, max_bashkick=22, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=2, pet_level=36, max_melee=47, max_bashkick=23, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=3, pet_level=37, max_melee=49, max_bashkick=23, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=4, pet_level=38, max_melee=51, max_bashkick=24, max_backstab=0, lt_proc=0))
+        pet_level_list.append(PetLevel(rank=5, pet_level=39, max_melee=52, max_bashkick=24, max_backstab=0, lt_proc=0, desc='Max'))
+        pet_spell = PetSpell('Spirit of the Howler', 'Shaman', caster_level=55, pet_level_list=pet_level_list.copy())
+        self.pet_dict[pet_spell.spell_name] = pet_spell
 
         #
         # Mage pets
