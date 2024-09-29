@@ -265,3 +265,30 @@ The server should be able to listen / tail the appropriate rsyslog file, and dec
 ```
 
 ---
+
+**_Build and Installation Steps:_**
+-
+EQValet makes use of a virtual python environment, and creates a standalone executable, which can be copied to a local directory for use.
+
+The build process is controlled via a makefile.
+
+Build steps:
+```
+git clone git@github.com:ewjax/EQValet.git
+cd EQValet
+make venv
+```
+Activate the python virtual environment, then continue the build process:
+```
+(unix): source .ascii-plot.venv/bin/activate
+(windows): .ascii-plot.venv\Scripts\activate
+make all
+Executable will be placed in ./dist subdirectory
+```
+Cleanup steps:
+```
+(while still in the python virtual environment): 
+make clean
+deactivate
+make venv.clean
+```
