@@ -127,6 +127,16 @@ def verify_settings() -> None:
         config_data.set(section, 'seconds', '4')
         modified = True
 
+    # WhoParser section
+    section = 'WhoParser'
+    if not config_data.has_section(section):
+        config_data.add_section(section)
+        modified = True
+
+    if not config_data.has_option(section, 'parse'):
+        config_data.set(section, 'parse', 'True')
+        modified = True
+
     # rsyslog servers
     section = 'rsyslog servers'
     if not config_data.has_section(section):
