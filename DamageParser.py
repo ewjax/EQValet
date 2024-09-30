@@ -109,11 +109,11 @@ class DamageEvent:
 #################################################################################################
 
 #
-# class for a one-time occurence of damage
+# class for a one-time occurrence of damage
 #
 class DiscreteDamageEvent(DamageEvent):
     """
-    Class for a one-time occurence of damage
+    Class for a one-time occurrence of damage
     """
 
     # ctor
@@ -324,7 +324,7 @@ class DotSpell(DamageEvent):
             rv = True
         return rv
 
-    # overload funciton to allow object to print() to screen in sensible manner, for debugging with print()
+    # overload function to allow object to print() to screen in sensible manner, for debugging with print()
     def __repr__(self) -> str:
         return '({}, {}, {}, {}, {}, {}, {}, {}, {})'.format(self.attacker_name,
                                                              self.target_name,
