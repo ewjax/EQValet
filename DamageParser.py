@@ -1055,7 +1055,7 @@ class DamageParser(Parser.Parser):
                     # extract RE data
                     target_name = m.group('target_name')
                     # ensure slain target was not a player and was not a pet
-                    if (target_name not in config.the_valet.player_names_set) and (target_name not in self.pet_names_set):
+                    if (target_name not in config.the_valet.who_parser.player_names_set) and (target_name not in self.pet_names_set):
                         # save for exp message comparison
                         self.slain_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                         self.end_combat(target_name, line)
@@ -1265,7 +1265,7 @@ class DamageParser(Parser.Parser):
                 if not DamageParser.is_zomm(target_name):
 
                     # the case where the Mob is attacking YOU, or a Player, or any pet
-                    if (target_name == 'YOU') or (target_name in config.the_valet.player_names_set) or (target_name in self.pet_names_set):
+                    if (target_name == 'YOU') or (target_name in config.the_valet.who_parser.player_names_set) or (target_name in self.pet_names_set):
 
                         # any damage event indicates we are in combat
                         the_target = self.get_target(attacker_name)
