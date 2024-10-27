@@ -1066,7 +1066,7 @@ class DamageParser(Parser.Parser):
                 if m:
                     # extract RE data
                     target_name = m.group('target_name')
-                    if target_name not in config.the_valet.player_names_set:
+                    if target_name not in config.the_valet.who_parser.player_names_set:
                         # save for exp message comparison
                         self.slain_datetime = datetime.strptime(line[0:26], '[%a %b %d %H:%M:%S %Y]')
                         self.end_combat(target_name, line)
